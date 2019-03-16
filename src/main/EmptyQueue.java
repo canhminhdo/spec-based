@@ -1,3 +1,4 @@
+package main;
 public class EmptyQueue<E> implements Queue<E> {
 	
     public EmptyQueue() {
@@ -15,4 +16,8 @@ public class EmptyQueue<E> implements Queue<E> {
     
     public Queue<E> dequeue() { return this; }
     public Queue<E> duptop() { return this; }
+    
+    public String toString() {
+    	return "empty";
+    }
 }

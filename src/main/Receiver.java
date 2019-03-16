@@ -1,3 +1,4 @@
+package main;
 import java.util.*;
 
 public class Receiver<P> extends Thread {

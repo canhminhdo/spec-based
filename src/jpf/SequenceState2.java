@@ -26,7 +26,7 @@ import main.Cell;
 import main.Channel;
 import main.Pair;
 
-public class SequenceState extends ListenerAdapter {
+public class SequenceState2 extends ListenerAdapter {
 	
 	private static final int DEPTH = 20;
 	private static final String TXT_EXT = "dot";
@@ -39,10 +39,61 @@ public class SequenceState extends ListenerAdapter {
 	private static int STARTUP = 1;
 	private Map<String,Integer> lookupTable = new HashMap<String,Integer>();
 	
-	public SequenceState(Config conf, JPF jpf) {
+	private static final String[] observers = {"channel1","channel2","packetsToBeSent","packetsReceived","finish","flag1","flag2"};
+
+	public SequenceState2(Config conf, JPF jpf) {
 		VM vm = jpf.getVM();
 		vm.recordSteps(true);
 		out = System.out;
+	}
+
+	/**
+	 * VM is about to execute the next instruction
+	 */
+	@Override
+	public void executeInstruction(VM vm, ThreadInfo currentThread, Instruction instructionToExecute) {
+//		Logger.log("executeInstruction");
+		out.print(">");
+//		Logger.log(instructionToExecute.getMnemonic());
+	}
+
+	/**
+	 * VM has executed the next instruction
+	 */
+	@Override
+	public void instructionExecuted(VM vm, ThreadInfo currentThread, Instruction nextInstruction,
+			Instruction executedInstruction) {
+//		Logger.log("executedInstruction");
+		out.print("<" + vm.getSearch().getStateId());
+	}
+
+	/**
+	 * a new ChoiceGenerator was set, which means we are at the beginning of a new
+	 * transition.
+	 *
+	 * NOTE - this notification happens before the KernelState is stored, i.e.
+	 * listeners are NOT allowed to alter the KernelState (e.g. by changing field
+	 * values or thread states)
+	 */
+	@Override
+	public void choiceGeneratorSet(VM vm, ChoiceGenerator<?> newCG) {
+		Logger.log("choiceGeneratorSet");
+		Object[] all = newCG.getAllChoices();
+		for(Object e : all) {
+			Logger.log(e);
+		}
+	}
+
+	/**
+	 * the next choice was requested from a previously registered ChoiceGenerator
+	 *
+	 * NOTE - this notification happens before the KernelState is stored, i.e.
+	 * listeners are NOT allowed to alter the KernelState (e.g. by changing field
+	 * values or thread states)
+	 */
+	@Override
+	public void choiceGeneratorAdvanced(VM vm, ChoiceGenerator<?> currentCG) {
+//		Logger.log("choiceGeneratorAdvanced");
 	}
 
 	/**
@@ -53,26 +104,40 @@ public class SequenceState extends ListenerAdapter {
 	 */
 	@Override
 	public void stateAdvanced(Search search) {
-		if (SequenceState.STARTUP == 1) {
-			SequenceState.STARTUP ++;
+		if (SequenceState2.STARTUP == 1) {
+			SequenceState2.STARTUP ++;
 			startup(search.getVM());
 		}
 		getConfiguration(search);
-		if (search.getDepth() > DEPTH)
-			search.terminate();
-		
-		if (search.isNewState()) {
-			
-		} else {
-			
-		}
+		System.exit(0);
+//		if (search.isNewState()) {
+//			VM vm = search.getVM();
+//			Heap heap = vm.getHeap();
+//			int depth = search.getDepth();
+//			if (depth > DEPTH)
+//				search.terminate();
+//		} else {
+//			Logger.log("TESTING");
+//		}
+	}
+
+	@Override
+	public void stateProcessed(Search search) {
+		// nothing to do
 	}
 
 	@Override
 	public void stateBacktracked(Search search) {
 		search.getVM().breakTransition("DONE");
+//		Logger.log("stateBacktracked");
+//		int depth = search.getDepth();
+//		Logger.log(depth);
 	}
 
+	@Override
+	public void stateRestored(Search search) {
+//		Logger.log("stateRestored");
+	}
 
 	@Override
 	public void searchStarted(Search search) {
@@ -111,11 +176,96 @@ public class SequenceState extends ListenerAdapter {
 		Logger.info("-----------");
 	}
 	
+	private void printHeap(VM vm) {
+		Heap heap = vm.getHeap();
+		Iterable<ElementInfo> iterElementInfo = heap.liveObjects();
+		for (ElementInfo ei : iterElementInfo) {
+			// ElementInfo describes an element of memory containing the field values of a class or an object
+			Logger.log(ei.getObjectRef() + " - " + ei.getClassInfo().getName());
+		}
+	}
+	
 	private void startup(VM vm) {
 		for (ElementInfo ei : vm.getHeap().liveObjects()) {
 			String name = ei.getClassInfo().getName();
 			if (name.contains("Sender") || name.contains("Receiver")) {
 				lookupTable.put(name, ei.getObjectRef());
+//				FieldInfo[] fis = ei.getClassInfo().getInstanceFields();
+//				for (FieldInfo fi : fis) {
+//					
+//					// flag1 -> done
+//					if (fi.getName().equals("flag1")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_flag1 = (ElementInfo)fi.getValueObject(ei.getFields());
+//							Boolean flag1 = getFlag(ei_flag1);
+//							Logger.log(flag1);
+//						}
+//					}
+//					
+//					// flag2 -> done
+//					if (fi.getName().equals("flag2")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_flag2 = (ElementInfo)fi.getValueObject(ei.getFields());
+//							Boolean flag2 = getFlag(ei_flag2);
+//							Logger.log(flag2);
+//						}
+//					}
+//					
+//					// finish -> done
+//					if (fi.getName().equals("finish")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_finish = (ElementInfo)fi.getValueObject(ei.getFields());
+//							Cell<Boolean> finish = getFinish(ei_finish);
+//							Logger.log(finish);
+//						}
+//					}
+//					
+//					// packetsToBeSent -> done
+//					if (fi.getName().equals("packetsToBeSent")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_packetsToBeSent = (ElementInfo)fi.getValueObject(ei.getFields());
+//							ArrayList<String> sentPackets = getPacketsToBeSent(vm, ei_packetsToBeSent);
+//							Logger.log(sentPackets);
+//						}
+//					}
+//					
+//					// packetsReceived -> done
+//					if (fi.getName().equals("packetsReceived")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_packetsReceived = (ElementInfo)fi.getValueObject(ei.getFields());
+//							ArrayList<String> recPackets = getPacketsReceived(vm, ei_packetsReceived);
+//							Logger.log(recPackets);
+//						}
+//					}
+//					
+//					// channel2 -> done
+//					if (fi.getName().equals("channel2")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_channel2 = (ElementInfo)fi.getValueObject(ei.getFields());
+//							// int nop = ei_channel2.getIntField("nop");
+//							int bound = ei_channel2.getIntField("bound");
+//							ElementInfo ei_queue = (ElementInfo) ei_channel2.getFieldValueObject("queue");
+//							Channel<Boolean> ch2 = getChannelBoolean(ei_queue, bound);
+//							Logger.log(ch2.toString());
+//						}
+//					}
+//					
+//					// channel 1 -> done
+//					if (fi.getName().equals("channel1")) {
+//						if (fi.isReference()) {
+//							ElementInfo ei_channel1 = (ElementInfo)fi.getValueObject(ei.getFields());
+//							// int nop = ei_channel1.getIntField("nop");
+//							int bound = ei_channel1.getIntField("bound");
+//							ElementInfo ei_queue = (ElementInfo) ei_channel1.getFieldValueObject("queue");
+//							Channel<Pair<String,Boolean>> ch1 = getChannelPair(ei_queue, bound);
+//							Logger.log(ch1.toString());
+//						}
+//					}
+//					
+//					if (Arrays.stream(observers).anyMatch(fi.getName()::equals)) {
+//						putToLookupTable(ei, fi);
+//					}
+//				}
 			}
 		}
 		showLookupTable();
@@ -137,42 +287,47 @@ public class SequenceState extends ListenerAdapter {
 						ElementInfo ei_flag1 = (ElementInfo)fi.getValueObject(ei.getFields());
 						Boolean flag1 = getFlag(ei_flag1);
 						config.setFlag1(flag1);
+//						Logger.log("flag1 = " + flag1);
 						break;
 					case "finish":
 						// finish -> done
 						ElementInfo ei_finish = (ElementInfo)fi.getValueObject(ei.getFields());
 						Cell<Boolean> finish = getFinish(ei_finish);
 						config.setFinish(finish);
+//						Logger.log("finish = " + finish);
 						break;
 					case "packetsToBeSent":
 						// packetsToBeSent -> done
 						ElementInfo ei_packetsToBeSent = (ElementInfo)fi.getValueObject(ei.getFields());
 						ArrayList<String> packetsToBeSent = getPacketsToBeSent(search.getVM(), ei_packetsToBeSent);
 						config.setPacketsToBeSent(packetsToBeSent);
+//						Logger.log("packetsToBeSent = " + sentPackets);
 					case "channel2":
 						// channel2 -> done
 						ElementInfo ei_channel2 = (ElementInfo)fi.getValueObject(ei.getFields());
 						if (ei_channel2.getClassInfo().getInstanceField("bound") == null) {
-							// TODO :: channel2 is empty
+							Logger.log("channel2 = empty");
 						} else {
 							// int nop = ei_channel2.getIntField("nop");
 							int bound = ei_channel2.getIntField("bound");
 							ElementInfo ei_queue = (ElementInfo) ei_channel2.getFieldValueObject("queue");
 							Channel<Boolean> channel2 = getChannelBoolean(ei_queue, bound);
 							config.setChannel2(channel2);
+//							Logger.log("channel2 = " + channel2.toString());
 						}
 						break;
 					case "channel1":
 						// channel 1 -> done
 						ElementInfo ei_channel1 = (ElementInfo)fi.getValueObject(ei.getFields());
 						if (ei_channel1.getClassInfo().getInstanceField("bound") == null) {
-							// TODO :: channel1 is empty
+							Logger.log("channel1 = empty");
 						} else {
 							// int nop = ei_channel1.getIntField("nop");
 							int bound = ei_channel1.getIntField("bound");
 							ElementInfo ei_queue = (ElementInfo) ei_channel1.getFieldValueObject("queue");
 							Channel<Pair<String,Boolean>> channel1 = getChannelPair(ei_queue, bound);
 							config.setChannel1(channel1);
+//							Logger.log("channel1 = " + channel1.toString());
 						}
 					default:
 						break;
@@ -190,6 +345,7 @@ public class SequenceState extends ListenerAdapter {
 						ElementInfo ei_flag2 = (ElementInfo)fi.getValueObject(ei.getFields());
 						Boolean flag2 = getFlag(ei_flag2);
 						config.setFlag2(flag2);
+//						Logger.log("flag2 = " + flag2);
 						break;
 					
 					case "packetsReceived":
@@ -197,6 +353,7 @@ public class SequenceState extends ListenerAdapter {
 						ElementInfo ei_packetsReceived = (ElementInfo)fi.getValueObject(ei.getFields());
 						ArrayList<String> packetsReceived = getPacketsReceived(search.getVM(), ei_packetsReceived);
 						config.setPacketsReceived(packetsReceived);
+						Logger.log("packetsReceived = " + packetsReceived);
 					default:
 						break;
 				}
@@ -286,5 +443,14 @@ public class SequenceState extends ListenerAdapter {
 		ElementInfo ei_element = (ElementInfo) ei_finish.getFieldValueObject("element");
 		NamedFields nf_element = (NamedFields) ei_element.getFields();
 		return new Cell<Boolean>(nf_element.getBooleanValue(0));
+	}
+	
+	private void putToLookupTable(ElementInfo ei, FieldInfo fi) {
+		if (fi.isReference()) {
+			ElementInfo _ei = (ElementInfo) fi.getValueObject(ei.getFields());
+			if (_ei != null)
+				if (!lookupTable.containsKey(fi.getName()))
+					lookupTable.put(fi.getName(),_ei.getObjectRef());
+		}
 	}
 }

@@ -1,3 +1,4 @@
+package main;
 public class NeQueue<E> implements Queue<E> {
     private E head;
     private Queue<E> tail;
@@ -27,5 +28,9 @@ public class NeQueue<E> implements Queue<E> {
     public NeQueue<E> duptop() {
         NeQueue<E> q = new NeQueue<E>(head,tail);
         return new NeQueue<E>(head,q);
+    }
+    
+    public String toString() {
+    	return head.toString() + " | " +  tail.toString();
     }
 }

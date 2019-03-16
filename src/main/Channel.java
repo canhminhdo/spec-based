@@ -1,3 +1,4 @@
+package main;
 public class Channel<P> {
     private Queue<P> queue;
     private final int bound;
@@ -32,5 +33,9 @@ public class Channel<P> {
         queue = queue.duptop();
         nop++;
         return queue.top();
+    }
+    
+    public String toString() {
+    	return queue.toString();
     }
 }

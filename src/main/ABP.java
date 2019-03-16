@@ -1,9 +1,17 @@
+package main;
 import java.util.*;
 
 public class ABP<P> {
     public void begin(Collection<P> sentPackets, Collection<P> recPackets, int bound) throws InterruptedException {
         Channel<Pair<P,Boolean>> ch1 = new Channel<Pair<P,Boolean>>(bound);
         Channel<Boolean> ch2 = new Channel<Boolean>(bound);
+        
+//        ch2.put(false);
+//        ch2.put(true);
+//        Iterator<P> iter = sentPackets.iterator();
+//        ch1.put(new Pair<P, Boolean>(iter.next(), true));
+//        ch1.put(new Pair<P, Boolean>(iter.next(), false));
+        
         Cell<Boolean> f = new Cell<Boolean>(false);
         Sender<P> sender = new Sender<P>(ch1,ch2,sentPackets,f);
         Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f);

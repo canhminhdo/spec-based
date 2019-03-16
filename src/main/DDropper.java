@@ -1,3 +1,4 @@
+package main;
 public class DDropper<P,B> extends Thread {
     private Channel<P> channel1;
     private Channel<B> channel2;

@@ -1,3 +1,4 @@
+package main;
 public class Dropper<P> extends Thread {
     private Channel<P> channel;
     private Cell<Boolean> finish;
