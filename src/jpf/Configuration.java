@@ -110,8 +110,8 @@ public class Configuration<P> {
 
 	@Override
 	public String toString() {
-		return "Configuration [channel1=" + channel1 + ", channel2=" + channel2 + ", packetsToBeSent=" + packetsToBeSent
-				+ ", packetsReceived=" + packetsReceived + ", finish=" + finish + ", flag1=" + flag1 + ", flag2="
-				+ flag2 + ", stateId=" + stateId + ", deep=" + deep + "]";
+		return "(stateId=" + stateId + ", deep=" + deep + ", channel1=" + channel1 + ", channel2=" + channel2 
+				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
+				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ")";
 	}
 }
