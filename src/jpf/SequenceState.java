@@ -1,11 +1,14 @@
 package jpf;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 
 import gov.nasa.jpf.Config;
@@ -28,23 +31,36 @@ import main.Pair;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 20;
-	private static final String TXT_EXT = "dot";
+	private static final int DEPTH = 10;
+	private static final String TXT_EXT = "txt";
 	private static final String OUT_FILENAME_NO_EXT = "jpf-sequence-state";
 
 	private BufferedWriter graph;
 	private String out_filename = OUT_FILENAME_NO_EXT + "." + TXT_EXT;
-	private PrintStream out;
 	
 	private static int STARTUP = 1;
 	private Map<String,Integer> lookupTable = new HashMap<String,Integer>();
+	private Node<Configuration<String>> root;
+	private Node<Configuration<String>> lastNode;
 	
 	public SequenceState(Config conf, JPF jpf) {
-		VM vm = jpf.getVM();
-		vm.recordSteps(true);
-		out = System.out;
+		root = new Node<Configuration<String>>();
+		lastNode = root;
 	}
-
+	
+	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq) throws IOException {
+		seq.add(node.getData());
+		if (node.isLeaf()) {
+			// Ending -> print sequence of state here
+			graph.write(seq.toString());
+			graph.newLine();
+		} else {
+			for (Node<Configuration<String>> child : node.getChildren()) {
+				try_seq(child, seq);
+			}
+		}
+	}
+	
 	/**
 	 * got the next state
 	 * 
@@ -57,22 +73,18 @@ public class SequenceState extends ListenerAdapter {
 			SequenceState.STARTUP ++;
 			startup(search.getVM());
 		}
-		getConfiguration(search);
-		if (search.getDepth() > DEPTH)
-			search.terminate();
+		Configuration<String> config = getConfiguration(search);
+		lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
 		
-		if (search.isNewState()) {
-			
-		} else {
-			
+		if (search.getDepth() > DEPTH) {
+			search.requestBacktrack();
 		}
 	}
 
 	@Override
 	public void stateBacktracked(Search search) {
-		search.getVM().breakTransition("DONE");
+		lastNode = lastNode.getParent();
 	}
-
 
 	@Override
 	public void searchStarted(Search search) {
@@ -85,14 +97,17 @@ public class SequenceState extends ListenerAdapter {
 	@Override
 	public void searchFinished(Search search) {
 		try {
+			Logger.log("Start writing to file: " +  out_filename);
+			try_seq(root, new ArrayList<Configuration<String>>());
 			endGraph();
+			Logger.log("Finished !!!");
 		} catch (IOException e) {
 		}
 	}
 
 	private void beginGraph() throws IOException {
 		graph = new BufferedWriter(new FileWriter(out_filename));
-		graph.write("digraph jpf_sequence_state {");
+		graph.write("jpf_sequence_states {");
 		graph.newLine();
 	}
 
@@ -121,7 +136,7 @@ public class SequenceState extends ListenerAdapter {
 		showLookupTable();
 	}
 	
-	private void getConfiguration(Search search) {
+	private Configuration<String> getConfiguration(Search search) {
 		Configuration<String> config = new Configuration<String>();
 		config.setStateId(search.getStateId());
 		config.setDeep(search.getDepth());
@@ -202,7 +217,7 @@ public class SequenceState extends ListenerAdapter {
 				}
 			}
 		}
-		Logger.log(config);
+		return config;
 	}
 	
 	private void showFieldInfos(ElementInfo ei) {
