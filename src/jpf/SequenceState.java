@@ -1,14 +1,9 @@
 package jpf;
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 
 import gov.nasa.jpf.Config;
@@ -16,14 +11,11 @@ import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.CharArrayFields;
-import gov.nasa.jpf.vm.ChoiceGenerator;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.Heap;
-import gov.nasa.jpf.vm.Instruction;
 import gov.nasa.jpf.vm.NamedFields;
 import gov.nasa.jpf.vm.ReferenceArrayFields;
-import gov.nasa.jpf.vm.ThreadInfo;
 import gov.nasa.jpf.vm.VM;
 import main.Cell;
 import main.Channel;
@@ -31,7 +23,10 @@ import main.Pair;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 10;
+	private static final int DEPTH = 1000;
+	private static final int BOUND = 10;
+	private static int COUNT = 0;
+	private static int PRINT_COUNT = 0;
 	private static final String TXT_EXT = "txt";
 	private static final String OUT_FILENAME_NO_EXT = "jpf-sequence-state";
 
@@ -54,6 +49,8 @@ public class SequenceState extends ListenerAdapter {
 			// Ending -> print sequence of state here
 			graph.write(seq.toString());
 			graph.newLine();
+			PRINT_COUNT ++;
+			Logger.log(PRINT_COUNT);
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
 				try_seq(child, seq);
@@ -74,10 +71,24 @@ public class SequenceState extends ListenerAdapter {
 			startup(search.getVM());
 		}
 		Configuration<String> config = getConfiguration(search);
-		lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
-		
-		if (search.getDepth() > DEPTH) {
+		if (config == null) {
+			// Finish program
 			search.requestBacktrack();
+			COUNT ++;
+		} else {
+			lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
+			if (search.isEndState() || !search.isNewState()) {
+				// End state or is not new state. JPF will back track
+				COUNT ++;
+			} if (search.getDepth() >= DEPTH) {
+				// current depth is greater than DEPTH, back track
+				search.requestBacktrack();
+				COUNT ++;
+			}
+		}
+		if (COUNT >= BOUND) {
+			// terminate when number of sequence of states reach to BOUND
+			search.terminate();
 		}
 	}
 
@@ -144,6 +155,9 @@ public class SequenceState extends ListenerAdapter {
 		{
 			// Sender
 			ElementInfo ei = heap.get(lookupTable.get("main.Sender"));
+			if (ei == null) {
+				return null;
+			}
 			FieldInfo[] fis = ei.getClassInfo().getInstanceFields();
 			for (FieldInfo fi : fis) {
 				switch (fi.getName()) {
@@ -197,6 +211,9 @@ public class SequenceState extends ListenerAdapter {
 		{
 			// Receiver
 			ElementInfo ei = heap.get(lookupTable.get("main.Receiver"));
+			if (ei == null) {
+				return null;
+			}
 			FieldInfo[] fis = ei.getClassInfo().getInstanceFields();
 			for (FieldInfo fi : fis) {
 				switch (fi.getName()) {

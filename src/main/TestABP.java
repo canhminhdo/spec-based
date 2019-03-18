@@ -19,8 +19,8 @@ public class TestABP {
         // abp.begin(list1,list2,2);
         abp.begin(list1,list2,1);
         
-        System.out.println("Packets sent: " + list1);
-        System.out.println("Packets rec: " + list2);
+//        System.out.println("Packets sent: " + list1);
+//        System.out.println("Packets rec: " + list2);
         assert list1.equals(list2);
     }
 }
