@@ -44,7 +44,8 @@ public class SequenceState extends ListenerAdapter {
 	}
 	
 	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq) throws IOException {
-		seq.add(node.getData());
+		if (!node.isRoot())
+			seq.add(node.getData());
 		if (node.isLeaf()) {
 			// Ending -> print sequence of state here
 			graph.write(seq.toString());
