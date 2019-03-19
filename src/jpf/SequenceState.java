@@ -24,7 +24,7 @@ import main.Pair;
 public class SequenceState extends ListenerAdapter {
 	
 	private static final int DEPTH = 1000;
-	private static final int BOUND = 10;
+	private static final int BOUND = 100;
 	private static int COUNT = 0;
 	private static int PRINT_COUNT = 0;
 	private static final String TXT_EXT = "txt";
@@ -50,8 +50,8 @@ public class SequenceState extends ListenerAdapter {
 			// Ending -> print sequence of state here
 			graph.write(seq.toString());
 			graph.newLine();
-			PRINT_COUNT ++;
-			Logger.log(PRINT_COUNT);
+//			PRINT_COUNT ++;
+//			Logger.log(PRINT_COUNT);
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
 				try_seq(child, seq);
@@ -72,10 +72,15 @@ public class SequenceState extends ListenerAdapter {
 			startup(search.getVM());
 		}
 		Configuration<String> config = getConfiguration(search);
+//		if (search.getDepth() > 10) {
+//			showHeap(search.getVM());
+//			search.terminate();
+//		}
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();
 			COUNT ++;
+			Logger.log("Hit to end of program");
 		} else {
 			lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
 			if (search.isEndState() || !search.isNewState()) {
@@ -146,6 +151,14 @@ public class SequenceState extends ListenerAdapter {
 			}
 		}
 		showLookupTable();
+	}
+	
+	private void showHeap(VM vm) {
+		for (ElementInfo ei : vm.getHeap().liveObjects()) {
+			String name = ei.getClassInfo().getName();
+			Logger.log(name + "-" + ei.getObjectRef());
+			showFieldInfos(ei);
+		}
 	}
 	
 	private Configuration<String> getConfiguration(Search search) {
