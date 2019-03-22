@@ -16,14 +16,14 @@ public class Configuration<P> {
     private Boolean flag1;
     private Boolean flag2;
     private int stateId;
-    private int deep;
+    private int depth;
     
 	public Configuration() {
 		
 	}
 
 	public Configuration(Channel<Pair<P, Boolean>> channel1, Channel<Boolean> channel2, Collection<P> packetsToBeSent,
-			Collection<P> packetsReceived, Cell<Boolean> finish, Boolean flag1, Boolean flag2, int stateId, int deep) {
+			Collection<P> packetsReceived, Cell<Boolean> finish, Boolean flag1, Boolean flag2, int stateId, int depth) {
 		super();
 		this.channel1 = channel1;
 		this.channel2 = channel2;
@@ -33,7 +33,7 @@ public class Configuration<P> {
 		this.flag1 = flag1;
 		this.flag2 = flag2;
 		this.stateId = stateId;
-		this.deep = deep;
+		this.depth = depth;
 	}
 
 	public Channel<Pair<P, Boolean>> getChannel1() {
@@ -100,17 +100,17 @@ public class Configuration<P> {
 		this.stateId = stateId;
 	}
 
-	public int getDeep() {
-		return deep;
+	public int getDepth() {
+		return depth;
 	}
 
-	public void setDeep(int deep) {
-		this.deep = deep;
+	public void setDepth(int depth) {
+		this.depth = depth;
 	}
 
 	@Override
 	public String toString() {
-		return "(stateId=" + stateId + ", deep=" + deep + ", channel1=" + channel1 + ", channel2=" + channel2 
+		return "(stateId=" + stateId + ", depth=" + depth + ", channel1=" + channel1 + ", channel2=" + channel2 
 				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
 				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ")";
 	}

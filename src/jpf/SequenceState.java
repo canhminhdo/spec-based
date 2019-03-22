@@ -72,15 +72,10 @@ public class SequenceState extends ListenerAdapter {
 			startup(search.getVM());
 		}
 		Configuration<String> config = getConfiguration(search);
-//		if (search.getDepth() > 10) {
-//			showHeap(search.getVM());
-//			search.terminate();
-//		}
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();
 			COUNT ++;
-			Logger.log("Hit to end of program");
 		} else {
 			lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
 			if (search.isEndState() || !search.isNewState()) {
@@ -101,6 +96,7 @@ public class SequenceState extends ListenerAdapter {
 	@Override
 	public void stateBacktracked(Search search) {
 		lastNode = lastNode.getParent();
+		Logger.log("Backtrack at stateID = " + search.getStateId() + ", depth = " + search.getDepth());
 	}
 
 	@Override
@@ -164,7 +160,7 @@ public class SequenceState extends ListenerAdapter {
 	private Configuration<String> getConfiguration(Search search) {
 		Configuration<String> config = new Configuration<String>();
 		config.setStateId(search.getStateId());
-		config.setDeep(search.getDepth());
+		config.setDepth(search.getDepth());
 		Heap heap = search.getVM().getHeap();
 		{
 			// Sender
@@ -294,15 +290,17 @@ public class SequenceState extends ListenerAdapter {
 	}
 	
 	private ArrayList<String> getPacketsReceived(VM vm, ElementInfo ei_packetsReceived) {
-		ElementInfo ei_a = (ElementInfo) ei_packetsReceived.getFieldValueObject("a");
+		ElementInfo ei_elementData = (ElementInfo) ei_packetsReceived.getFieldValueObject("elementData");
 		ArrayList<String> packetsReceived = new ArrayList<String>();
-		if (ei_a != null) {
-			ReferenceArrayFields raf = (ReferenceArrayFields) ei_a.getArrayFields();
+		if (ei_elementData != null) {
+			ReferenceArrayFields raf = (ReferenceArrayFields) ei_elementData.getArrayFields();
 			for (int i : (int[])raf.getValues()) {
-				ElementInfo ei_rf = vm.getHeap().get(i);
-				ElementInfo ei_value = (ElementInfo) ei_rf.getFieldValueObject("value");
-				CharArrayFields caf = (CharArrayFields) ei_value.getArrayFields();
-				packetsReceived.add(String.valueOf((char[])caf.getValues()));
+				if (i > 0) {
+					ElementInfo ei_rf = vm.getHeap().get(i);
+					ElementInfo ei_value = (ElementInfo) ei_rf.getFieldValueObject("value");
+					CharArrayFields caf = (CharArrayFields) ei_value.getArrayFields();
+					packetsReceived.add(String.valueOf((char[])caf.getValues()));
+				}
 			}
 		}
 		return packetsReceived;
