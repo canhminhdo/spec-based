@@ -72,6 +72,11 @@ public class SequenceState extends ListenerAdapter {
 			startup(search.getVM());
 		}
 		Configuration<String> config = getConfiguration(search);
+//		if (config != null) {
+//			if (config.getFinish().get()) {
+//				Logger.log("FINISH = TRUE");
+//			}
+//		}
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();
