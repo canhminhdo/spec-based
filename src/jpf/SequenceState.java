@@ -23,10 +23,10 @@ import main.Pair;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 100;
-	private static final int BOUND = 100;
+	private static final int DEPTH = 10000;
+	private static final int BOUND = 10000;
 	private static boolean DEPTH_FLAG = true;
-	private static boolean BOUND_FLAG = false;
+	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;
 	private static int PRINT_COUNT = 0;
 	private static final String TXT_EXT = "txt";
@@ -79,12 +79,13 @@ public class SequenceState extends ListenerAdapter {
 			COUNT ++;
 		} else {
 			lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
-			COUNT ++;
 			if (search.isEndState() || !search.isNewState()) {
 				// End state or is not new state (visited state). JPF will back track automatically
+				COUNT ++;
 			} if (DEPTH_FLAG && search.getDepth() >= DEPTH) {
 				// current depth is greater than DEPTH, back track
 				search.requestBacktrack();
+				COUNT ++;
 			}
 		}
 		if (BOUND_FLAG && COUNT >= BOUND) {
