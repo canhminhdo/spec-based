@@ -23,8 +23,10 @@ import main.Pair;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 1000;
+	private static final int DEPTH = 100;
 	private static final int BOUND = 100;
+	private static boolean DEPTH_FLAG = true;
+	private static boolean BOUND_FLAG = false;
 	private static int COUNT = 0;
 	private static int PRINT_COUNT = 0;
 	private static final String TXT_EXT = "txt";
@@ -50,8 +52,7 @@ public class SequenceState extends ListenerAdapter {
 			// Ending -> print sequence of state here
 			graph.write(seq.toString());
 			graph.newLine();
-//			PRINT_COUNT ++;
-//			Logger.log(PRINT_COUNT);
+			PRINT_COUNT ++;
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
 				try_seq(child, seq);
@@ -72,27 +73,21 @@ public class SequenceState extends ListenerAdapter {
 			startup(search.getVM());
 		}
 		Configuration<String> config = getConfiguration(search);
-//		if (config != null) {
-//			if (config.getFinish().get()) {
-//				Logger.log("FINISH = TRUE");
-//			}
-//		}
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();
 			COUNT ++;
 		} else {
 			lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
+			COUNT ++;
 			if (search.isEndState() || !search.isNewState()) {
-				// End state or is not new state. JPF will back track
-				COUNT ++;
-			} if (search.getDepth() >= DEPTH) {
+				// End state or is not new state (visited state). JPF will back track automatically
+			} if (DEPTH_FLAG && search.getDepth() >= DEPTH) {
 				// current depth is greater than DEPTH, back track
 				search.requestBacktrack();
-				COUNT ++;
 			}
 		}
-		if (COUNT >= BOUND) {
+		if (BOUND_FLAG && COUNT >= BOUND) {
 			// terminate when number of sequence of states reach to BOUND
 			search.terminate();
 		}
@@ -101,7 +96,7 @@ public class SequenceState extends ListenerAdapter {
 	@Override
 	public void stateBacktracked(Search search) {
 		lastNode = lastNode.getParent();
-		Logger.log("Backtrack at stateID = " + search.getStateId() + ", depth = " + search.getDepth());
+//		Logger.log("Backtrack at stateID = " + search.getStateId() + ", depth = " + search.getDepth());
 	}
 
 	@Override
@@ -131,6 +126,8 @@ public class SequenceState extends ListenerAdapter {
 
 	private void endGraph() throws IOException {
 		graph.write("}");
+		graph.newLine();
+		graph.write("Number of sequence of states is " + PRINT_COUNT);
 		graph.newLine();
 		graph.close();
 	}
