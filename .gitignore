@@ -8,3 +8,4 @@ bin/
 *.ucls
 *~
 *.txt
+*.maude

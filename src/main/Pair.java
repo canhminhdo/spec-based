@@ -12,6 +12,6 @@ public class Pair<E1,E2> {
     public E2 second() { return elt2; }
 
     public String toString() {
-        return "<d(" + elt1 + ")," + elt2 + ">";
+        return "< d(" + elt1 + ")," + elt2 + " >";
     }
 }

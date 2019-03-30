@@ -23,17 +23,17 @@ import main.Pair;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 10000;
+	private static final int DEPTH = 1000;
 	private static final int BOUND = 100;
 	private static boolean DEPTH_FLAG = true;
 	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;
 	private static int PRINT_COUNT = 0;
-	private static final String TXT_EXT = "txt";
-	private static final String OUT_FILENAME_NO_EXT = "jpf-sequence-state";
+	private static final String MAUDE_EXT = "maude";
+	private static final String OUT_FILENAME_NO_EXT = "env-data";
 
 	private BufferedWriter graph;
-	private String out_filename = OUT_FILENAME_NO_EXT + "." + TXT_EXT;
+	private String out_filename = OUT_FILENAME_NO_EXT + "." + MAUDE_EXT;
 	
 	private static int STARTUP = 1;
 	private Map<String,Integer> lookupTable = new HashMap<String,Integer>();
@@ -50,14 +50,28 @@ public class SequenceState extends ListenerAdapter {
 			seq.add(node.getData());
 		if (node.isLeaf()) {
 			// Ending -> print sequence of state here
-			graph.write(seq.toString());
-			graph.newLine();
+			graph.write(seqToString(seq) + " , ");
 			PRINT_COUNT ++;
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
 				try_seq(child, seq);
 			}
 		}
+	}
+	
+	public String seqToString(ArrayList<Configuration<String>> seq) {
+		if (seq.size() == 0) {
+			return "nil";
+		}
+		StringBuffer sb = new StringBuffer();
+		sb.append("(");
+		sb.append(seq.get(0));
+		for (int i = 1; i < seq.size(); i ++) {
+			sb.append(" | ");
+			sb.append(seq.get(i));
+		}
+		sb.append(" | nil)");
+		return sb.toString();
 	}
 	
 	/**
@@ -121,15 +135,23 @@ public class SequenceState extends ListenerAdapter {
 
 	private void beginGraph() throws IOException {
 		graph = new BufferedWriter(new FileWriter(out_filename));
-		graph.write("jpf_sequence_states {");
+		graph.write("mod ENV-DATA is");
 		graph.newLine();
+		graph.write("pr ENV-CONFIG .");
+		graph.newLine();
+		graph.write("op data : -> ListSeqABP .");
+		graph.newLine();
+		graph.write("op size : -> Nat .");
+		graph.newLine();
+		graph.write("eq data = ");
 	}
 
 	private void endGraph() throws IOException {
-		graph.write("}");
+		graph.write(" empty .");
 		graph.newLine();
-		graph.write("Number of sequence of states is " + PRINT_COUNT);
+		graph.write("eq size = " + PRINT_COUNT + " .");
 		graph.newLine();
+		graph.write("endm");
 		graph.close();
 	}
 	
