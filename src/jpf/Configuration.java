@@ -114,4 +114,8 @@ public class Configuration<P> {
 				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
 				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ")";
 	}
+	
+	public String getOBs() {
+		return "";
+	}
 }
