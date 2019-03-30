@@ -24,7 +24,7 @@ import main.Pair;
 public class SequenceState extends ListenerAdapter {
 	
 	private static final int DEPTH = 10000;
-	private static final int BOUND = 10000;
+	private static final int BOUND = 100;
 	private static boolean DEPTH_FLAG = true;
 	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;
@@ -179,6 +179,11 @@ public class SequenceState extends ListenerAdapter {
 						ElementInfo ei_flag1 = (ElementInfo)fi.getValueObject(ei.getFields());
 						Boolean flag1 = getFlag(ei_flag1);
 						config.setFlag1(flag1);
+						break;
+					case "index":
+						// index -> done
+						int index = ei.getIntField(fi);
+						config.setIndex(index);
 						break;
 					case "finish":
 						// finish -> done

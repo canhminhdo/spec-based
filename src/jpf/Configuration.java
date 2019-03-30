@@ -1,6 +1,7 @@
 package jpf;
 
 import java.util.Collection;
+import java.util.List;
 
 import main.Cell;
 import main.Channel;
@@ -9,6 +10,7 @@ import main.Pair;
 public class Configuration<P> {
 	
 	private Channel<Pair<P,Boolean>> channel1;
+	private int index;
     private Channel<Boolean> channel2;
     private Collection<P> packetsToBeSent;
     private Collection<P> packetsReceived;
@@ -34,6 +36,14 @@ public class Configuration<P> {
 		this.flag2 = flag2;
 		this.stateId = stateId;
 		this.depth = depth;
+	}
+
+	public int getIndex() {
+		return index;
+	}
+
+	public void setIndex(int index) {
+		this.index = index;
 	}
 
 	public Channel<Pair<P, Boolean>> getChannel1() {
@@ -110,12 +120,39 @@ public class Configuration<P> {
 
 	@Override
 	public String toString() {
-		return "(stateId=" + stateId + ", depth=" + depth + ", channel1=" + channel1 + ", channel2=" + channel2 
-				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
-				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ")";
+		return getObserverComponents();
+//		return "(stateId=" + stateId + ", depth=" + depth + ", channel1=" + channel1 + ", channel2=" + channel2 
+//				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
+//				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ", index=" + index + ")";
 	}
 	
-	public String getOBs() {
-		return "";
+	public String getAbpData() {
+		return "d(" + ((List<P>)packetsToBeSent).get(index) + ")";
+	}
+	
+	public String getAbpBuf() {
+		if (packetsReceived.size() == 0) {
+			return "nil";
+		}
+		StringBuffer sb = new StringBuffer();
+		sb.append("(");
+		sb.append("d(" + ((List<P>)packetsReceived).get(0) + ")");
+		for (int i = 1; i < packetsReceived.size(); i ++) {
+			sb.append(" | ");
+			sb.append("d(" + ((List<P>)packetsReceived).get(i) + ")");
+		}
+		sb.append(" | nil)");
+		return sb.toString();
+	}
+	
+	public String getObserverComponents() {
+		return "{" +
+					"abp-sb: " + flag1 +
+					" abp-data: " + getAbpData() +
+					" abp-dc: " + channel1 +
+					" abp-ac: " + channel2 +
+					" abp-rb: " + flag2 +
+					" abp-buf: " + getAbpBuf() +
+			   "}";
 	}
 }

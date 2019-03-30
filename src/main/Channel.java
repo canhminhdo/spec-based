@@ -36,6 +36,9 @@ public class Channel<P> {
     }
     
     public String toString() {
-    	return queue.toString();
+    	if (nop == 0) {
+    		return queue.toString();
+    	}
+    	return "(" + queue.toString() + ")";
     }
 }

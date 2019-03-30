@@ -7,6 +7,7 @@ public class Sender<P> extends Thread {
     private Collection<P> packetsToBeSent;
     private Cell<Boolean> finish;
     private Boolean flag1 = true;
+    private int index = 0;
 
     public Sender(Channel<Pair<P,Boolean>> ch1,
                   Channel<Boolean> ch2,
@@ -19,8 +20,11 @@ public class Sender<P> extends Thread {
     }
 
     public void run() {
-        for (P p : packetsToBeSent) {
-            Pair<P,Boolean> pr = new Pair<P,Boolean>(p,flag1);
+    	for (int i = 0; i < packetsToBeSent.size(); i ++) {
+    		synchronized(this) {
+            	index = i;
+            }
+    		Pair<P,Boolean> pr = new Pair<P,Boolean>(((List<P>)packetsToBeSent).get(i),flag1);
             while (true) {
                 channel1.put(pr);
                 /*
@@ -38,7 +42,7 @@ public class Sender<P> extends Thread {
                     }
                 }
             }
-        }
+    	}
         finish.set(true);
         /*
         System.out.println("Sender has sent all packets!");

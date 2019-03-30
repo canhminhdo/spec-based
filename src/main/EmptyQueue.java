@@ -18,6 +18,6 @@ public class EmptyQueue<E> implements Queue<E> {
     public Queue<E> duptop() { return this; }
     
     public String toString() {
-    	return "empty";
+    	return "nil";
     }
 }
