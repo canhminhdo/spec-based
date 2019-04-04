@@ -23,8 +23,8 @@ import main.Pair;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 1000;
-	private static final int BOUND = 100;
+	private static final int DEPTH = 10000;
+	private static final int BOUND = 1000;
 	private static boolean DEPTH_FLAG = true;
 	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;
@@ -51,6 +51,7 @@ public class SequenceState extends ListenerAdapter {
 		if (node.isLeaf()) {
 			// Ending -> print sequence of state here
 			graph.write(seqToString(seq) + " , ");
+			graph.newLine();
 			PRINT_COUNT ++;
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
@@ -90,6 +91,7 @@ public class SequenceState extends ListenerAdapter {
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();
+			Logger.log("Finish program at " + search.getDepth());
 			COUNT ++;
 		} else {
 			lastNode = lastNode.addChild(new Node<Configuration<String>>(config));
