@@ -163,12 +163,12 @@ public class Configuration<P> {
 	
 	public String getObserverComponents() {
 		return "{" +
-					"abp-sb: " + flag1 +
-					" abp-data: " + getAbpData() +
-					" abp-dc: " + channel1 +
-					" abp-ac: " + channel2 +
-					" abp-rb: " + flag2 +
-					" abp-buf: " + getAbpBuf() +
+					"sb: " + flag1 +
+					" data: " + getAbpData() +
+					" dc: " + channel1 +
+					" ac: " + channel2 +
+					" rb: " + flag2 +
+					" buf: " + getAbpBuf() +
 			   "}";
 	}
 }
