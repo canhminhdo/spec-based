@@ -54,7 +54,7 @@ public class SequenceState extends ListenerAdapter {
 				if (!lastElement.equals(node.getData())) {
 					seq.add(node.getData());
 				} else {
-					Logger.log("Duplicated !!!");
+//					Logger.log("Duplicated !!!");
 				}
 			}
 		}
