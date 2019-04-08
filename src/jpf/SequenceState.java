@@ -151,7 +151,7 @@ public class SequenceState extends ListenerAdapter {
 		graph.newLine();
 		graph.write("pr ENV-CONFIG .");
 		graph.newLine();
-		graph.write("op data : -> ListSeqABP .");
+		graph.write("op data : -> ListSeq .");
 		graph.newLine();
 		graph.write("op size : -> Nat .");
 		graph.newLine();
