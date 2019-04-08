@@ -40,4 +40,17 @@ public class Channel<P> {
     		return queue.toString();
     	return "(" + queue.toString() + ")";
     }
+    
+    public Queue<P> getQueue() {
+		return queue;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		Channel<P> other = (Channel<P>) obj;
+		return this.getQueue().equals(other.getQueue()); 
+	}
 }

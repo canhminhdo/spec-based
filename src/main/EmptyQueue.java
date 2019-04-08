@@ -20,4 +20,15 @@ public class EmptyQueue<E> implements Queue<E> {
     public String toString() {
     	return "nil";
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj instanceof NeQueue) {
+			return false;
+		}
+		return true;
+	}
 }

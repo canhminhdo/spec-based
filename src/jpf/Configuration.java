@@ -10,15 +10,15 @@ import main.Pair;
 public class Configuration<P> {
 	
 	private Channel<Pair<P,Boolean>> channel1;
-	private int index;
+	private Integer index;
     private Channel<Boolean> channel2;
     private Collection<P> packetsToBeSent;
     private Collection<P> packetsReceived;
     private Cell<Boolean> finish;
     private Boolean flag1;
     private Boolean flag2;
-    private int stateId;
-    private int depth;
+    private Integer stateId;
+    private Integer depth;
     
 	public Configuration() {
 		
@@ -36,6 +36,22 @@ public class Configuration<P> {
 		this.flag2 = flag2;
 		this.stateId = stateId;
 		this.depth = depth;
+	}
+	
+	
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		Configuration<P> other = (Configuration<P>) obj;
+		return index.equals(other.getIndex()) &&  
+				flag1.equals(other.getFlag1()) &&
+				flag2.equals(other.getFlag2()) &&
+				finish.equals(other.getFinish()) && 
+				packetsReceived.equals(other.getPacketsReceived()) &&
+				channel1.equals(other.getChannel1()) &&
+				channel2.equals(other.getChannel2());
 	}
 
 	public int getIndex() {

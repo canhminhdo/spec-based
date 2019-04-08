@@ -14,4 +14,15 @@ public class Pair<E1,E2> {
     public String toString() {
         return "< d(" + elt1 + ")," + elt2 + " >";
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		Pair<E1,E2> other = (Pair<E1,E2>) obj;
+		return first().equals(other.first()) && second().equals(other.second());
+	}
+    
+    
 }

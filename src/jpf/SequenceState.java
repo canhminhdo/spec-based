@@ -46,8 +46,18 @@ public class SequenceState extends ListenerAdapter {
 	}
 	
 	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq) throws IOException {
-		if (!node.isRoot())
-			seq.add(node.getData());
+		if (!node.isRoot()) {
+			if (seq.isEmpty()) {
+				seq.add(node.getData());
+			} else {
+				Configuration<String> lastElement = seq.get(seq.size() - 1);
+				if (!lastElement.equals(node.getData())) {
+					seq.add(node.getData());
+				} else {
+					Logger.log("Duplicated !!!");
+				}
+			}
+		}
 		if (node.isLeaf()) {
 			// Ending -> print sequence of state here
 			graph.write(seqToString(seq) + " , ");

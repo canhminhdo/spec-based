@@ -33,4 +33,17 @@ public class NeQueue<E> implements Queue<E> {
     public String toString() {
     	return head.toString() + " | " +  tail.toString();
     }
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (obj instanceof EmptyQueue) {
+			return false;
+		}
+		NeQueue<E> other = (NeQueue<E>) obj;
+		return top().equals(other.top()) && dequeue().equals(other.dequeue());
+	}
+	
 }
