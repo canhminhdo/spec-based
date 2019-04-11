@@ -122,8 +122,15 @@ public class SequenceState extends ListenerAdapter {
 
 	@Override
 	public void stateBacktracked(Search search) {
-		lastNode = lastNode.getParent();
+		while (lastNode.getData() != null && lastNode.getData().getStateId() != search.getStateId()) {
+			lastNode = lastNode.getParent();
+		}
 //		Logger.log("Backtrack at stateID = " + search.getStateId() + ", depth = " + search.getDepth());
+	}
+	
+	@Override
+	public void stateRestored(Search search) {
+		Logger.log("State restored");
 	}
 
 	@Override
