@@ -20,11 +20,14 @@ import gov.nasa.jpf.vm.VM;
 import main.Cell;
 import main.Channel;
 import main.Pair;
+import model.TestCase;
+import service.AdapterData;
+import service.TestCaseService;
 
 public class SequenceState extends ListenerAdapter {
 	
 	private static final int DEPTH = 10000;
-	private static final int BOUND = 1000;
+	private static final int BOUND = 30;
 	private static boolean DEPTH_FLAG = true;
 	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;
@@ -43,10 +46,14 @@ public class SequenceState extends ListenerAdapter {
 	public SequenceState(Config conf, JPF jpf) {
 		root = new Node<Configuration<String>>();
 		lastNode = root;
+		if (!TestCaseService.truncate()) {
+			Logger.error("Can't truncate `test_cases` table");
+		}
 	}
 	
-	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq) throws IOException {
+	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq, ArrayList<TestCase> list) throws IOException {
 		if (!node.isRoot()) {
+			list.add(convert(node.getData()));
 			if (seq.isEmpty()) {
 				seq.add(node.getData());
 			} else {
@@ -54,7 +61,7 @@ public class SequenceState extends ListenerAdapter {
 				if (!lastElement.equals(node.getData())) {
 					seq.add(node.getData());
 				} else {
-//					Logger.log("Duplicated !!!");
+					// Duplicated !!!
 				}
 			}
 		}
@@ -63,11 +70,35 @@ public class SequenceState extends ListenerAdapter {
 			graph.write(seqToString(seq) + " , ");
 			graph.newLine();
 			PRINT_COUNT ++;
+			
+			// save to database here
+			if (TestCaseService.insertBatch(list, PRINT_COUNT)) {
+				// Insert done
+			} else {
+				Logger.error("Can't insert");
+			}
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
-				try_seq(child, seq);
+				try_seq(child, seq, list);
 			}
 		}
+	}
+	
+	public TestCase convert(Configuration<String> config) {
+		TestCase testCase = new TestCase();
+		
+		testCase.setStateId(config.getStateId());
+		testCase.setDepth(config.getDepth());
+		testCase.setPacketsToBeSent(config.getPacketsToBeSent().toString());
+		testCase.setPacketsReceived(config.getAbpBuf());
+		testCase.setChannel1(config.getChannel1().toString());
+		testCase.setChannel2(config.getChannel2().toString());
+		testCase.setIndex(config.getIndex());
+		testCase.setFinish(config.getFinish().toString());
+		testCase.setFlag1(config.getFlag1());
+		testCase.setFlag2(config.getFlag2());
+		
+		return testCase;
 	}
 	
 	public String seqToString(ArrayList<Configuration<String>> seq) {
@@ -145,7 +176,7 @@ public class SequenceState extends ListenerAdapter {
 	public void searchFinished(Search search) {
 		try {
 			Logger.log("Start writing to file: " +  out_filename);
-			try_seq(root, new ArrayList<Configuration<String>>());
+			try_seq(root, new ArrayList<Configuration<String>>(), new ArrayList<TestCase>());
 			endGraph();
 			Logger.log("Finished !!!");
 		} catch (IOException e) {

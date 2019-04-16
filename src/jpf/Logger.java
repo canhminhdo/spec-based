@@ -22,7 +22,7 @@ public class Logger {
 	
 	public static void error(Object msg) {
 		if ((LOG_MODE & LOG_LEVEL_ERROR) > 0) {
-			System.out.println(msg);
+			System.err.println(msg);
 		}
 	}
 	

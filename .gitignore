@@ -9,3 +9,4 @@ bin/
 *~
 *.txt
 *.maude
+/.gradle/

@@ -164,6 +164,7 @@ public class Configuration<P> {
 	public String getObserverComponents() {
 		return "{" +
 					"sb: " + flag1 +
+//					" stateId: " + stateId +
 					" data: " + getAbpData() +
 					" dc: " + channel1 +
 					" ac: " + channel2 +
