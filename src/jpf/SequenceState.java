@@ -21,7 +21,6 @@ import main.Cell;
 import main.Channel;
 import main.Pair;
 import model.TestCase;
-import service.AdapterData;
 import service.TestCaseService;
 
 public class SequenceState extends ListenerAdapter {
@@ -79,7 +78,9 @@ public class SequenceState extends ListenerAdapter {
 			}
 		} else {
 			for (Node<Configuration<String>> child : node.getChildren()) {
-				try_seq(child, seq, list);
+				ArrayList<Configuration<String>> seq_new = (ArrayList<Configuration<String>>) seq.clone();
+				ArrayList<TestCase> list_new = (ArrayList<TestCase>) list.clone();
+				try_seq(child, seq_new, list_new);
 			}
 		}
 	}
