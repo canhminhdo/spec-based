@@ -1,6 +1,8 @@
 package main;
 import java.util.*;
 
+import gov.nasa.jpf.vm.Verify;
+
 public class Receiver<P> extends Thread {
     private Channel<Pair<P,Boolean>> channel1;
     private Channel<Boolean> channel2;
@@ -31,8 +33,10 @@ public class Receiver<P> extends Thread {
                 System.out.println("RecReceived " + pr);
                 */
                 if (pr.second() == flag2) {
+                	Verify.beginAtomic();
                     packetsReceived.add(pr.first());
                     flag2 = !flag2;
+                    Verify.endAtomic();
                 }
             }
             if (finish.get()) break;

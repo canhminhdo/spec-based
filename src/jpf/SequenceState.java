@@ -26,7 +26,7 @@ import service.TestCaseService;
 public class SequenceState extends ListenerAdapter {
 	
 	private static final int DEPTH = 10000;
-	private static final int BOUND = 30;
+	private static final int BOUND = 50;
 	private static boolean DEPTH_FLAG = true;
 	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;

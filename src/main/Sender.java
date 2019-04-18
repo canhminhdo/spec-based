@@ -1,6 +1,8 @@
 package main;
 import java.util.*;
 
+import gov.nasa.jpf.vm.Verify;
+
 public class Sender<P> extends Thread {
     private Channel<Pair<P,Boolean>> channel1;
     private Channel<Boolean> channel2;
@@ -21,9 +23,6 @@ public class Sender<P> extends Thread {
 
     public void run() {
     	for (int i = 0; i < packetsToBeSent.size(); i ++) {
-    		synchronized(this) {
-            	index = i;
-            }
     		Pair<P,Boolean> pr = new Pair<P,Boolean>(((List<P>)packetsToBeSent).get(i),flag1);
             while (true) {
                 channel1.put(pr);
@@ -37,7 +36,10 @@ public class Sender<P> extends Thread {
                         /*
                         System.out.println("Snd-Received " + b);
                         */
+                    	Verify.beginAtomic();
                         flag1 = !flag1;
+                        index ++;
+                        Verify.endAtomic();
                         break;
                     }
                 }
