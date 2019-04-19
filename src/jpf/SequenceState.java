@@ -26,7 +26,7 @@ import service.TestCaseService;
 public class SequenceState extends ListenerAdapter {
 	
 	private static final int DEPTH = 10000;
-	private static final int BOUND = 50;
+	private static final int BOUND = 1000;
 	private static boolean DEPTH_FLAG = true;
 	private static boolean BOUND_FLAG = true;
 	private static int COUNT = 0;
@@ -50,7 +50,36 @@ public class SequenceState extends ListenerAdapter {
 		}
 	}
 	
-	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq, ArrayList<TestCase> list) throws IOException {
+	public void try_seq(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq) throws IOException {
+		if (!node.isRoot()) {
+			if (seq.isEmpty()) {
+				seq.add(node.getData());
+			} else {
+				Configuration<String> lastElement = seq.get(seq.size() - 1);
+				if (!lastElement.equals(node.getData())) {
+					seq.add(node.getData());
+				} else {
+					// Duplicated !!!
+				}
+			}
+		}
+		if (node.isLeaf()) {
+			// Ending -> print sequence of state here
+			graph.write(seqToString(seq) + " , ");
+			graph.newLine();
+			PRINT_COUNT ++;
+		} else {
+			int seq_size = seq.size();
+			for (Node<Configuration<String>> child : node.getChildren()) {
+				try_seq(child, seq);
+				while (seq.size() > 0 && seq.size() > seq_size) {
+					seq.remove(seq.size() - 1);
+				}
+			}
+		}
+	}
+	
+	public void try_seq_log(Node<Configuration<String>> node, ArrayList<Configuration<String>> seq, ArrayList<TestCase> list) throws IOException {
 		if (!node.isRoot()) {
 			list.add(convert(node.getData()));
 			if (seq.isEmpty()) {
@@ -77,10 +106,16 @@ public class SequenceState extends ListenerAdapter {
 				Logger.error("Can't insert");
 			}
 		} else {
+			int seq_size = seq.size();
+			int list_size = list.size();
 			for (Node<Configuration<String>> child : node.getChildren()) {
-				ArrayList<Configuration<String>> seq_new = (ArrayList<Configuration<String>>) seq.clone();
-				ArrayList<TestCase> list_new = (ArrayList<TestCase>) list.clone();
-				try_seq(child, seq_new, list_new);
+				try_seq_log(child, seq, list);
+				while (seq.size() > 0 && seq.size() > seq_size) {
+					seq.remove(seq.size() - 1);
+				}
+				while (list.size() > 0 && list.size() > list_size) {
+					list.remove(list.size() - 1);
+				}
 			}
 		}
 	}
@@ -177,7 +212,8 @@ public class SequenceState extends ListenerAdapter {
 	public void searchFinished(Search search) {
 		try {
 			Logger.log("Start writing to file: " +  out_filename);
-			try_seq(root, new ArrayList<Configuration<String>>(), new ArrayList<TestCase>());
+			try_seq(root, new ArrayList<Configuration<String>>());
+//			try_seq_log(root, new ArrayList<Configuration<String>>(), new ArrayList<TestCase>());
 			endGraph();
 			Logger.log("Finished !!!");
 		} catch (IOException e) {

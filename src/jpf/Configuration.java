@@ -143,6 +143,8 @@ public class Configuration<P> {
 	}
 	
 	public String getAbpData() {
+		if (index == packetsToBeSent.size())
+			return "d(" + (Integer.parseInt((String)((List<P>)packetsToBeSent).get(index - 1)) + 1) + ")";
 		return "d(" + ((List<P>)packetsToBeSent).get(index) + ")";
 	}
 	
