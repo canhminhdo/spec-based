@@ -1,8 +1,11 @@
 package main;
 import java.util.*;
 
+import gov.nasa.jpf.vm.Verify;
+
 public class ABP<P> {
     public void begin(Collection<P> sentPackets, Collection<P> recPackets, int bound) throws InterruptedException {
+    	Verify.beginAtomic();
         Channel<Pair<P,Boolean>> ch1 = new Channel<Pair<P,Boolean>>(bound);
         Channel<Boolean> ch2 = new Channel<Boolean>(bound);
         
@@ -17,7 +20,7 @@ public class ABP<P> {
         Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f);
         DDropper<Pair<P,Boolean>,Boolean> ddropper = new DDropper<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         DDuplicator<Pair<P,Boolean>,Boolean> dduplicator = new DDuplicator<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
-        
+        Verify.endAtomic();
         /*
         Dropper<Pair<P,Boolean>> dropper1
             = new Dropper<Pair<P,Boolean>>(ch1,f);

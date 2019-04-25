@@ -25,17 +25,17 @@ import service.TestCaseService;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private static final int DEPTH = 10000;
+	private static final int DEPTH = 50;
 	private static final int BOUND = 1000;
 	private static boolean DEPTH_FLAG = true;
-	private static boolean BOUND_FLAG = true;
+	private static boolean BOUND_FLAG = false;
 	private static int COUNT = 0;
 	private static int PRINT_COUNT = 0;
-	private static final String MAUDE_EXT = "maude";
-	private static final String OUT_FILENAME_NO_EXT = "env-data";
+	private static final String TXT_EXT = "txt";
+	private static final String OUT_FILENAME_NO_EXT = "./maude/data";
 
 	private BufferedWriter graph;
-	private String out_filename = OUT_FILENAME_NO_EXT + "." + MAUDE_EXT;
+	private String out_filename = OUT_FILENAME_NO_EXT + "." + TXT_EXT;
 	
 	private static int STARTUP = 1;
 	private Map<String,Integer> lookupTable = new HashMap<String,Integer>();
@@ -222,24 +222,11 @@ public class SequenceState extends ListenerAdapter {
 
 	private void beginGraph() throws IOException {
 		graph = new BufferedWriter(new FileWriter(out_filename));
-		graph.write("mod ENV-DATA is");
-		graph.newLine();
-		graph.write("pr ENV-CONFIG .");
-		graph.newLine();
-		graph.write("op data : -> ListSeq .");
-		graph.newLine();
-		graph.write("op size : -> Nat .");
-		graph.newLine();
-		graph.write("eq data = ");
 	}
 
 	private void endGraph() throws IOException {
-		graph.write(" empty .");
-		graph.newLine();
-		graph.write("eq size = " + PRINT_COUNT + " .");
-		graph.newLine();
-		graph.write("endm");
 		graph.close();
+		Logger.log(PRINT_COUNT);
 	}
 	
 	private void showLookupTable() {
