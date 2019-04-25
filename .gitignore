@@ -7,6 +7,6 @@ bin/
 *.jpeg
 *.ucls
 *~
-*.txt
+maude/data.txt
 *.maude
 /.gradle/

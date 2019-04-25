@@ -1,0 +1,2 @@
+({sb: true data: d(0) dc: nil ac: nil rb: true buf: nil} | nil) , 
+({sb: true data: d(0) dc: nil ac: nil rb: true buf: nil} | {sb: true data: d(0) dc: nil ac: (true | nil) rb: true buf: nil} | nil) , 
