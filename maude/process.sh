@@ -10,10 +10,12 @@ cat head.txt body.txt > env-data.maude
 
 echo " empty .\neq size = ${SIZE} .\nendm" >> env-data.maude
 
+rm body.txt
+
 TARGET="/Users/student/Home/JAIST/maude/env/data"
 
 echo "MOVING TO $TARGET ..."
 
-mv env-data.maude $TARGET 
+mv env-data.maude $TARGET
 
 echo "FINISHED !!!"
