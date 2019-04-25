@@ -1,2 +1,0 @@
-target = tas.TestTAS
-listener=gov.nasa.jpf.listener.PreciseRaceDetector
