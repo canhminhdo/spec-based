@@ -13,6 +13,7 @@ echo " empty .\neq size = ${SIZE} .\nendm" >> env-data.maude
 rm body.txt
 
 TARGET="/Users/student/Home/JAIST/maude/env/data"
+#TARGET="/Users/canhdominh/Home/JAIST/Master/master-thesis/maude/env/data"
 
 echo "MOVING TO $TARGET ..."
 
