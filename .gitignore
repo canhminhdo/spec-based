@@ -10,3 +10,4 @@ bin/
 maude/data.txt
 *.maude
 /.gradle/
+maude/process.sh
