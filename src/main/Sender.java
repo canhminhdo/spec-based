@@ -8,17 +8,21 @@ public class Sender<P> extends Thread {
     private Channel<Boolean> channel2;
     private Collection<P> packetsToBeSent;
     private Cell<Boolean> finish;
-    private Boolean flag1 = true;
-    private int index = 0;
+    private Boolean flag1;	// initially `true`
+    private int index;
 
     public Sender(Channel<Pair<P,Boolean>> ch1,
                   Channel<Boolean> ch2,
                   Collection<P> c,
-                  Cell<Boolean> f) {
+                  Cell<Boolean> f,
+                  Boolean flag1,
+                  int index) {
         this.channel1 = ch1;
         this.channel2 = ch2;
         this.packetsToBeSent = c;
         this.finish = f;
+        this.flag1 = flag1;
+        this.index = index;
     }
 
     public void run() {

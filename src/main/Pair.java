@@ -1,5 +1,8 @@
 package main;
-public class Pair<E1,E2> {
+
+import java.io.Serializable;
+
+public class Pair<E1,E2> implements Serializable {
     private E1 elt1;
     private E2 elt2;
 
@@ -13,6 +16,10 @@ public class Pair<E1,E2> {
 
     public String toString() {
         return "< d(" + elt1 + ")," + elt2 + " >";
+    }
+    
+    public String toCommand() {
+    	return elt1 + "-" + elt2;
     }
 
 	@Override

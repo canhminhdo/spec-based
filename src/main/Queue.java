@@ -4,4 +4,5 @@ public interface Queue<E> {
     NeQueue<E> enqueue(E e);
     Queue<E> dequeue();
     Queue<E> duptop();
+    String toCommand();
 }

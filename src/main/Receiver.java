@@ -8,16 +8,18 @@ public class Receiver<P> extends Thread {
     private Channel<Boolean> channel2;
     private Collection<P> packetsReceived;
     private Cell<Boolean> finish;
-    private Boolean flag2 = true;
+    private Boolean flag2;	// initially `true`
 
     public Receiver(Channel<Pair<P,Boolean>> ch1,
                     Channel<Boolean> ch2,
                     Collection<P> c,
-                    Cell<Boolean> f) {
+                    Cell<Boolean> f,
+                    Boolean flag2) {
         this.channel1 = ch1;
         this.channel2 = ch2;
         this.packetsReceived = c;
         this.finish = f;
+        this.flag2 = flag2;
     }
 
     public void run() {

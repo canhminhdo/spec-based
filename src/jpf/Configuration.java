@@ -1,13 +1,16 @@
 package jpf;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 
 import main.Cell;
 import main.Channel;
+import main.EmptyQueue;
 import main.Pair;
+import main.Queue;
 
-public class Configuration<P> {
+public class Configuration<P> implements Serializable {
 	
 	private Channel<Pair<P,Boolean>> channel1;
 	private Integer index;
@@ -136,7 +139,8 @@ public class Configuration<P> {
 
 	@Override
 	public String toString() {
-		return getObserverComponents();
+		return getCommandArguments();
+//		return getObserverComponents();
 //		return "(stateId=" + stateId + ", depth=" + depth + ", channel1=" + channel1 + ", channel2=" + channel2 
 //				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
 //				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ", index=" + index + ")";
@@ -164,11 +168,37 @@ public class Configuration<P> {
 		return sb.toString();
 	}
 	
+	public String getPackets(Collection<P> packets) {
+		if (packets.size() == 0) {
+			return "nil";
+		}
+		StringBuffer sb = new StringBuffer();
+		sb.append(((List<P>)packets).get(0));
+		for (int i = 1; i < packets.size(); i ++) {
+			sb.append(",");
+			sb.append(((List<P>)packets).get(i));
+		}
+		return sb.toString();
+	}
+	
+	public String getCommandArguments() {
+		String cmd = "";
+		cmd += getPackets(packetsToBeSent) + " ";
+		cmd += getPackets(packetsReceived) + " ";
+		cmd += finish + " ";
+		cmd += flag1 + " ";
+		cmd += flag2 + " ";
+		cmd += channel1.toCommand() + " ";
+		cmd += channel2.toCommand();
+		return cmd;
+	}
+	
 	public String getObserverComponents() {
 		return "{" +
 					"sb: " + flag1 +
 //					" stateId: " + stateId +
 					" data: " + getAbpData() +
+//					" packets: " + packetsToBeSent +
 					" dc: " + channel1 +
 					" ac: " + channel2 +
 					" rb: " + flag2 +

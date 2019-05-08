@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
-import database.RedisClient;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import gov.nasa.jpf.ListenerAdapter;
@@ -21,42 +20,26 @@ import gov.nasa.jpf.vm.VM;
 import main.Cell;
 import main.Channel;
 import main.Pair;
-import redis.clients.jedis.Jedis;
 import utils.DateUtil;
-import utils.GFG;
 
-public class SequenceState extends ListenerAdapter {
+public class SequenceStateFull extends ListenerAdapter {
 	
-	private final int DEPTH = 50;
-	private final int BOUND = 1000;
-	private boolean DEPTH_FLAG = true;
-	private boolean BOUND_FLAG = false;
-	private int COUNT = 0;
-	private int SEQ_UNIQUE_COUNT = 0;
-	private final String TXT_EXT = "txt";
-	private final String OUT_FILENAME_NO_EXT = "./maude/data";
+	private static final int DEPTH = 50;
+	private static final int BOUND = 1000;
+	private static boolean DEPTH_FLAG = true;
+	private static boolean BOUND_FLAG = false;
+	private static int COUNT = 0;
+	private static final String TXT_EXT = "txt";
+	private static final String OUT_FILENAME_NO_EXT = "./maude/data";
 
 	private BufferedWriter graph;
 	private String out_filename = OUT_FILENAME_NO_EXT + "-" + DateUtil.getTime() + "." + TXT_EXT;
 	
-	private int STARTUP = 1;
-	private Map<String,Integer> lookupTable;
-	private ArrayList<Configuration<String>> seq;
-	private Jedis jedis = null;
+	private static int STARTUP = 1;
+	private Map<String,Integer> lookupTable = new HashMap<String,Integer>();
+	private ArrayList<Configuration<String>> seq = new ArrayList<Configuration<String>>();
 	
-	public SequenceState(Config conf, JPF jpf) {
-		initialize();
-		jedis.flushAll();
-	}
-	
-	public SequenceState() {
-		initialize();
-	}
-	
-	private void initialize() {
-		jedis = RedisClient.getInstance().getConnection();
-		lookupTable = new HashMap<String,Integer>();
-		seq = new ArrayList<Configuration<String>>();
+	public SequenceStateFull(Config conf, JPF jpf) {
 	}
 	
 	public String seqToString() {
@@ -82,26 +65,9 @@ public class SequenceState extends ListenerAdapter {
 	
 	public void writeSeqStringToFile() {
 		try {
-			if (seq.size() > 0) {
-				String seqString = seqToString();
-				String seqSha256 = GFG.getSHA(seqString);
-				if (!jedis.exists(seqSha256)) {
-					jedis.set(seqSha256, seqString);
-					graph.write(seqString + " , ");
-					graph.newLine();
-					SEQ_UNIQUE_COUNT ++;
-				}
-				Configuration<String> lastElement = seq.get(seq.size() - 1);
-				if (lastElement != null) {
-					String elementSha256 = GFG.getSHA(lastElement.toString());
-					if (!jedis.exists(elementSha256)) {
-						jedis.set(elementSha256, lastElement.toString());
-						// TODO :: submit job to the queue broker
-//						mq.Sender.getInstance().sendJob(lastElement);
-					}
-				}
-			}
-		} catch (Exception e) {
+			graph.write(seqToString() + " , ");
+			graph.newLine();
+		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
@@ -114,8 +80,8 @@ public class SequenceState extends ListenerAdapter {
 	 */
 	@Override
 	public void stateAdvanced(Search search) {
-		if (STARTUP == 1) {
-			STARTUP ++;
+		if (SequenceStateFull.STARTUP == 1) {
+			SequenceStateFull.STARTUP ++;
 			startup(search.getVM());
 		}
 		Configuration<String> config = getConfiguration(search);
@@ -182,7 +148,7 @@ public class SequenceState extends ListenerAdapter {
 
 	private void endGraph() throws IOException {
 		graph.close();
-		Logger.log(COUNT + " - " + SEQ_UNIQUE_COUNT);
+		Logger.log(COUNT);
 	}
 	
 	private void showLookupTable() {
@@ -202,6 +168,14 @@ public class SequenceState extends ListenerAdapter {
 			}
 		}
 		showLookupTable();
+	}
+	
+	private void showHeap(VM vm) {
+		for (ElementInfo ei : vm.getHeap().liveObjects()) {
+			String name = ei.getClassInfo().getName();
+			Logger.log(name + "-" + ei.getObjectRef());
+			showFieldInfos(ei);
+		}
 	}
 	
 	private Configuration<String> getConfiguration(Search search) {
@@ -298,7 +272,15 @@ public class SequenceState extends ListenerAdapter {
 		}
 		return config;
 	}
-
+	
+	private void showFieldInfos(ElementInfo ei) {
+		FieldInfo[] fis = ei.getClassInfo().getDeclaredInstanceFields();
+		Logger.log("Length: " + ei.getClassInfo().getNumberOfDeclaredInstanceFields());
+		for (FieldInfo fi : fis) {
+			Logger.log(fi.getName() + "-" + fi.getType() + " -> ref: " + fi.isReference());
+		}
+	}
+	
 	private Channel<Boolean> getChannelBoolean(ElementInfo ei_queue, int bound) {
 		Channel<Boolean> channel2 = new Channel<Boolean>(bound);
 		while (true) {

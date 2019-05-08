@@ -11,3 +11,6 @@ maude/data.txt
 *.maude
 /.gradle/
 maude/process.sh
+maude/move.sh
+maude/data-*
+lib/

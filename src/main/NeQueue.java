@@ -1,5 +1,8 @@
 package main;
-public class NeQueue<E> implements Queue<E> {
+
+import java.io.Serializable;
+
+public class NeQueue<E> implements Queue<E>, Serializable {
     private E head;
     private Queue<E> tail;
 
@@ -33,6 +36,11 @@ public class NeQueue<E> implements Queue<E> {
     public String toString() {
     	return head.toString() + " | " +  tail.toString();
     }
+    
+    public String toCommand() {
+    	return head + "," +  tail.toCommand();
+    }
+    
 
 	@Override
 	public boolean equals(Object obj) {
@@ -45,5 +53,4 @@ public class NeQueue<E> implements Queue<E> {
 		NeQueue<E> other = (NeQueue<E>) obj;
 		return top().equals(other.top()) && dequeue().equals(other.dequeue());
 	}
-	
 }

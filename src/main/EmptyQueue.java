@@ -1,5 +1,8 @@
 package main;
-public class EmptyQueue<E> implements Queue<E> {
+
+import java.io.Serializable;
+
+public class EmptyQueue<E> implements Queue<E>, Serializable {
 	
     public EmptyQueue() {
     	
@@ -30,5 +33,10 @@ public class EmptyQueue<E> implements Queue<E> {
 			return false;
 		}
 		return true;
+	}
+
+	@Override
+	public String toCommand() {
+		return "nil";
 	}
 }

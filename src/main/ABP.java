@@ -1,25 +1,26 @@
 package main;
-import java.util.*;
+import java.util.Collection;
 
 import gov.nasa.jpf.vm.Verify;
 
 public class ABP<P> {
-    public void begin(Collection<P> sentPackets, Collection<P> recPackets, int bound) throws InterruptedException {
-    	Verify.beginAtomic();
-        Channel<Pair<P,Boolean>> ch1 = new Channel<Pair<P,Boolean>>(bound);
-        Channel<Boolean> ch2 = new Channel<Boolean>(bound);
-        
-//        ch2.put(false);
-//        ch2.put(true);
-//        Iterator<P> iter = sentPackets.iterator();
-//        ch1.put(new Pair<P, Boolean>(iter.next(), true));
-//        ch1.put(new Pair<P, Boolean>(iter.next(), false));
-        
-        Cell<Boolean> f = new Cell<Boolean>(false);
-        Sender<P> sender = new Sender<P>(ch1,ch2,sentPackets,f);
-        Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f);
+	public void begin(
+			Collection<P> sentPackets,
+			Collection<P> recPackets,
+			Channel<Pair<P,Boolean>> ch1,
+			Channel<Boolean> ch2,
+			Integer index,
+			Boolean finish,
+			Boolean flag1,
+			Boolean flag2) throws InterruptedException {
+		Verify.beginAtomic();
+		
+		Cell<Boolean> f = new Cell<Boolean>(finish);
+        Sender<P> sender = new Sender<P>(ch1,ch2,sentPackets,f,flag1,index);
+        Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f,flag2);
         DDropper<Pair<P,Boolean>,Boolean> ddropper = new DDropper<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         DDuplicator<Pair<P,Boolean>,Boolean> dduplicator = new DDuplicator<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
+        
         Verify.endAtomic();
         /*
         Dropper<Pair<P,Boolean>> dropper1

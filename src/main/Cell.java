@@ -1,5 +1,8 @@
 package main;
-public class Cell<E> {
+
+import java.io.Serializable;
+
+public class Cell<E> implements Serializable {
     private E element;
     public Cell(E e) { this.element = e; }
     public E get() { return element; }

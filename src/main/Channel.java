@@ -1,5 +1,8 @@
 package main;
-public class Channel<P> {
+
+import java.io.Serializable;
+
+public class Channel<P> implements Serializable {
     private Queue<P> queue;
     private final int bound;
     private int nop;
@@ -39,6 +42,12 @@ public class Channel<P> {
     	if (queue instanceof EmptyQueue)
     		return queue.toString();
     	return "(" + queue.toString() + ")";
+    }
+    
+    public String toCommand() {
+    	if (queue instanceof EmptyQueue)
+    		return queue.toCommand();
+    	return queue.toCommand();
     }
     
     public Queue<P> getQueue() {
