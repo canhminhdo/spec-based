@@ -1,8 +1,13 @@
 package jpf;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import com.mysql.jdbc.StringUtils;
 
 import main.Cell;
 import main.Channel;
@@ -181,15 +186,68 @@ public class Configuration<P> implements Serializable {
 		return sb.toString();
 	}
 	
+	public String getChannel1(String ch1) {
+		if (ch1.equals("nil"))
+			return ch1;
+		
+		Pattern p = Pattern.compile("(< d\\([0-9]+\\),(true|false) >)");
+		Matcher matcher = p.matcher(ch1);
+		ArrayList<String> str = new ArrayList<String>();
+        while (matcher.find()) {
+        	str.add(String.join("-", matcher.group(1).replace("< d(", "").replace(")", "").replace(" >", "").split(",")));
+        }
+        return org.apache.commons.lang3.StringUtils.join(str, ",");
+	}
+	
+	public String getChannel2(String ch2) {
+		if (ch2.equals("nil"))
+			return ch2;
+		String[] channel2 = ch2.split(",");
+		return org.apache.commons.lang3.StringUtils.join(channel2, ",", 0, channel2.length - 1);
+	}
+	
+	public String getPacketsToBeSentCommand() {
+		return getPackets(packetsToBeSent);
+	}
+	
+	public String getPacketsReceivedCommand() {
+		return getPackets(packetsReceived);
+	}
+	
+	public String getIndexCommand() {
+		return index + "";
+	}
+	
+	public String getFinishCommand() {
+		return finish + "";
+	}
+	
+	public String getFlag1Command() {
+		return flag1 + "";
+	}
+	
+	public String getFlag2Command() {
+		return flag2 + "";
+	}
+	
+	public String getChannel1Command() {
+		return getChannel1(channel1.toCommand());
+	}
+	
+	public String getChannel2Command() {
+		return getChannel1(channel2.toCommand());
+	}
+	
 	public String getCommandArguments() {
 		String cmd = "";
 		cmd += getPackets(packetsToBeSent) + " ";
 		cmd += getPackets(packetsReceived) + " ";
+		cmd += index + " ";
 		cmd += finish + " ";
 		cmd += flag1 + " ";
 		cmd += flag2 + " ";
-		cmd += channel1.toCommand() + " ";
-		cmd += channel2.toCommand();
+		cmd += getChannel1(channel1.toCommand()) + " ";
+		cmd += getChannel2(channel2.toCommand());
 		return cmd;
 	}
 	

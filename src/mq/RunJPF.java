@@ -12,18 +12,25 @@ public class RunJPF extends Thread {
 
 	public RunJPF(Configuration<String> config) {
 		configList = new ArrayList<String>();
-		configList.add("+classpath=/Users/student/eclipse-workspace/tas/bin");
+		configList.add("+classpath=/Users/canhdominh/eclipse-workspace/abp/bin");
 		configList.add("main.TestABP");
-		// 1st argument: packetsToBeSent
-		String packetsToBeSent;
-		for (int i = 0; i < config.getPacketsToBeSent().size(); i ++) {
-			
-		}
 		
-//		configList.add(String.valueOf(((HWMutex)config.getLock()).getLockFlag().getValue()));
-//		for(int i = 0; i < config.getThreads().size(); i ++) {
-//			configList.add(config.getThreads().get(i).getLoc());
-//		}
+		// 1st argument: packetsToBeSent
+		configList.add(config.getPacketsToBeSentCommand());
+		// 2nd argument: packetsReceived
+		configList.add(config.getPacketsReceivedCommand());
+		// 3rd argument: index of packetsToBeSent
+		configList.add(config.getIndexCommand());
+		// 4th argument: finish flag
+		configList.add(config.getFinishCommand());
+		// 5th argument: flag1
+		configList.add(config.getFlag1Command());
+		// 6th argument: flag2
+		configList.add(config.getFlag2Command());
+		// 7th argument: channel1
+		configList.add(config.getChannel1Command());
+		// 8th argument: channel2
+		configList.add(config.getChannel2Command());
 	}
 
 	public void run() {

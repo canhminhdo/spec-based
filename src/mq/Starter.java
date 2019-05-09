@@ -13,11 +13,7 @@ import com.rabbitmq.client.ConnectionFactory;
 import database.RedisClient;
 import jpf.Configuration;
 import main.Cell;
-import main.DDropper;
-import main.DDuplicator;
 import main.Pair;
-import main.Receiver;
-import main.Sender;
 
 public class Starter implements RabbitMQ {
 	
@@ -47,8 +43,13 @@ public class Starter implements RabbitMQ {
 				String packets[] = { "0", "1", "2" };
 		        List<String> sentPackets = Arrays.asList(packets);
 		        List<String> recPackets = new ArrayList<String>();
+//		        List<String> recPackets = Arrays.asList(packets);
 				main.Channel<Pair<String,Boolean>> ch1 = new main.Channel<Pair<String,Boolean>>(bound);
+//				ch1.put(new Pair<String,Boolean>("1",true));
+//				ch1.put(new Pair<String,Boolean>("2",true));
 				main.Channel<Boolean> ch2 = new main.Channel<Boolean>(bound);
+//				ch2.put(true);
+//				ch2.put(false);
 				Cell<Boolean> f = new Cell<Boolean>(false);
 				
 				// 1st argument: packetsToBeSent

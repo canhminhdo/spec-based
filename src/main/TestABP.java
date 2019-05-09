@@ -26,7 +26,7 @@ public class TestABP {
     		// 1st argument: packetsToBeSent
     		String[] packetsToBeSent = args[0].split(",");
     		sentPackets = Arrays.asList(packetsToBeSent);
-    		System.out.println(sentPackets);
+    		System.out.println("sentPackets: " + sentPackets);
     		
     		// 2nd argument: packetsReceived
     		if (args.length >= 1) {
@@ -37,31 +37,31 @@ public class TestABP {
 	    		} else {
 	    			recPackets = new ArrayList<String>();
 	    		}
-	    		System.out.println(recPackets);
+	    		System.out.println("recPackets: " + recPackets);
     		}
     		
     		// 3rd argument: index of packetsToBeSent
     		if (args.length >= 2) {
 	    		index = Integer.parseInt(args[2]);
-	    		System.out.println(index);
+	    		System.out.println("index: " + index);
     		}
     		
     		// 4th argument: finish flag
     		if (args.length >= 3) {
 	    		finish = Boolean.parseBoolean(args[3]);
-	    		System.out.println(finish);
+	    		System.out.println("finish: " + finish);
     		}
     		
     		// 5th argument: flag1
     		if (args.length >= 4) {
 	    		flag1 = Boolean.parseBoolean(args[4]);
-	    		System.out.println(flag1);
+	    		System.out.println("flag1: " + flag1);
     		}
     		
     		// 6th argument: flag2
     		if (args.length >= 5) {
 	    		flag2 = Boolean.parseBoolean(args[5]);
-	    		System.out.println(flag2);
+	    		System.out.println("flag2: " + flag2);
     		}
     		
     		// 7th argument: channel1
@@ -76,6 +76,7 @@ public class TestABP {
 		    			ch1.put(new Pair<String,Boolean>(ele[0], Boolean.parseBoolean(ele[1])));
 		    		}
 	    		}
+	    		System.out.println("ch1: " + ch1);
     		}
     		
     		// 8th argument: channel2
@@ -89,7 +90,7 @@ public class TestABP {
 		    			ch2.put(Boolean.parseBoolean(channel2[i]));
 		    		}
 	    		}
-	    		System.out.println(ch2);
+	    		System.out.println("ch2: " + ch2);
     		}
 		} else {
 			// default parameters
@@ -105,8 +106,8 @@ public class TestABP {
     	Verify.endAtomic();
     	
     	abp.begin(sentPackets, recPackets, ch1, ch2, index, finish, flag1, flag2);
-        System.out.println("Packets sent: " + sentPackets);
-        System.out.println("Packets rec: " + recPackets);
-        assert sentPackets.equals(recPackets);
+//        System.out.println("Packets sent: " + sentPackets);
+//        System.out.println("Packets rec: " + recPackets);
+//        assert sentPackets.equals(recPackets);
     }
 }

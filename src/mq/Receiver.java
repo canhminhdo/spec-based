@@ -23,14 +23,14 @@ public class Receiver implements RabbitMQ {
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
         	Configuration<String> config = SerializationUtils.deserialize(delivery.getBody());
             System.out.println(" [x] Received '" + config);
-//            RunJPF runner = new RunJPF(config);
-//            runner.start();
-//            try {
-//				runner.join();
-//				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-//			} catch (InterruptedException e) {
-//				e.printStackTrace();
-//			}
+            RunJPF runner = new RunJPF(config);
+            runner.start();
+            try {
+				runner.join();
+				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
         };
         boolean autoAck = false;
         channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> { });
