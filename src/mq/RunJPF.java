@@ -2,6 +2,7 @@ package mq;
 
 import java.util.ArrayList;
 
+import config.Env;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import jpf.Configuration;
@@ -12,7 +13,7 @@ public class RunJPF extends Thread {
 
 	public RunJPF(Configuration<String> config) {
 		configList = new ArrayList<String>();
-		configList.add("+classpath=/Users/canhdominh/eclipse-workspace/abp/bin");
+		configList.add("+classpath=" + Env.CLASS_PATH);
 		configList.add("main.TestABP");
 		
 		// 1st argument: packetsToBeSent

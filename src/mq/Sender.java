@@ -16,7 +16,9 @@ public class Sender implements RabbitMQ {
 	private Sender() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost("localhost");
+			factory.setHost(HOST);
+			factory.setUsername(USERNAME);
+			factory.setPassword(PASSWORD);
 			connection = factory.newConnection();
 			channel = connection.createChannel();
 			channel.queueDeclare(QUEUE_NAME, false, false, false, null);

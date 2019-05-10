@@ -2,7 +2,7 @@ package database;
 
 import redis.clients.jedis.Jedis;
 
-public class RedisClient {
+public class RedisClient implements RedisServer {
 	private static RedisClient _instance = null;
 	private Jedis jedis = null; 
 	
@@ -14,7 +14,7 @@ public class RedisClient {
 	}
 	
 	private RedisClient() {
-		this.jedis = new Jedis("localhost");
+		this.jedis = new Jedis(HOST, PORT);
 	}
 	
 	public Jedis getConnection() {

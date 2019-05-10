@@ -14,6 +14,8 @@ public class Receiver implements RabbitMQ {
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(HOST);
+        factory.setUsername(USERNAME);
+		factory.setPassword(PASSWORD);
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
