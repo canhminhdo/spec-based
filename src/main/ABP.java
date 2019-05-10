@@ -17,7 +17,7 @@ public class ABP<P> {
 		
 		Cell<Boolean> f = new Cell<Boolean>(finish);
         Sender<P> sender = new Sender<P>(ch1,ch2,sentPackets,f,flag1,index);
-        Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f,flag2);
+        Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f,flag2,sentPackets);
         DDropper<Pair<P,Boolean>,Boolean> ddropper = new DDropper<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         DDuplicator<Pair<P,Boolean>,Boolean> dduplicator = new DDuplicator<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         

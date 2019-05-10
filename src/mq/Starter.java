@@ -39,8 +39,8 @@ public class Starter implements RabbitMQ {
 	
 				// prepare to send a message to queue
 				Configuration<String> config = new Configuration<String>();
-				int bound = 3;
-				String packets[] = { "0", "1", "2" };
+				int bound = 1;
+				String packets[] = { "0", "1", "2", "3" };
 		        List<String> sentPackets = Arrays.asList(packets);
 		        List<String> recPackets = new ArrayList<String>();
 //		        List<String> recPackets = Arrays.asList(packets);

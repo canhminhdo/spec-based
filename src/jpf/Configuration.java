@@ -144,15 +144,14 @@ public class Configuration<P> implements Serializable {
 
 	@Override
 	public String toString() {
-		return getCommandArguments();
-//		return getObserverComponents();
+		return getObserverComponents();
 //		return "(stateId=" + stateId + ", depth=" + depth + ", channel1=" + channel1 + ", channel2=" + channel2 
 //				+ ", packetsToBeSent=" + packetsToBeSent + ", packetsReceived=" + packetsReceived 
 //				+ ", finish=" + finish + ", flag1=" + flag1 + ", flag2=" + flag2 + ", index=" + index + ")";
 	}
 	
 	public String getAbpData() {
-		if (index == packetsToBeSent.size())
+		if (index >= packetsToBeSent.size())
 			return "d(" + index + ")";
 //		return "d(" + (Integer.parseInt((String)((List<P>)packetsToBeSent).get(index - 1)) + 1) + ")";
 		return "d(" + ((List<P>)packetsToBeSent).get(index) + ")";

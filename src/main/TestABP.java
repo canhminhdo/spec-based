@@ -4,7 +4,7 @@ import java.util.*;
 import gov.nasa.jpf.vm.Verify;
 
 public class TestABP {
-	public static int bound = 3;
+	public static int bound = 1;
 	
     public static void main(String[] args)
         throws InterruptedException

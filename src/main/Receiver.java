@@ -6,6 +6,7 @@ import gov.nasa.jpf.vm.Verify;
 public class Receiver<P> extends Thread {
     private Channel<Pair<P,Boolean>> channel1;
     private Channel<Boolean> channel2;
+    private Collection<P> packetsToBeSent;
     private Collection<P> packetsReceived;
     private Cell<Boolean> finish;
     private Boolean flag2;	// initially `true`
@@ -14,12 +15,14 @@ public class Receiver<P> extends Thread {
                     Channel<Boolean> ch2,
                     Collection<P> c,
                     Cell<Boolean> f,
-                    Boolean flag2) {
+                    Boolean flag2,
+                    Collection<P> packetsToBeSent) {
         this.channel1 = ch1;
         this.channel2 = ch2;
         this.packetsReceived = c;
         this.finish = f;
         this.flag2 = flag2;
+        this.packetsToBeSent = packetsToBeSent;
     }
 
     public void run() {
@@ -30,17 +33,25 @@ public class Receiver<P> extends Thread {
                 System.out.println("RecSending " + flag2);
             */
             Pair<P,Boolean> pr = channel1.get();
+            Verify.beginAtomic();
             if (pr != null) {
                 /*
                 System.out.println("RecReceived " + pr);
                 */
                 if (pr.second() == flag2) {
-                	Verify.beginAtomic();
-                    packetsReceived.add(pr.first());
+                	// Add bugs
+                	if (packetsReceived.size() == 1) {
+                		packetsReceived.add(((List<P>)packetsToBeSent).get(2));
+                	} else {
+                		packetsReceived.add(pr.first());
+                	}
+                	
+                	// packetsReceived.add(pr.first());
                     flag2 = !flag2;
-                    Verify.endAtomic();
+                    
                 }
             }
+            Verify.endAtomic();
             if (finish.get()) break;
         }
         /*

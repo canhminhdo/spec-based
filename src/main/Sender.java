@@ -34,6 +34,7 @@ public class Sender<P> extends Thread {
                 if (p != null)
                     System.out.println("Snd-Sending " + p);
                 */
+                
                 Boolean b = channel2.get();
                 if (b != null) {
                     if (b == !flag1) {
@@ -47,6 +48,7 @@ public class Sender<P> extends Thread {
                         break;
                     }
                 }
+                
             }
     	}
         finish.set(true);
