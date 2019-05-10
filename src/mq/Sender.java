@@ -8,7 +8,7 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import jpf.Configuration;
 
-public class Sender implements RabbitMQ {
+public class Sender extends RabbitMQ {
 	private static Sender _instance = null;
 	private Connection connection;
 	private Channel channel;
@@ -16,9 +16,11 @@ public class Sender implements RabbitMQ {
 	private Sender() {
 		try {
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(HOST);
-			factory.setUsername(USERNAME);
-			factory.setPassword(PASSWORD);
+			factory.setHost(getHost());
+			if (isRemote()) {
+				factory.setUsername(USERNAME);
+				factory.setPassword(PASSWORD);
+			}
 			connection = factory.newConnection();
 			channel = connection.createChannel();
 			channel.queueDeclare(QUEUE_NAME, false, false, false, null);

@@ -16,7 +16,7 @@ import jpf.Configuration;
 import main.Cell;
 import main.Pair;
 
-public class Starter implements RabbitMQ {
+public class Starter extends RabbitMQ {
 	
 	public static void main(String[] argv) {
 		try {
@@ -34,9 +34,11 @@ public class Starter implements RabbitMQ {
 			
 			// Push a initial job to message queue 
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(HOST);
-			factory.setUsername(USERNAME);
-			factory.setPassword(PASSWORD);
+			factory.setHost(getHost());
+			if (isRemote()) {
+				factory.setUsername(USERNAME);
+				factory.setPassword(PASSWORD);
+			}
 			try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
 				channel.queueDeclare(QUEUE_NAME, false, false, false, null);
 	

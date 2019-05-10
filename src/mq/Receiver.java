@@ -9,13 +9,15 @@ import com.rabbitmq.client.DeliverCallback;
 
 import jpf.Configuration;
 
-public class Receiver implements RabbitMQ {
+public class Receiver extends RabbitMQ {
 
     public static void main(String[] argv) throws Exception {
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(HOST);
-        factory.setUsername(USERNAME);
-		factory.setPassword(PASSWORD);
+        factory.setHost(getHost());
+        if (isRemote()) {
+			factory.setUsername(USERNAME);
+			factory.setPassword(PASSWORD);
+		}
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
