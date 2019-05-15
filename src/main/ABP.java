@@ -1,6 +1,9 @@
 package main;
 import java.util.Collection;
 
+import atomic.HWMutex;
+import atomic.Lock;
+import atomic.TestAndSet;
 import gov.nasa.jpf.vm.Verify;
 
 public class ABP<P> {
@@ -14,6 +17,14 @@ public class ABP<P> {
 			Boolean flag1,
 			Boolean flag2) throws InterruptedException {
 		Verify.beginAtomic();
+		
+		// Initial for lock
+		TestAndSet lockFlagCh1 = new TestAndSet();
+		Lock lockCh1 = new HWMutex(lockFlagCh1);
+		TestAndSet lockFlagCh2 = new TestAndSet();
+		Lock lockCh2 = new HWMutex(lockFlagCh2);
+		ch1.setLock(lockCh1);
+		ch2.setLock(lockCh2);
 		
 		Cell<Boolean> f = new Cell<Boolean>(finish);
         Sender<P> sender = new Sender<P>(ch1,ch2,sentPackets,f,flag1,index);

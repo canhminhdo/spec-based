@@ -1,6 +1,7 @@
 package main;
 import java.util.*;
 
+import config.Env;
 import gov.nasa.jpf.vm.Verify;
 
 public class Receiver<P> extends Thread {
@@ -32,26 +33,30 @@ public class Receiver<P> extends Thread {
             if (b != null)
                 System.out.println("RecSending " + flag2);
             */
+            
+            channel1.getLock().requestCS();
+            if (Env.JPF_MODE) Verify.beginAtomic();
             Pair<P,Boolean> pr = channel1.get();
-            Verify.beginAtomic();
             if (pr != null) {
                 /*
                 System.out.println("RecReceived " + pr);
                 */
                 if (pr.second() == flag2) {
                 	// Add bugs
-                	if (packetsReceived.size() == 1) {
-                		packetsReceived.add(((List<P>)packetsToBeSent).get(2));
+                	if (packetsReceived.size() == 2) {
+                		packetsReceived.add(((List<P>)packetsToBeSent).get(3));
                 	} else {
                 		packetsReceived.add(pr.first());
                 	}
                 	
-                	// packetsReceived.add(pr.first());
+//                	packetsReceived.add(pr.first());
                     flag2 = !flag2;
                     
                 }
             }
-            Verify.endAtomic();
+            if (Env.JPF_MODE) Verify.endAtomic();
+            channel1.getLock().releaseCS();
+            
             if (finish.get()) break;
         }
         /*

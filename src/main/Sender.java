@@ -1,6 +1,7 @@
 package main;
 import java.util.*;
 
+import config.Env;
 import gov.nasa.jpf.vm.Verify;
 
 public class Sender<P> extends Thread {
@@ -35,20 +36,28 @@ public class Sender<P> extends Thread {
                     System.out.println("Snd-Sending " + p);
                 */
                 
+                Boolean flag = false;
+                
+                channel2.getLock().requestCS();
+                if (Env.JPF_MODE) Verify.beginAtomic();
                 Boolean b = channel2.get();
                 if (b != null) {
                     if (b == !flag1) {
                         /*
                         System.out.println("Snd-Received " + b);
                         */
-                    	Verify.beginAtomic();
+                    	
                         flag1 = !flag1;
                         index ++;
-                        Verify.endAtomic();
-                        break;
+                        flag = true;
                     }
                 }
+                if (Env.JPF_MODE) Verify.endAtomic();
+                channel2.getLock().releaseCS();
                 
+                if (flag) {
+                	break;
+                }
             }
     	}
         finish.set(true);

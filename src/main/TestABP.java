@@ -1,6 +1,10 @@
 package main;
 import java.util.*;
 
+import atomic.HWMutex;
+import atomic.Lock;
+import atomic.TestAndSet;
+import config.Env;
 import gov.nasa.jpf.vm.Verify;
 
 public class TestABP {
@@ -9,7 +13,7 @@ public class TestABP {
     public static void main(String[] args)
         throws InterruptedException
     {
-    	Verify.beginAtomic();
+    	if (Env.JPF_MODE) Verify.beginAtomic();
     	
     	// Initially variables
     	List<String> sentPackets = null;
@@ -94,7 +98,7 @@ public class TestABP {
     		}
 		} else {
 			// default parameters
-			String packets[] = { "0", "1", "2" };
+			String packets[] = { "0", "1", "2", "3" };
 	        sentPackets = Arrays.asList(packets);
 	        recPackets = new ArrayList<String>();
 	        index = 0;
@@ -103,7 +107,8 @@ public class TestABP {
 	        flag2 = true;
 		}
     	ABP<String> abp = new ABP<String>();
-    	Verify.endAtomic();
+    	
+    	if (Env.JPF_MODE) Verify.endAtomic();
     	
     	abp.begin(sentPackets, recPackets, ch1, ch2, index, finish, flag1, flag2);
 //        System.out.println("Packets sent: " + sentPackets);
