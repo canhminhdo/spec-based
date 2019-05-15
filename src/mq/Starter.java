@@ -44,16 +44,14 @@ public class Starter extends RabbitMQ {
 	
 				// prepare to send a message to queue
 				Configuration<String> config = new Configuration<String>();
-				int bound = 1;
-				String packets[] = { "0", "1", "2", "3" };
-		        List<String> sentPackets = Arrays.asList(packets);
+		        List<String> sentPackets = Arrays.asList(Env.PACKETS);
 		        List<String> recPackets = new ArrayList<String>();
 //		        String packetsRecived[] = { "0" };
 //		        List<String> recPackets = Arrays.asList(packetsRecived);
-				main.Channel<Pair<String,Boolean>> ch1 = new main.Channel<Pair<String,Boolean>>(bound);
+				main.Channel<Pair<String,Boolean>> ch1 = new main.Channel<Pair<String,Boolean>>(Env.BOUND);
 //				ch1.put(new Pair<String,Boolean>("0",false));
 //				ch1.put(new Pair<String,Boolean>("2",true));
-				main.Channel<Boolean> ch2 = new main.Channel<Boolean>(bound);
+				main.Channel<Boolean> ch2 = new main.Channel<Boolean>(Env.BOUND);
 //				ch2.put(true);
 //				ch2.put(false);
 				Cell<Boolean> f = new Cell<Boolean>(false);

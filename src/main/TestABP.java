@@ -1,10 +1,10 @@
 package main;
 import java.util.*;
 
+import config.Env;
 import gov.nasa.jpf.vm.Verify;
 
 public class TestABP {
-	public static int bound = 1;
 	
     public static void main(String[] args)
         throws InterruptedException
@@ -18,8 +18,8 @@ public class TestABP {
     	Boolean finish = null;
     	Boolean flag1 = null;
     	Boolean flag2 = null;
-    	Channel<Pair<String,Boolean>> ch1 = new Channel<Pair<String,Boolean>>(bound);
-    	Channel<Boolean> ch2 = new Channel<Boolean>(bound);
+    	Channel<Pair<String,Boolean>> ch1 = new Channel<Pair<String,Boolean>>(Env.BOUND);
+    	Channel<Boolean> ch2 = new Channel<Boolean>(Env.BOUND);
     	
     	// Read arguments
     	if (args.length > 0) {
@@ -94,8 +94,7 @@ public class TestABP {
     		}
 		} else {
 			// default parameters
-			String packets[] = { "0", "1", "2" };
-	        sentPackets = Arrays.asList(packets);
+	        sentPackets = Arrays.asList(Env.PACKETS);
 	        recPackets = new ArrayList<String>();
 	        index = 0;
 	        finish = false;
