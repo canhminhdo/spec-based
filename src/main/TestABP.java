@@ -1,5 +1,7 @@
 package main;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import config.Env;
 import gov.nasa.jpf.vm.Verify;
@@ -9,7 +11,7 @@ public class TestABP {
     public static void main(String[] args)
         throws InterruptedException
     {
-    	Verify.beginAtomic();
+    	if (Env.JPF_MODE) Verify.beginAtomic();
     	
     	// Initially variables
     	List<String> sentPackets = null;
@@ -73,7 +75,7 @@ public class TestABP {
 	    		if (channel1 != null) {
 		    		for (int i = 0; i < channel1.length; i ++) {
 		    			String[] ele = channel1[i].split("-");
-		    			ch1.put(new Pair<String,Boolean>(ele[0], Boolean.parseBoolean(ele[1])));
+		    			ch1.put_asyn(new Pair<String,Boolean>(ele[0], Boolean.parseBoolean(ele[1])));
 		    		}
 	    		}
 	    		System.out.println("ch1: " + ch1);
@@ -87,7 +89,7 @@ public class TestABP {
 	    		}
 	    		if (channel2 != null) {
 		    		for (int i = 0; i < channel2.length; i ++) {
-		    			ch2.put(Boolean.parseBoolean(channel2[i]));
+		    			ch2.put_asyn(Boolean.parseBoolean(channel2[i]));
 		    		}
 	    		}
 	    		System.out.println("ch2: " + ch2);
@@ -102,7 +104,8 @@ public class TestABP {
 	        flag2 = true;
 		}
     	ABP<String> abp = new ABP<String>();
-    	Verify.endAtomic();
+    	
+    	if (Env.JPF_MODE) Verify.endAtomic();
     	
     	abp.begin(sentPackets, recPackets, ch1, ch2, index, finish, flag1, flag2);
 //        System.out.println("Packets sent: " + sentPackets);

@@ -15,14 +15,20 @@ public class DDropper<P,B> extends Thread {
             try { Thread.sleep(100); }
             catch (InterruptedException e) { }
             if (finish.get()) break;
+            
+            channel1.getLock().requestCS();
             P p = channel1.get();
+            channel1.getLock().releaseCS();
+            
+            channel2.getLock().requestCS();
             B b = channel2.get();
-            /*
-            if (p != null)
-                System.out.println("dropped1: " + p);
-            if (b != null)
-                System.out.println("dropped2: " + b);
-            */
+            channel2.getLock().releaseCS();
+            
+//            if (p != null)
+//                System.out.println("dropped1: " + p);
+//            if (b != null)
+//                System.out.println("dropped2: " + b);
+            
         }
     }
 }

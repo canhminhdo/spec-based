@@ -308,7 +308,7 @@ public class SequenceState extends ListenerAdapter {
 				break;
 			}
 			ElementInfo ei_head = (ElementInfo) ei_queue.getFieldValueObject("head");
-			channel2.put(((NamedFields)ei_head.getFields()).getBooleanValue(0));
+			channel2.put_asyn(((NamedFields)ei_head.getFields()).getBooleanValue(0));
 			ei_queue = (ElementInfo) ei_queue.getFieldValueObject("tail");
 		}
 		return channel2;
@@ -329,7 +329,7 @@ public class SequenceState extends ListenerAdapter {
 			// elt2
 			ElementInfo ei_elt2 = (ElementInfo) ei_head.getFieldValueObject("elt2");
 			boolean elt2 = ei_elt2.getBooleanField("value");
-			channel1.put(new Pair<String,Boolean>(elt1,elt2));
+			channel1.put_asyn(new Pair<String,Boolean>(elt1,elt2));
 			ei_queue = (ElementInfo) ei_queue.getFieldValueObject("tail");
 		}
 		return channel1;
