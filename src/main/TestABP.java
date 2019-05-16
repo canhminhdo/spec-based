@@ -33,11 +33,13 @@ public class TestABP {
     		// 2nd argument: packetsReceived
     		if (args.length >= 1) {
 	    		String[] packetsReceived = null;
+	    		recPackets = new ArrayList<String>();
 	    		if (!args[1].equals("nil")) {
 	    			packetsReceived = args[1].split(",");
-	    			recPackets = Arrays.asList(packetsReceived);
-	    		} else {
-	    			recPackets = new ArrayList<String>();
+	    			for (int i = 0; i < packetsReceived.length; i ++) {
+	    				recPackets.add(packetsReceived[i]);
+	    			}
+//	    			recPackets = Arrays.asList(packetsReceived); // return a fixed size -> So stupid
 	    		}
 	    		System.out.println("recPackets: " + recPackets);
     		}

@@ -48,7 +48,6 @@ public class Receiver<P> extends Thread {
                 	} else {
                 		packetsReceived.add(pr.first());
                 	}
-                	
 //                	packetsReceived.add(pr.first());
                     flag2 = !flag2;
                     

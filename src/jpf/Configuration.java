@@ -234,7 +234,7 @@ public class Configuration<P> implements Serializable {
 	}
 	
 	public String getChannel2Command() {
-		return getChannel1(channel2.toCommand());
+		return getChannel2(channel2.toCommand());
 	}
 	
 	public String getCommandArguments() {

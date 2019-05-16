@@ -27,7 +27,7 @@ import utils.GFG;
 
 public class SequenceState extends ListenerAdapter {
 	
-	private final int DEPTH = 50;
+	private final int DEPTH = 100;
 	private final int BOUND = 1000;
 	private boolean DEPTH_FLAG = true;
 	private boolean BOUND_FLAG = false;
