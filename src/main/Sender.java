@@ -27,8 +27,9 @@ public class Sender<P> extends Thread {
     }
 
     public void run() {
-    	for (int i = 0; i < packetsToBeSent.size(); i ++) {
+    	for (int i = index; i < packetsToBeSent.size(); i ++) {
     		Pair<P,Boolean> pr = new Pair<P,Boolean>(((List<P>)packetsToBeSent).get(i),flag1);
+    		
             while (true) {
                 channel1.put(pr);
                 /*
