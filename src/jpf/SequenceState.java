@@ -97,7 +97,7 @@ public class SequenceState extends ListenerAdapter {
 					if (!jedis.exists(elementSha256)) {
 						jedis.set(elementSha256, lastElement.toString());
 						// TODO :: submit job to the queue broker
-						if (lastElement.getFinish().get() == false || lastElement.getIndex() < 2) {
+						if (lastElement.getFinish().get() == false) {
 							mq.Sender.getInstance().sendJob(lastElement);
 						}
 					}
