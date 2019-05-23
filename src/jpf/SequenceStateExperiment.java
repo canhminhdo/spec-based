@@ -6,6 +6,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import config.Env;
 import database.RedisClient;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
@@ -45,6 +46,7 @@ public class SequenceStateExperiment extends ListenerAdapter {
 	private Jedis jedis = null;
 	
 	public SequenceStateExperiment(Config conf, JPF jpf) {
+		System.out.println("CHANEL BOUND = " + Env.BOUND);
 		initialize();
 		jedis.flushAll();
 	}
