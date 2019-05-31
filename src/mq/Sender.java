@@ -7,23 +7,32 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import jpf.Configuration;
+import server.Application;
+import server.ApplicationConfigurator;
+import server.RabbitMQ;
+import server.ServerFactory;
 
-public class Sender extends RabbitMQ {
+public class Sender {
 	private static Sender _instance = null;
 	private Connection connection;
 	private Channel channel;
+	private RabbitMQ rabbitMQ;
 
 	private Sender() {
 		try {
+			Application app = ApplicationConfigurator.getInstance().getApplication();
+			ServerFactory serverFactory = app.getServerFactory();
+			this.rabbitMQ = app.getRabbitMQ();
+			
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(getHost());
-			if (isRemote()) {
-				factory.setUsername(USERNAME);
-				factory.setPassword(PASSWORD);
+			factory.setHost(this.rabbitMQ.getHost());
+			if (serverFactory.isRemote()) {
+				factory.setUsername(this.rabbitMQ.getUserName());
+				factory.setPassword(this.rabbitMQ.getPassword());
 			}
 			connection = factory.newConnection();
 			channel = connection.createChannel();
-			channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+			channel.queueDeclare(this.rabbitMQ.getQueueName(), false, false, false, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -37,7 +46,7 @@ public class Sender extends RabbitMQ {
 	}
 
 	public void sendJob(Configuration<String> config) throws Exception {
-		channel.basicPublish("", QUEUE_NAME, null, SerializationUtils.serialize(config));
+		channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
 		System.out.println(" [x] Sent '" + config);
 	}
 	

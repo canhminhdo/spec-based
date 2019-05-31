@@ -15,32 +15,48 @@ import database.RedisClient;
 import jpf.Configuration;
 import main.Cell;
 import main.Pair;
+import server.Application;
+import server.ApplicationConfigurator;
+import server.Redis;
+import server.ServerFactory;
 
-public class Starter extends RabbitMQ {
+public class Starter {
 	
 	public static void main(String[] argv) {
 		try {
+			// Initialize application with configuration
+			Application app = ApplicationConfigurator.getInstance().getApplication();
+			ServerFactory serverFactory = app.getServerFactory();
+			Redis redis = app.getRedis();
+			server.RabbitMQ rabbitMQ = app.getRabbitMQ();
+			
+			// Clean up before kicking off environment
+			
 			// Remove all old data in "maude" folder
 			Process p1 = Runtime.getRuntime().exec(new String[] {"/bin/bash", "-c", "rm " + Env.MAUDE_DATA_PATH});
 			// Purge queue
-			Process p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name=" + QUEUE_NAME);
+			Process p2 = null;
+			if (!serverFactory.isRemote())
+				p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name=" + rabbitMQ.getQueueName());
 			
 			// Flush all keys and values from redis server
-			RedisClient.getInstance().getConnection().flushAll();
+			RedisClient.getInstance(redis.getHost(), redis.getPort()).getConnection().flushAll();
 			
 			// Wait
 			p1.waitFor();
-			p2.waitFor();
+			if (!app.getServerFactory().isRemote())
+				p2.waitFor();
 			
 			// Push a initial job to message queue 
 			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(getHost());
-			if (isRemote()) {
-				factory.setUsername(USERNAME);
-				factory.setPassword(PASSWORD);
+			factory.setHost(app.getRabbitMQ().getHost());
+			if (serverFactory.isRemote()) {
+				factory.setUsername(rabbitMQ.getUserName());
+				factory.setPassword(rabbitMQ.getPassword());
 			}
+			
 			try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
-				channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+				channel.queueDeclare(rabbitMQ.getQueueName(), false, false, false, null);
 	
 				// prepare to send a message to queue
 				Configuration<String> config = new Configuration<String>();
@@ -75,7 +91,7 @@ public class Starter extends RabbitMQ {
 		        
 				byte[] data = SerializationUtils.serialize(config);
 	
-				channel.basicPublish("", QUEUE_NAME, null, data);
+				channel.basicPublish("", rabbitMQ.getQueueName(), null, data);
 				System.out.println(" [x] Sent '" + config);
 			}
 		} catch (Exception e) {

@@ -8,20 +8,28 @@ import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import jpf.Configuration;
+import server.Application;
+import server.ApplicationConfigurator;
+import server.ServerFactory;
 
-public class Receiver extends RabbitMQ {
+public class Receiver {
 
     public static void main(String[] argv) throws Exception {
+    	// Initialize application with configuration
+		Application app = ApplicationConfigurator.getInstance().getApplication();
+		ServerFactory serverFactory = app.getServerFactory();
+		server.RabbitMQ rabbitMQ = app.getRabbitMQ();
+    	
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(getHost());
-        if (isRemote()) {
-			factory.setUsername(USERNAME);
-			factory.setPassword(PASSWORD);
+        factory.setHost(rabbitMQ.getHost());
+        if (serverFactory.isRemote()) {
+			factory.setUsername(rabbitMQ.getUserName());
+			factory.setPassword(rabbitMQ.getPassword());
 		}
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.queueDeclare(QUEUE_NAME, false, false, false, null);
+        channel.queueDeclare(rabbitMQ.getQueueName(), false, false, false, null);
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
@@ -37,7 +45,7 @@ public class Receiver extends RabbitMQ {
 			}
         };
         boolean autoAck = false;
-        channel.basicConsume(QUEUE_NAME, autoAck, deliverCallback, consumerTag -> { });
+        channel.basicConsume(rabbitMQ.getQueueName(), autoAck, deliverCallback, consumerTag -> { });
     }
 
 }

@@ -23,6 +23,9 @@ import main.Cell;
 import main.Channel;
 import main.Pair;
 import redis.clients.jedis.Jedis;
+import server.Application;
+import server.ApplicationConfigurator;
+import server.Redis;
 import utils.DateUtil;
 import utils.GFG;
 
@@ -56,7 +59,9 @@ public class SequenceStateExperiment extends ListenerAdapter {
 	}
 	
 	private void initialize() {
-		jedis = RedisClient.getInstance().getConnection();
+		Application app = ApplicationConfigurator.getInstance().getApplication();
+		Redis redis = app.getRedis();
+		jedis = RedisClient.getInstance(redis.getHost(), redis.getPort()).getConnection();
 		lookupTable = new HashMap<String,Integer>();
 		seq = new ArrayList<Configuration<String>>();
 	}
