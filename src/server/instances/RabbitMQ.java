@@ -1,7 +1,13 @@
 package server.instances;
 
+/**
+ * RabbitMQ instance configuration
+ * 
+ * @author ogataslab
+ *
+ */
 public class RabbitMQ {
-	
+
 	String host = null;
 	String userName = null;
 	String password = null;
@@ -29,5 +35,5 @@ public class RabbitMQ {
 	public String getQueueName() {
 		return queueName;
 	}
-	
+
 }

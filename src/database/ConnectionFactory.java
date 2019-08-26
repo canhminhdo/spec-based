@@ -6,12 +6,23 @@ import java.sql.SQLException;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.Driver;
 
+/**
+ * Singleton MySQL instance
+ * 
+ * @author ogataslab
+ *
+ */
 public class ConnectionFactory {
 	
 	public static final String URL = "jdbc:mysql://localhost:3306/env";
 	public static final String USER = "root";
 	public static final String PASS = "";
 	
+	/**
+	 * Get singleton MySQL connection
+	 * 
+	 * @return {@link Connection}
+	 */
 	public static Connection getConnection() {
 		try {
 			DriverManager.registerDriver(new Driver());
@@ -21,6 +32,11 @@ public class ConnectionFactory {
 		}
 	}
 	
+	/**
+	 * Close MySQL connection
+	 * 
+	 * @param conn
+	 */
 	public static void closeConnection(Connection conn) {
 		try {
 			conn.close();
@@ -30,9 +46,10 @@ public class ConnectionFactory {
 	}
 	
 	/**
-	 * Test Connection
+	 * Test connection
+	 * 
+	 * @param args
 	 */
-	
 	public static void main(String[] args) {
 		Connection conn = ConnectionFactory.getConnection();
 		System.out.println("Connected !!!");

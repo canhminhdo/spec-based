@@ -1,7 +1,8 @@
 package main;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
-import config.Env;
+import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
 
 public class Sender<P> extends Thread {
@@ -40,7 +41,7 @@ public class Sender<P> extends Thread {
                 Boolean flag = false;
                 
                 channel2.getLock().requestCS();
-                if (Env.JPF_MODE) Verify.beginAtomic();
+                if (CaseStudy.JPF_MODE) Verify.beginAtomic();
                 Boolean b = channel2.get();
                 if (b != null) {
                     if (b == !flag1) {
@@ -53,7 +54,7 @@ public class Sender<P> extends Thread {
                         flag = true;
                     }
                 }
-                if (Env.JPF_MODE) Verify.endAtomic();
+                if (CaseStudy.JPF_MODE) Verify.endAtomic();
                 channel2.getLock().releaseCS();
                 
                 if (flag) {

@@ -7,15 +7,17 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import com.mysql.jdbc.StringUtils;
-
 import jpf.common.OC;
 import main.Cell;
 import main.Channel;
-import main.EmptyQueue;
 import main.Pair;
-import main.Queue;
 
+/**
+ * Configuration for ABP protocol
+ * @author ogataslab
+ *
+ * @param <P>
+ */
 public class Configuration<P> implements Serializable, OC {
 	
 	private Channel<Pair<P,Boolean>> channel1;
@@ -47,7 +49,12 @@ public class Configuration<P> implements Serializable, OC {
 		this.depth = depth;
 	}
 	
-	
+	/**
+	 * Check whether a Configuration<P> object equals another one
+	 * 
+	 * @param obj
+	 * @return {@link Boolean}
+	 */
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {
@@ -238,6 +245,11 @@ public class Configuration<P> implements Serializable, OC {
 		return getChannel2(channel2.toCommand());
 	}
 	
+	/**
+	 * Get command arguments
+	 * 
+	 * @return {@link String}
+	 */
 	public String getCommandArguments() {
 		String cmd = "";
 		cmd += getPackets(packetsToBeSent) + " ";
@@ -251,6 +263,11 @@ public class Configuration<P> implements Serializable, OC {
 		return cmd;
 	}
 	
+	/**
+	 * Get Observer Components that is in form of String
+	 * 
+	 * @return {@link String}
+	 */
 	public String getObserverComponents() {
 		return "{" +
 					"sb: " + flag1 +

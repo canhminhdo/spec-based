@@ -1,6 +1,13 @@
 package atomic;
 
+/**
+ * Hadware Mutex Implementation
+ * 
+ * @author ogataslab
+ *
+ */
 public class HWMutex implements Lock {
+	
 	private TestAndSet lockFlag;
 
 	public HWMutex() {

@@ -1,7 +1,8 @@
 package main;
-import java.util.*;
+import java.util.Collection;
+import java.util.List;
 
-import config.Env;
+import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
 
 public class Receiver<P> extends Thread {
@@ -35,7 +36,7 @@ public class Receiver<P> extends Thread {
             */
             
             channel1.getLock().requestCS();
-            if (Env.JPF_MODE) Verify.beginAtomic();
+            if (CaseStudy.JPF_MODE) Verify.beginAtomic();
             Pair<P,Boolean> pr = channel1.get();
             if (pr != null) {
                 /*
@@ -53,7 +54,7 @@ public class Receiver<P> extends Thread {
                     
                 }
             }
-            if (Env.JPF_MODE) Verify.endAtomic();
+            if (CaseStudy.JPF_MODE) Verify.endAtomic();
             channel1.getLock().releaseCS();
             
             if (finish.get()) break;

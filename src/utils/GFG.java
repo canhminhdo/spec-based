@@ -4,12 +4,23 @@ import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 
+/**
+ * This file is used to hash a string by SHA algorithm
+ * 
+ * @author ogataslab
+ *
+ */
 public class GFG {
-	
+
+	/**
+	 * Get SHA cipher from a string by SHA algorithm
+	 * 
+	 * @param input
+	 * @return {@link String}
+	 */
 	public static String getSHA(String input) {
 
 		try {
-
 			// Static getInstance method is called with hashing SHA
 			MessageDigest md = MessageDigest.getInstance("SHA-256");
 
@@ -29,10 +40,7 @@ public class GFG {
 			}
 
 			return hashtext;
-		}
-
-		// For specifying wrong message digest algorithms
-		catch (NoSuchAlgorithmException e) {
+		} catch (NoSuchAlgorithmException e) {
 			System.out.println("Exception thrown" + " for incorrect algorithm: " + e);
 
 			return null;

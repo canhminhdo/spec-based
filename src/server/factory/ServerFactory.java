@@ -4,10 +4,16 @@ import config.CaseStudy;
 import server.instances.RabbitMQ;
 import server.instances.Redis;
 
+/**
+ * Factory Method
+ * 
+ * @author ogataslab
+ *
+ */
 public class ServerFactory {
-	
+
 	CaseStudy cs;
-	
+
 	public ServerFactory(CaseStudy cs) {
 		this.cs = cs;
 	}
@@ -17,7 +23,8 @@ public class ServerFactory {
 	}
 
 	public RabbitMQ createRabbitMQ() {
-		return new RabbitMQ(this.cs.getRabbitMQHost(), this.cs.getRabbitMQUsername(), this.cs.getRabbitMQPassword(), this.cs.getQueueName());
+		return new RabbitMQ(this.cs.getRabbitMQHost(), this.cs.getRabbitMQUsername(), this.cs.getRabbitMQPassword(),
+				this.cs.getQueueName());
 	}
 
 	public Boolean isRemote() {

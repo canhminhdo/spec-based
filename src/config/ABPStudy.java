@@ -9,22 +9,35 @@ import jpf.common.OC;
 import main.Cell;
 import main.Pair;
 
+/**
+ * ABP is a case study for testing concurrent programs at OgataLab This file is
+ * specialized for ABP protocol. You need to revise in this file
+ * 
+ * @author ogataslab
+ */
 public class ABPStudy extends CaseStudy {
-	final String MAIN_CLASS = "main.TestABP";
-	final String QUEUE_NAME = "ABP";
-	final String MAUDE_PATH = "/Users/canhdominh/eclipse-workspace/abp/maude/data*";
-	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/abp/bin";
-	
-	// student
-//		final String CLASS_PATH = "/Users/student/eclipse-workspace/abp/bin";
-//		final String MAUDE_DATA_PATH = "/Users/student/eclipse-workspace/abp/maude/data*";
-		
-		// ogataslab
-//		final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/abp/bin";
-//		final String MAUDE_DATA_PATH = "/Users/ogataslab/eclipse-workspace/abp/maude/data*";
 
-	final String PACKETS[] = { "0", "1", "2", "3" };
-	final int BOUND = 3;
+	// main class to start ABP program
+	final String MAIN_CLASS = "main.TestABP";
+	// name of queue when using RabbitMQ
+	final String QUEUE_NAME = "ABP";
+	// Maude path if in the case you want to write to file
+//	final String MAUDE_PATH = "/Users/canhdominh/eclipse-workspace/abp/maude/data*";
+	// Path to abp program
+//	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/abp/bin";
+
+	// if you use "student" computer at lab
+//	final String CLASS_PATH = "/Users/student/eclipse-workspace/abp/bin";
+//	final String MAUDE_PATH = "/Users/student/eclipse-workspace/abp/maude/data*";
+
+	// if you use "ogataslab" computer at lab
+	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/abp/bin";
+	final String MAUDE_PATH = "/Users/ogataslab/eclipse-workspace/abp/maude/data*";
+
+	// packets will send over network
+	public static String PACKETS[] = { "0", "1", "2", "3" };
+	// channel size
+	public static int BOUND = 3;
 
 	@Override
 	public String getQueueName() {
@@ -40,7 +53,7 @@ public class ABPStudy extends CaseStudy {
 	public String getClassPath() {
 		return CLASS_PATH;
 	}
-	
+
 	@Override
 	public OC getInitialMessage() {
 		Configuration<String> config = new Configuration<String>();
@@ -75,14 +88,14 @@ public class ABPStudy extends CaseStudy {
 
 		return config;
 	}
-	
+
 	@Override
 	public ArrayList<String> getConfigList(OC config) {
-			
+
 		ArrayList<String> configList = new ArrayList<String>();
 		configList.add("+classpath=" + this.CLASS_PATH);
 		configList.add(this.MAIN_CLASS);
-		
+
 		// 1st argument: packetsToBeSent
 		configList.add(((Configuration<String>) config).getPacketsToBeSentCommand());
 		// 2nd argument: packetsReceived
@@ -99,7 +112,7 @@ public class ABPStudy extends CaseStudy {
 		configList.add(((Configuration<String>) config).getChannel1Command());
 		// 8th argument: channel2
 		configList.add(((Configuration<String>) config).getChannel2Command());
-		
+
 		return configList;
 	}
 

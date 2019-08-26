@@ -1,19 +1,31 @@
 package atomic;
 
-import config.Env;
+import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
 
+/**
+ * TestAndSet file supports Test&Set protocol
+ * 
+ * @author ogataslab
+ *
+ */
 public class TestAndSet {
 	Integer myValue = 0;
 
 	public TestAndSet() {
 	}
-
+	
+	/**
+	 * Synchronized test and test function
+	 * 
+	 * @param newValue
+	 * @return {@link Integer}
+	 */
 	public synchronized int testAndSet(int newValue) {
-		if (Env.JPF_MODE) Verify.beginAtomic();
+		if (CaseStudy.JPF_MODE) Verify.beginAtomic();
 		int oldValue = myValue;
 		myValue = newValue;
-		if (Env.JPF_MODE) Verify.endAtomic();
+		if (CaseStudy.JPF_MODE) Verify.endAtomic();
 		return oldValue;
 	}
 }

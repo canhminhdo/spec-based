@@ -1,7 +1,13 @@
 package server.instances;
 
+/**
+ * Redis instance configuration
+ * 
+ * @author ogataslab
+ *
+ */
 public class Redis {
-	
+
 	String host = null;
 	Integer port = null;
 
@@ -13,9 +19,9 @@ public class Redis {
 	public String getHost() {
 		return this.host;
 	}
-	
+
 	public Integer getPort() {
 		return this.port;
 	}
-	
+
 }

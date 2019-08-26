@@ -6,24 +6,33 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import jpf.abp.Configuration;
+import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
 import server.factory.ServerFactory;
 import server.instances.RabbitMQ;
 
+/**
+ * Sending message back to RabbitMQ master from RabbitMQ client
+ * 
+ * @author ogataslab
+ *
+ */
 public class Sender {
 	private static Sender _instance = null;
 	private Connection connection;
 	private Channel channel;
 	private RabbitMQ rabbitMQ;
 
+	/**
+	 * Connecting to RabbitMQ master
+	 */
 	private Sender() {
 		try {
 			Application app = ApplicationConfigurator.getInstance().getApplication();
 			ServerFactory serverFactory = app.getServerFactory();
 			this.rabbitMQ = app.getRabbitMQ();
-			
+
 			ConnectionFactory factory = new ConnectionFactory();
 			factory.setHost(this.rabbitMQ.getHost());
 			if (serverFactory.isRemote()) {
@@ -38,6 +47,11 @@ public class Sender {
 		}
 	}
 
+	/**
+	 * Get singleton Sender instance
+	 * 
+	 * @return {@link Sender}
+	 */
 	public static Sender getInstance() {
 		if (_instance == null)
 			_instance = new Sender();
@@ -45,11 +59,22 @@ public class Sender {
 		return _instance;
 	}
 
-	public void sendJob(Configuration<String> config) throws Exception {
+	/**
+	 * Send message to RabbitMQ master
+	 * 
+	 * @param config
+	 * @throws Exception
+	 */
+	public void sendJob(OC config) throws Exception {
 		channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
 		System.out.println(" [x] Sent '" + config);
 	}
-	
+
+	/**
+	 * Closing singleton Sender instance
+	 * 
+	 * @throws Exception
+	 */
 	public void close() throws Exception {
 		_instance = null;
 		channel.close();

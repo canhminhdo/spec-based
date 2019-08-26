@@ -13,14 +13,25 @@ import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
 
+/**
+ * Starter program to kick-off environment by sending the initial message to
+ * RabbitMQ master
+ * 
+ * @author ogataslab
+ *
+ */
 public class Starter {
 
+	/**
+	 * Connecting to RabbitMQ and send initial message
+	 * 
+	 * @param argv Unused.
+	 */
 	public static void main(String[] argv) {
 		try {
 			// Initialize application with configuration
-			CaseStudy cs = new ABPStudy();
-			Application app = ApplicationConfigurator.getInstance(cs).getApplication();
-			
+			Application app = ApplicationConfigurator.getInstance().getApplication();
+
 			cleanUp(app);
 
 			// Push a initial job to message queue
@@ -35,8 +46,8 @@ public class Starter {
 				channel.queueDeclare(app.getRabbitMQ().getQueueName(), false, false, false, null);
 
 				// prepare to send a message to queue
-				OC config = cs.getInitialMessage();
-				
+				OC config = app.getCaseStudy().getInitialMessage();
+
 				byte[] data = SerializationUtils.serialize(config);
 
 				channel.basicPublish("", app.getRabbitMQ().getQueueName(), null, data);
@@ -47,26 +58,34 @@ public class Starter {
 		}
 	}
 
+	/**
+	 * Clean up before starting environment
+	 * 
+	 * @param app
+	 */
 	public static void cleanUp(Application app) {
 		try {
 			// Clean up before kicking off environment
-	
-			// Remove all old data in "maude" folder. If you write state sequences to file systems
-			Process p1 = Runtime.getRuntime().exec(new String[] { "/bin/bash", "-c", "rm " + app.getCaseStudy().getMaudePath() });
-	
+
+			// Remove all old data in "maude" folder. If you write state sequences to file
+			// systems
+			Process p1 = Runtime.getRuntime()
+					.exec(new String[] { "/bin/bash", "-c", "rm " + app.getCaseStudy().getMaudePath() });
+
 			// Purge queue
 			Process p2 = null;
 			if (!app.getServerFactory().isRemote())
-				p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name=" + app.getRabbitMQ().getQueueName());
-	
+				p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
+						+ app.getRabbitMQ().getQueueName());
+
 			// Flush all keys and values from redis server
 			RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().flushAll();
-	
+
 			// Wait
 			p1.waitFor();
 			if (!app.getServerFactory().isRemote())
 				p2.waitFor();
-			
+
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

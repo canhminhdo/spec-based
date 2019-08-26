@@ -4,11 +4,21 @@ import java.util.ArrayList;
 
 import jpf.common.OC;
 
+/**
+ * This file to cover all case studies what we will experiment Using RabbitMQ as
+ * message broker and Redis as cache
+ * 
+ * @author ogataslab
+ */
 public abstract class CaseStudy {
 	
-	public final Boolean IS_REMOTE = false;
-	public final Boolean JPF_MODE = true;
+	// the current version
+	public static String version = "1.0";
+	// using JPF_MODE ?
+	public static Boolean JPF_MODE = true;
 	
+	public final Boolean IS_REMOTE = false;
+
 	// RABBITMQ
 	// -> remote mode
 	public final String RABBITMQ_REMOTE_HOST = "45.32.43.1";
@@ -20,7 +30,6 @@ public abstract class CaseStudy {
 	public final String RABBITMQ_LOCAL_USERNAME = "";
 	public final String RABBITMQ_LOCAL_PASSWORD = "";
 	public final String RABBITMQ_LOCAL_QUEUENAME = "ABP";
-	
 
 	// REDIS
 	// -> remote mode
@@ -29,44 +38,93 @@ public abstract class CaseStudy {
 	// -> local mode
 	public final String REDIS_LOCAL_HOST = "localhost";
 	public final Integer REDIS_LOCAL_PORT = 6379;
-	
-	
-	// you must implement these kind of functions to conform with each case study 
+
+	/**
+	 * Get Maude path where you store state sequences to file systems
+	 * 
+	 * @return {@link String}
+	 */
 	public abstract String getMaudePath();
+
+	/**
+	 * Get CLASS_PATH where you program is locate
+	 * 
+	 * @return {@link String}
+	 */
 	public abstract String getClassPath();
+
+	/**
+	 * This is to get the initial message to send to the master queue
+	 * 
+	 * @return {@link OC}
+	 */
 	public abstract OC getInitialMessage();
+
+	/**
+	 * Building configList from a Observer Component
+	 * 
+	 * @param config This is a observer component object value
+	 * @return {@link ArrayList<String>}
+	 */
 	public abstract ArrayList<String> getConfigList(OC config);
-	
+
+	/**
+	 * Are you using remote mode ?
+	 * 
+	 * @return {@link Boolean}
+	 */
 	public Boolean isRemote() {
 		return IS_REMOTE;
 	}
-	
-	public Boolean isJPFMode() {
-		return JPF_MODE;
-	}
-	
-	
-	// RABBITMQ informations
+
+	/**
+	 * Get RabbitMQ Host
+	 * 
+	 * @return {@link String}
+	 */
 	public String getRabbitMQHost() {
 		return isRemote() ? RABBITMQ_REMOTE_HOST : RABBITMQ_LOCAL_HOST;
 	};
-	
+
+	/**
+	 * Get RabbitMQ Username
+	 * 
+	 * @return {@link String}
+	 */
 	public String getRabbitMQUsername() {
 		return isRemote() ? RABBITMQ_REMOTE_USERNAME : RABBITMQ_LOCAL_USERNAME;
 	};
-	
+
+	/**
+	 * Get RabbitMQ Password
+	 * 
+	 * @return {@link String}
+	 */
 	public String getRabbitMQPassword() {
 		return isRemote() ? RABBITMQ_REMOTE_PASSWORD : RABBITMQ_LOCAL_PASSWORD;
 	};
-	
+
+	/**
+	 * Get queue name when using RabbitMQ
+	 * 
+	 * @return {@link String}
+	 */
 	public abstract String getQueueName();
-	
-	
-	// REDIS informations
+
+	/**
+	 * Get Redis Host
+	 * 
+	 * @return {@link String}
+	 */
 	public String getRedisHost() {
 		return isRemote() ? REDIS_REMOTE_HOST : REDIS_LOCAL_HOST;
 	};
-	
+
+	/**
+	 * Get Redis port
+	 * 
+	 * @return {@link String}
+	 */
 	public Integer getRedisPort() {
 		return isRemote() ? REDIS_REMOTE_PORT : REDIS_LOCAL_PORT;
 	}
