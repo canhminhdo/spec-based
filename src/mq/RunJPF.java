@@ -2,37 +2,47 @@ package mq;
 
 import java.util.ArrayList;
 
-import config.Env;
+import config.ABPStudy;
+import config.CaseStudy;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import jpf.SequenceState;
-import jpf.abp.Configuration;
+import jpf.common.OC;
+import server.Application;
+import server.ApplicationConfigurator;
 
 public class RunJPF extends Thread {
 	private ArrayList<String> configList;
 
-	public RunJPF(Configuration<String> config) {
-		configList = new ArrayList<String>();
-		configList.add("+classpath=" + Env.CLASS_PATH);
-		configList.add("main.TestABP");
-		
-		// 1st argument: packetsToBeSent
-		configList.add(config.getPacketsToBeSentCommand());
-		// 2nd argument: packetsReceived
-		configList.add(config.getPacketsReceivedCommand());
-		// 3rd argument: index of packetsToBeSent
-		configList.add(config.getIndexCommand());
-		// 4th argument: finish flag
-		configList.add(config.getFinishCommand());
-		// 5th argument: flag1
-		configList.add(config.getFlag1Command());
-		// 6th argument: flag2
-		configList.add(config.getFlag2Command());
-		// 7th argument: channel1
-		configList.add(config.getChannel1Command());
-		// 8th argument: channel2
-		configList.add(config.getChannel2Command());
+	public RunJPF(OC config) {
+		// TODO: Customize with each case study here.
+		CaseStudy cs = new ABPStudy();
+		Application app = ApplicationConfigurator.getInstance(cs).getApplication();
+		this.configList = app.getCaseStudy().getConfigList(config);
 	}
+
+//	public RunJPF(Configuration<String> config) {
+//		configList = new ArrayList<String>();
+//		configList.add("+classpath=" + Env.CLASS_PATH);
+//		configList.add("main.TestABP");
+//		
+//		// 1st argument: packetsToBeSent
+//		configList.add(config.getPacketsToBeSentCommand());
+//		// 2nd argument: packetsReceived
+//		configList.add(config.getPacketsReceivedCommand());
+//		// 3rd argument: index of packetsToBeSent
+//		configList.add(config.getIndexCommand());
+//		// 4th argument: finish flag
+//		configList.add(config.getFinishCommand());
+//		// 5th argument: flag1
+//		configList.add(config.getFlag1Command());
+//		// 6th argument: flag2
+//		configList.add(config.getFlag2Command());
+//		// 7th argument: channel1
+//		configList.add(config.getChannel1Command());
+//		// 8th argument: channel2
+//		configList.add(config.getChannel2Command());
+//	}
 
 	public void run() {
 		try {

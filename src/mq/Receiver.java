@@ -7,7 +7,10 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+import config.ABPStudy;
+import config.CaseStudy;
 import jpf.abp.Configuration;
+import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
 import server.factory.ServerFactory;
@@ -16,26 +19,25 @@ public class Receiver {
 
     public static void main(String[] argv) throws Exception {
     	// Initialize application with configuration
-		Application app = ApplicationConfigurator.getInstance().getApplication();
-		ServerFactory serverFactory = app.getServerFactory();
-		server.instances.RabbitMQ rabbitMQ = app.getRabbitMQ();
+    	CaseStudy cs = new ABPStudy();
+		Application app = ApplicationConfigurator.getInstance(cs).getApplication();
     	
 		// rabbitMQ connection
         ConnectionFactory factory = new ConnectionFactory();
-        factory.setHost(rabbitMQ.getHost());
-        if (serverFactory.isRemote()) {
-			factory.setUsername(rabbitMQ.getUserName());
-			factory.setPassword(rabbitMQ.getPassword());
+        factory.setHost(app.getRabbitMQ().getHost());
+        if (app.getServerFactory().isRemote()) {
+			factory.setUsername(app.getRabbitMQ().getUserName());
+			factory.setPassword(app.getRabbitMQ().getPassword());
 		}
         Connection connection = factory.newConnection();
         Channel channel = connection.createChannel();
 
-        channel.queueDeclare(rabbitMQ.getQueueName(), false, false, false, null);
+        channel.queueDeclare(app.getRabbitMQ().getQueueName(), false, false, false, null);
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
         	
-        	Configuration<String> config = SerializationUtils.deserialize(delivery.getBody());
+        	OC config = SerializationUtils.deserialize(delivery.getBody());
             System.out.println(" [x] Received '" + config);
             RunJPF runner = new RunJPF(config);
             runner.start();
@@ -48,7 +50,7 @@ public class Receiver {
         };
         
         boolean autoAck = false;
-        channel.basicConsume(rabbitMQ.getQueueName(), autoAck, deliverCallback, consumerTag -> { });
+        channel.basicConsume(app.getRabbitMQ().getQueueName(), autoAck, deliverCallback, consumerTag -> { });
     }
 
 }
