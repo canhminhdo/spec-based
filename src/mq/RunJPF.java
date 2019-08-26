@@ -5,8 +5,8 @@ import java.util.ArrayList;
 import config.Env;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
-import jpf.Configuration;
 import jpf.SequenceState;
+import jpf.abp.Configuration;
 
 public class RunJPF extends Thread {
 	private ArrayList<String> configList;

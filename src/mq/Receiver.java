@@ -7,10 +7,10 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
-import jpf.Configuration;
+import jpf.abp.Configuration;
 import server.Application;
 import server.ApplicationConfigurator;
-import server.ServerFactory;
+import server.factory.ServerFactory;
 
 public class Receiver {
 
@@ -18,8 +18,9 @@ public class Receiver {
     	// Initialize application with configuration
 		Application app = ApplicationConfigurator.getInstance().getApplication();
 		ServerFactory serverFactory = app.getServerFactory();
-		server.RabbitMQ rabbitMQ = app.getRabbitMQ();
+		server.instances.RabbitMQ rabbitMQ = app.getRabbitMQ();
     	
+		// rabbitMQ connection
         ConnectionFactory factory = new ConnectionFactory();
         factory.setHost(rabbitMQ.getHost());
         if (serverFactory.isRemote()) {
@@ -33,6 +34,7 @@ public class Receiver {
         System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
         DeliverCallback deliverCallback = (consumerTag, delivery) -> {
+        	
         	Configuration<String> config = SerializationUtils.deserialize(delivery.getBody());
             System.out.println(" [x] Received '" + config);
             RunJPF runner = new RunJPF(config);
@@ -44,6 +46,7 @@ public class Receiver {
 				e.printStackTrace();
 			}
         };
+        
         boolean autoAck = false;
         channel.basicConsume(rabbitMQ.getQueueName(), autoAck, deliverCallback, consumerTag -> { });
     }

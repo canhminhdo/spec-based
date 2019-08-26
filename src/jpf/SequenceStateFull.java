@@ -17,6 +17,7 @@ import gov.nasa.jpf.vm.Heap;
 import gov.nasa.jpf.vm.NamedFields;
 import gov.nasa.jpf.vm.ReferenceArrayFields;
 import gov.nasa.jpf.vm.VM;
+import jpf.abp.Configuration;
 import main.Cell;
 import main.Channel;
 import main.Pair;

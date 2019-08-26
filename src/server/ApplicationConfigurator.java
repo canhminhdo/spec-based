@@ -1,25 +1,27 @@
 package server;
 
-import config.Env;
+import config.CaseStudy;
+import server.factory.ServerFactory;
 
 public class ApplicationConfigurator {
+	
 	private static ApplicationConfigurator _instance = null;
 	private Application app = null;
 	
-	public static ApplicationConfigurator getInstance() {
+	public static ApplicationConfigurator getInstance(CaseStudy cs) {
 		if (_instance == null)
-			_instance = new ApplicationConfigurator();
+			_instance = new ApplicationConfigurator(cs);
 		
 		return _instance;
 	}
 	
+	public static ApplicationConfigurator getInstance() {
+		return _instance;
+	}
+	
 
-	public ApplicationConfigurator() {
-		if (Env.IS_REMOTE) {
-			this.app = new Application(new RemoteFactory());
-		} else {
-			this.app = new Application(new LocalFactory());
-		}
+	public ApplicationConfigurator(CaseStudy cs) {
+		this.app = new Application(new ServerFactory(cs), cs);
 	}
 	
 	public Application getApplication() {

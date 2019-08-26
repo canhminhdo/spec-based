@@ -18,13 +18,14 @@ import gov.nasa.jpf.vm.Heap;
 import gov.nasa.jpf.vm.NamedFields;
 import gov.nasa.jpf.vm.ReferenceArrayFields;
 import gov.nasa.jpf.vm.VM;
+import jpf.abp.Configuration;
 import main.Cell;
 import main.Channel;
 import main.Pair;
 import redis.clients.jedis.Jedis;
 import server.Application;
 import server.ApplicationConfigurator;
-import server.Redis;
+import server.instances.Redis;
 import utils.DateUtil;
 import utils.GFG;
 

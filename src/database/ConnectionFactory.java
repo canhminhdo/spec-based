@@ -7,6 +7,7 @@ import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.Driver;
 
 public class ConnectionFactory {
+	
 	public static final String URL = "jdbc:mysql://localhost:3306/env";
 	public static final String USER = "root";
 	public static final String PASS = "";

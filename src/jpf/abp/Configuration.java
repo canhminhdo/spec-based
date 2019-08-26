@@ -1,4 +1,4 @@
-package jpf;
+package jpf.abp;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -9,13 +9,14 @@ import java.util.regex.Pattern;
 
 import com.mysql.jdbc.StringUtils;
 
+import jpf.common.OC;
 import main.Cell;
 import main.Channel;
 import main.EmptyQueue;
 import main.Pair;
 import main.Queue;
 
-public class Configuration<P> implements Serializable {
+public class Configuration<P> implements Serializable, OC {
 	
 	private Channel<Pair<P,Boolean>> channel1;
 	private Integer index;

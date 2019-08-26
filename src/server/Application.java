@@ -1,13 +1,20 @@
 package server;
 
+import config.CaseStudy;
+import server.factory.ServerFactory;
+import server.instances.RabbitMQ;
+import server.instances.Redis;
+
 public class Application {
 	
+	CaseStudy cs = null;
 	ServerFactory serverFactory = null;
 	Redis redis = null;
 	RabbitMQ rabbitMQ = null;
 
-	public Application(ServerFactory serverFactory) {
+	public Application(ServerFactory serverFactory, CaseStudy cs) {
 		this.serverFactory = serverFactory;
+		this.cs = cs;
 		this.createServer();
 	}
 	
@@ -26,6 +33,10 @@ public class Application {
 
 	public RabbitMQ getRabbitMQ() {
 		return rabbitMQ;
+	}
+	
+	public CaseStudy getCaseStudy() {
+		return cs;
 	}
 	
 }

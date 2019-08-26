@@ -1,11 +1,11 @@
-package server;
+package server.instances;
 
-public class LocalRedis implements Redis {
+public class Redis {
 	
 	String host = null;
 	Integer port = null;
 
-	public LocalRedis(String host, Integer port) {
+	public Redis(String host, Integer port) {
 		this.host = host;
 		this.port = port;
 	}
@@ -17,5 +17,5 @@ public class LocalRedis implements Redis {
 	public Integer getPort() {
 		return this.port;
 	}
-
+	
 }

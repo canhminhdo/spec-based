@@ -6,11 +6,11 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import jpf.Configuration;
+import jpf.abp.Configuration;
 import server.Application;
 import server.ApplicationConfigurator;
-import server.RabbitMQ;
-import server.ServerFactory;
+import server.factory.ServerFactory;
+import server.instances.RabbitMQ;
 
 public class Sender {
 	private static Sender _instance = null;

@@ -1,13 +1,13 @@
-package server;
+package server.instances;
 
-public class RemoteRabbitMQ implements RabbitMQ {
+public class RabbitMQ {
 	
 	String host = null;
 	String userName = null;
 	String password = null;
 	String queueName = null;
-	
-	public RemoteRabbitMQ(String host, String userName, String password, String queueName) {
+
+	public RabbitMQ(String host, String userName, String password, String queueName) {
 		this.host = host;
 		this.userName = userName;
 		this.password = password;

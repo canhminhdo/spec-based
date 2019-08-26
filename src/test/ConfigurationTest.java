@@ -6,8 +6,8 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
-import jpf.Configuration;
 import jpf.Node;
+import jpf.abp.Configuration;
 import junit.framework.TestCase;
 import main.Cell;
 import main.Channel;
