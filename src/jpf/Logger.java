@@ -3,7 +3,7 @@ package jpf;
 /**
  * Logger utility class
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class Logger {

@@ -1,12 +1,12 @@
-package main;
+package main.abp;
 
 import gov.nasa.jpf.vm.Verify;
 
-public class Dropper<P> extends Thread {
+public class Duplicator<P> extends Thread {
     private Channel<P> channel;
     private Cell<Boolean> finish;
 
-    public Dropper(Channel<P> ch,Cell<Boolean> f) {
+    public Duplicator(Channel<P> ch,Cell<Boolean> f) {
         this.channel = ch;
         this.finish = f;
     }
@@ -17,11 +17,11 @@ public class Dropper<P> extends Thread {
             catch (InterruptedException e) { }
             if (finish.get()) break;
             Verify.beginAtomic();
-            P p = channel.get();
+            P p = channel.duptop();
             Verify.endAtomic();
             /*
             if (p != null)
-                System.out.println("dropped: " + p);
+                System.out.println("duplicated: " + p);
             */
         }
     }

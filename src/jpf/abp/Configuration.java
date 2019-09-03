@@ -8,13 +8,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import jpf.common.OC;
-import main.Cell;
-import main.Channel;
-import main.Pair;
+import main.abp.Cell;
+import main.abp.Channel;
+import main.abp.Pair;
 
 /**
  * Configuration for ABP protocol
- * @author ogataslab
+ * @author OgataLab
  *
  * @param <P>
  */
@@ -279,5 +279,10 @@ public class Configuration<P> implements Serializable, OC {
 					" rb: " + flag2 +
 					" buf: " + getAbpBuf() +
 			   "}";
+	}
+
+	@Override
+	public boolean isFinished() {
+		return this.getFinish().get();
 	}
 }

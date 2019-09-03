@@ -1,6 +1,7 @@
 package server;
 
 import config.CaseStudy;
+import jpf.common.HeapJPF;
 import server.factory.ServerFactory;
 import server.instances.RabbitMQ;
 import server.instances.Redis;
@@ -8,12 +9,13 @@ import server.instances.Redis;
 /**
  * Application that contains all important instances
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class Application {
 
 	CaseStudy cs = null;
+	HeapJPF heap = null;
 	ServerFactory serverFactory = null;
 	Redis redis = null;
 	RabbitMQ rabbitMQ = null;
@@ -62,6 +64,19 @@ public class Application {
 	 */
 	public CaseStudy getCaseStudy() {
 		return cs;
+	}
+	
+	/**
+	 * Setup heapJPF
+	 * 
+	 * @param heap
+	 */
+	public void setHeapJPF(HeapJPF heap) {
+		this.heap = heap;
+	}
+	
+	public HeapJPF getHeapJPF() {
+		return this.heap;
 	}
 
 }

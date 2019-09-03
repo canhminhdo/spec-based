@@ -9,7 +9,7 @@ import com.mysql.jdbc.Driver;
 /**
  * Singleton MySQL instance
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class ConnectionFactory {

@@ -6,8 +6,6 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
-import config.ABPStudy;
-import config.CaseStudy;
 import database.RedisClient;
 import jpf.common.OC;
 import server.Application;
@@ -17,7 +15,7 @@ import server.ApplicationConfigurator;
  * Starter program to kick-off environment by sending the initial message to
  * RabbitMQ master
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class Starter {
@@ -67,25 +65,21 @@ public class Starter {
 		try {
 			// Clean up before kicking off environment
 
-			// Remove all old data in "maude" folder. If you write state sequences to file
-			// systems
-			Process p1 = Runtime.getRuntime()
-					.exec(new String[] { "/bin/bash", "-c", "rm " + app.getCaseStudy().getMaudePath() });
-
-			// Purge queue
-			Process p2 = null;
-			if (!app.getServerFactory().isRemote())
-				p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
-						+ app.getRabbitMQ().getQueueName());
-
-			// Flush all keys and values from redis server
-			RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().flushAll();
-
-			// Wait
-			p1.waitFor();
-			if (!app.getServerFactory().isRemote())
+			// Purge queue from RabbitMQ
+			if (!app.getServerFactory().isRemote()) {
+				Process p1 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
+						+ app.getCaseStudy().getQueueName());
+				
+				Process p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
+						+ app.getCaseStudy().getMaudeQueue());
+				
+				p1.waitFor();
 				p2.waitFor();
+			}
 
+			// Flush all keys and values from Redis server
+			RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().flushAll();
+			
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

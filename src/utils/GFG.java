@@ -7,7 +7,7 @@ import java.security.NoSuchAlgorithmException;
 /**
  * This file is used to hash a string by SHA algorithm
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class GFG {

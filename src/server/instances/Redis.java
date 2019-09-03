@@ -3,7 +3,7 @@ package server.instances;
 /**
  * Redis instance configuration
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class Redis {

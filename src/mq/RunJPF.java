@@ -12,7 +12,7 @@ import server.ApplicationConfigurator;
 /**
  * This file show how to start JPF program from internal java program
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class RunJPF extends Thread {
@@ -29,6 +29,7 @@ public class RunJPF extends Thread {
 		// TODO: Customize with each case study here.
 		Application app = ApplicationConfigurator.getInstance().getApplication();
 		this.configList = app.getCaseStudy().getConfigList(config);
+		app.setHeapJPF(app.getCaseStudy().getHeapJPF());
 	}
 
 	/**

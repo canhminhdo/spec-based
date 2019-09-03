@@ -6,16 +6,18 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
+import config.CaseStudy;
 import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
 import server.factory.ServerFactory;
 import server.instances.RabbitMQ;
+import utils.AES;
 
 /**
  * Sending message back to RabbitMQ master from RabbitMQ client
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class Sender {
@@ -42,6 +44,7 @@ public class Sender {
 			connection = factory.newConnection();
 			channel = connection.createChannel();
 			channel.queueDeclare(this.rabbitMQ.getQueueName(), false, false, false, null);
+			channel.queueDeclare(this.rabbitMQ.getMaudeQueue(), false, false, false, null);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -68,6 +71,19 @@ public class Sender {
 	public void sendJob(OC config) throws Exception {
 		channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
 		System.out.println(" [x] Sent '" + config);
+	}
+	
+	/**
+	 * Send message to RabbitMQ master for Maude program
+	 * 
+	 * @param config
+	 * @throws Exception
+	 */
+	public void sendMaudeJob(String seq) throws Exception {
+		// Encrypt before sending
+		String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
+		channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(cipher));
+		System.out.println(" [x] Sent to Maude '" + seq);
 	}
 
 	/**

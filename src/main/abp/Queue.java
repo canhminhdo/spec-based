@@ -1,4 +1,4 @@
-package main;
+package main.abp;
 public interface Queue<E> {
     E top();
     NeQueue<E> enqueue(E e);

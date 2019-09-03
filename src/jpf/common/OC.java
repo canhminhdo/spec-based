@@ -5,9 +5,12 @@ import java.io.Serializable;
 /**
  * Observer Component for all case studies
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public interface OC extends Serializable {
-	
+
+	public int getStateId();
+
+	public boolean isFinished();
 }

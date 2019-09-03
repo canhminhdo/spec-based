@@ -2,21 +2,33 @@ package config;
 
 import java.util.ArrayList;
 
+import jpf.common.HeapJPF;
 import jpf.common.OC;
 
 /**
- * This file to cover all case studies what we will experiment Using RabbitMQ as
- * message broker and Redis as cache
+ * This file to cover all case studies what we will experiment. Using RabbitMQ
+ * as message broker and Redis as cache
  * 
- * @author ogataslab
+ * @author OgataLab
  */
 public abstract class CaseStudy {
-	
+
 	// the current version
 	public static String version = "1.0";
 	// using JPF_MODE ?
 	public static Boolean JPF_MODE = true;
 	
+	public static String SECRETE_KEY = "OgataLab";
+	
+	// Maude program information
+	public static String MAUDE_PROGRAM = "/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";
+	
+	// Using for state sequences generation by JPF
+	public static int DEPTH = 100;
+	public static int BOUND = 1000;
+	public static boolean DEPTH_FLAG = false;
+	public static boolean BOUND_FLAG = false;
+
 	public final Boolean IS_REMOTE = false;
 
 	// RABBITMQ
@@ -24,12 +36,10 @@ public abstract class CaseStudy {
 	public final String RABBITMQ_REMOTE_HOST = "45.32.43.1";
 	public final String RABBITMQ_REMOTE_USERNAME = "dev";
 	public final String RABBITMQ_REMOTE_PASSWORD = "pdev";
-	public final String RABBITMQ_REMOTE_QUEUENAME = "ABP";
 	// -> local mode
 	public final String RABBITMQ_LOCAL_HOST = "localhost";
 	public final String RABBITMQ_LOCAL_USERNAME = "";
 	public final String RABBITMQ_LOCAL_PASSWORD = "";
-	public final String RABBITMQ_LOCAL_QUEUENAME = "ABP";
 
 	// REDIS
 	// -> remote mode
@@ -38,13 +48,6 @@ public abstract class CaseStudy {
 	// -> local mode
 	public final String REDIS_LOCAL_HOST = "localhost";
 	public final Integer REDIS_LOCAL_PORT = 6379;
-
-	/**
-	 * Get Maude path where you store state sequences to file systems
-	 * 
-	 * @return {@link String}
-	 */
-	public abstract String getMaudePath();
 
 	/**
 	 * Get CLASS_PATH where you program is locate
@@ -110,6 +113,13 @@ public abstract class CaseStudy {
 	 * @return {@link String}
 	 */
 	public abstract String getQueueName();
+	
+	/**
+	 * Get queue name of maude when using RabbitMQ
+	 * 
+	 * @return {@link String}
+	 */
+	public abstract String getMaudeQueue();
 
 	/**
 	 * Get Redis Host
@@ -128,4 +138,32 @@ public abstract class CaseStudy {
 	public Integer getRedisPort() {
 		return isRemote() ? REDIS_REMOTE_PORT : REDIS_LOCAL_PORT;
 	}
+
+	/**
+	 * Get a HeapJPF object
+	 * 
+	 * @return {@link HeapJPF}
+	 */
+	public abstract HeapJPF getHeapJPF();
+
+	/**
+	 * Print your case study before state sequences generation
+	 */
+	public void printConfiguration() {
+		System.out.println("Case Study");
+	}
+	
+	/**
+	 * Get all maude files what you need to pre-load
+	 * 
+	 * @return [@link String[]]
+	 */
+	public abstract String[] getMaudeFiles();
+	
+	/**
+	 * Get command to feed into Maude program
+	 * 
+	 * @return [@link String]
+	 */
+	public abstract String getCommand();
 }

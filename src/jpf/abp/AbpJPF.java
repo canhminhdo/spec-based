@@ -1,14 +1,8 @@
-package jpf;
-import java.io.BufferedWriter;
-import java.io.FileWriter;
-import java.io.IOException;
+package jpf.abp;
+
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
 
-import gov.nasa.jpf.Config;
-import gov.nasa.jpf.JPF;
-import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.CharArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
@@ -17,176 +11,44 @@ import gov.nasa.jpf.vm.Heap;
 import gov.nasa.jpf.vm.NamedFields;
 import gov.nasa.jpf.vm.ReferenceArrayFields;
 import gov.nasa.jpf.vm.VM;
-import jpf.abp.Configuration;
-import main.Cell;
-import main.Channel;
-import main.Pair;
-import utils.DateUtil;
+import jpf.common.HeapJPF;
+import jpf.common.OC;
+import main.abp.Cell;
+import main.abp.Channel;
+import main.abp.Pair;
 
-public class SequenceStateFull extends ListenerAdapter {
-	
-	private static final int DEPTH = 50;
-	private static final int BOUND = 1000;
-	private static boolean DEPTH_FLAG = true;
-	private static boolean BOUND_FLAG = false;
-	private static int COUNT = 0;
-	private static final String TXT_EXT = "txt";
-	private static final String OUT_FILENAME_NO_EXT = "./maude/data";
+/**
+ * ABP interacts with Heap of JPF
+ * 
+ * @author OgataLab
+ *
+ */
+public class AbpJPF extends HeapJPF {
 
-	private BufferedWriter graph;
-	private String out_filename = OUT_FILENAME_NO_EXT + "-" + DateUtil.getTime() + "." + TXT_EXT;
-	
-	private static int STARTUP = 1;
-	private Map<String,Integer> lookupTable = new HashMap<String,Integer>();
-	private ArrayList<Configuration<String>> seq = new ArrayList<Configuration<String>>();
-	
-	public SequenceStateFull(Config conf, JPF jpf) {
-	}
-	
-	public String seqToString() {
-		if (seq.size() == 0) {
-			return "nil";
-		}
-		Configuration<String> config = seq.get(0);
-		StringBuffer sb = new StringBuffer();
-		sb.append("(");
-		sb.append(config);
-		for (int i = 1; i < seq.size(); i ++) {
-			if (config.equals(seq.get(i))) {
-//				Logger.log("Dupplicated");
-				continue;
-			}
-			config = seq.get(i);
-			sb.append(" | ");
-			sb.append(config);
-		}
-		sb.append(" | nil)");
-		return sb.toString();
-	}
-	
-	public void writeSeqStringToFile() {
-		try {
-			graph.write(seqToString() + " , ");
-			graph.newLine();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
-	}
-	
-	/**
-	 * got the next state
-	 * 
-	 * Note - this will be notified before any potential propertyViolated, in which
-	 * case the currentError will be already set
-	 */
-	@Override
-	public void stateAdvanced(Search search) {
-		if (SequenceStateFull.STARTUP == 1) {
-			SequenceStateFull.STARTUP ++;
-			startup(search.getVM());
-		}
-		Configuration<String> config = getConfiguration(search);
-		if (config == null) {
-			// Finish program
-			search.requestBacktrack();
-			Logger.log("Finish program at " + search.getDepth());
-			COUNT ++;
-			writeSeqStringToFile();
-		} else {
-			seq.add(config);
-			if (search.isEndState() || !search.isNewState()) {
-				// End state or is not new state (visited state). JPF will back track automatically
-				COUNT ++;
-				writeSeqStringToFile();
-			} if (DEPTH_FLAG && search.getDepth() >= DEPTH) {
-				// current depth is greater than DEPTH, back track
-//				Logger.log("Reach to the bound depth " + search.getDepth());
-				search.requestBacktrack();
-				COUNT ++;
-				writeSeqStringToFile();
-			}
-		}
-		// 1413243
-		if (BOUND_FLAG && COUNT >= BOUND) {
-			// terminate when number of sequence of states reach to BOUND
-			search.terminate();
-		}
-	}
-
-	@Override
-	public void stateBacktracked(Search search) {
-		while (seq.size() > 0 && seq.get(seq.size() - 1).getStateId() != search.getStateId()) {
-			seq.remove(seq.size() - 1);
-		}
+	public AbpJPF() {
+		this.lookupTable = new HashMap<String, Integer>();;
 	}
 	
 	@Override
-	public void stateRestored(Search search) {
-		Logger.log("State restored");
-	}
-
-	@Override
-	public void searchStarted(Search search) {
-		try {
-			beginGraph();
-		} catch (IOException e) {
-		}
-	}
-
-	@Override
-	public void searchFinished(Search search) {
-		try {
-			Logger.log("Start writing to file: " +  out_filename);
-			endGraph();
-			Logger.log("Finished !!!");
-		} catch (IOException e) {
-		}
-	}
-
-	private void beginGraph() throws IOException {
-		graph = new BufferedWriter(new FileWriter(out_filename));
-	}
-
-	private void endGraph() throws IOException {
-		graph.close();
-		Logger.log(COUNT);
-	}
-	
-	private void showLookupTable() {
-		Logger.info("Looup Table");
-		Logger.info("-----------");
-		for (Map.Entry< String,Integer > entry:lookupTable.entrySet()) { 
-			Logger.info(entry.getKey() + ":" + entry.getValue());
-		}
-		Logger.info("-----------");
-	}
-	
-	private void startup(VM vm) {
+	public void startup(VM vm) {
 		for (ElementInfo ei : vm.getHeap().liveObjects()) {
 			String name = ei.getClassInfo().getName();
 			if (name.contains("Sender") || name.contains("Receiver")) {
-				lookupTable.put(name, ei.getObjectRef());
+				this.lookupTable.put(name, ei.getObjectRef());
 			}
 		}
-		showLookupTable();
+		this.showLookupTable();
 	}
 	
-	private void showHeap(VM vm) {
-		for (ElementInfo ei : vm.getHeap().liveObjects()) {
-			String name = ei.getClassInfo().getName();
-			Logger.log(name + "-" + ei.getObjectRef());
-			showFieldInfos(ei);
-		}
-	}
-	
-	private Configuration<String> getConfiguration(Search search) {
+	@Override
+	public OC getConfiguration(Search search) {
 		Configuration<String> config = new Configuration<String>();
 		config.setStateId(search.getStateId());
 		config.setDepth(search.getDepth());
 		Heap heap = search.getVM().getHeap();
 		{
 			// Sender
-			ElementInfo ei = heap.get(lookupTable.get("main.Sender"));
+			ElementInfo ei = heap.get(lookupTable.get("main.abp.Sender"));
 			if (ei == null) {
 				return null;
 			}
@@ -247,7 +109,7 @@ public class SequenceStateFull extends ListenerAdapter {
 		}
 		{
 			// Receiver
-			ElementInfo ei = heap.get(lookupTable.get("main.Receiver"));
+			ElementInfo ei = heap.get(lookupTable.get("main.abp.Receiver"));
 			if (ei == null) {
 				return null;
 			}
@@ -272,14 +134,6 @@ public class SequenceStateFull extends ListenerAdapter {
 			}
 		}
 		return config;
-	}
-	
-	private void showFieldInfos(ElementInfo ei) {
-		FieldInfo[] fis = ei.getClassInfo().getDeclaredInstanceFields();
-		Logger.log("Length: " + ei.getClassInfo().getNumberOfDeclaredInstanceFields());
-		for (FieldInfo fi : fis) {
-			Logger.log(fi.getName() + "-" + fi.getType() + " -> ref: " + fi.isReference());
-		}
 	}
 	
 	private Channel<Boolean> getChannelBoolean(ElementInfo ei_queue, int bound) {

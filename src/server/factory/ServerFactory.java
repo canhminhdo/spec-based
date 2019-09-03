@@ -7,7 +7,7 @@ import server.instances.Redis;
 /**
  * Factory Method
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class ServerFactory {
@@ -24,7 +24,7 @@ public class ServerFactory {
 
 	public RabbitMQ createRabbitMQ() {
 		return new RabbitMQ(this.cs.getRabbitMQHost(), this.cs.getRabbitMQUsername(), this.cs.getRabbitMQPassword(),
-				this.cs.getQueueName());
+				this.cs.getQueueName(), this.cs.getMaudeQueue());
 	}
 
 	public Boolean isRemote() {

@@ -3,7 +3,7 @@ package server.instances;
 /**
  * RabbitMQ instance configuration
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class RabbitMQ {
@@ -12,12 +12,14 @@ public class RabbitMQ {
 	String userName = null;
 	String password = null;
 	String queueName = null;
+	String maudeQueue = null;
 
-	public RabbitMQ(String host, String userName, String password, String queueName) {
+	public RabbitMQ(String host, String userName, String password, String queueName, String maudeQueue) {
 		this.host = host;
 		this.userName = userName;
 		this.password = password;
 		this.queueName = queueName;
+		this.maudeQueue = maudeQueue;
 	}
 
 	public String getHost() {
@@ -34,6 +36,10 @@ public class RabbitMQ {
 
 	public String getQueueName() {
 		return queueName;
+	}
+	
+	public String getMaudeQueue() {
+		return maudeQueue;
 	}
 
 }

@@ -3,7 +3,7 @@ package atomic;
 /**
  * Hadware Mutex Implementation
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class HWMutex implements Lock {

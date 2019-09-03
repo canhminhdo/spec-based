@@ -3,6 +3,13 @@ package jpf;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Tree data structure to maintain sequence of state
+ * 
+ * @author OgataLab
+ *
+ * @param <T>
+ */
 public class Node<T> {
 
 	private T data = null;
@@ -10,10 +17,10 @@ public class Node<T> {
 	private List<Node<T>> children = new ArrayList<Node<T>>();
 
 	private Node<T> parent = null;
-	
+
 	public Node() {
 	}
-	
+
 	public Node(T data) {
 		this.data = data;
 	}
@@ -48,14 +55,14 @@ public class Node<T> {
 	public Node<T> getParent() {
 		return parent;
 	}
-	
-	public boolean isRoot() {
-        return (this.parent == null);
-    }
 
-    public boolean isLeaf() {
-        return this.children.size() == 0;
-    }
+	public boolean isRoot() {
+		return (this.parent == null);
+	}
+
+	public boolean isLeaf() {
+		return this.children.size() == 0;
+	}
 
 	@Override
 	public String toString() {

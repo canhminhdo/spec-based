@@ -5,7 +5,7 @@ import redis.clients.jedis.Jedis;
 /**
  * Singleton Redis instance
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class RedisClient {

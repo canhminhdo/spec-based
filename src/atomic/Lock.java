@@ -3,7 +3,7 @@ package atomic;
 /**
  * Lock implements Test&Set protocol
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public interface Lock {

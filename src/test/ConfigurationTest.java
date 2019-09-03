@@ -9,9 +9,9 @@ import org.junit.Test;
 import jpf.Node;
 import jpf.abp.Configuration;
 import junit.framework.TestCase;
-import main.Cell;
-import main.Channel;
-import main.Pair;
+import main.abp.Cell;
+import main.abp.Channel;
+import main.abp.Pair;
 import service.TestCaseService;
 
 public class ConfigurationTest extends TestCase {

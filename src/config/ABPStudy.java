@@ -4,40 +4,44 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import jpf.abp.AbpJPF;
 import jpf.abp.Configuration;
+import jpf.common.HeapJPF;
 import jpf.common.OC;
-import main.Cell;
-import main.Pair;
+import main.abp.Cell;
+import main.abp.Pair;
 
 /**
  * ABP is a case study for testing concurrent programs at OgataLab This file is
  * specialized for ABP protocol. You need to revise in this file
  * 
- * @author ogataslab
+ * @author OgataLab
  */
 public class ABPStudy extends CaseStudy {
 
+	// Maude files
+	final String[] maude_files = { "/Users/ogataslab/Home/jaist/maude/env/env.maude" };
+	// Maude command
+	final String command = "reduce checkConform('ABP, {{seq}}, {{depth}}) .\n";
+
 	// main class to start ABP program
-	final String MAIN_CLASS = "main.TestABP";
+	final String MAIN_CLASS = "main.abp.TestABP";
 	// name of queue when using RabbitMQ
 	final String QUEUE_NAME = "ABP";
-	// Maude path if in the case you want to write to file
-//	final String MAUDE_PATH = "/Users/canhdominh/eclipse-workspace/abp/maude/data*";
+	final String MAUDE_QUEUE = "ABP_MAUDE";
 	// Path to abp program
 //	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/abp/bin";
 
 	// if you use "student" computer at lab
 //	final String CLASS_PATH = "/Users/student/eclipse-workspace/abp/bin";
-//	final String MAUDE_PATH = "/Users/student/eclipse-workspace/abp/maude/data*";
 
 	// if you use "ogataslab" computer at lab
 	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/abp/bin";
-	final String MAUDE_PATH = "/Users/ogataslab/eclipse-workspace/abp/maude/data*";
 
 	// packets will send over network
 	public static String PACKETS[] = { "0", "1", "2", "3" };
 	// channel size
-	public static int BOUND = 3;
+	public static int BOUND = 1;
 
 	@Override
 	public String getQueueName() {
@@ -45,8 +49,8 @@ public class ABPStudy extends CaseStudy {
 	}
 
 	@Override
-	public String getMaudePath() {
-		return MAUDE_PATH;
+	public String getMaudeQueue() {
+		return MAUDE_QUEUE;
 	}
 
 	@Override
@@ -61,10 +65,10 @@ public class ABPStudy extends CaseStudy {
 		List<String> recPackets = new ArrayList<String>();
 //        String packetsRecived[] = { "0" };
 //        List<String> recPackets = Arrays.asList(packetsRecived);
-		main.Channel<Pair<String, Boolean>> ch1 = new main.Channel<Pair<String, Boolean>>(this.BOUND);
+		main.abp.Channel<Pair<String, Boolean>> ch1 = new main.abp.Channel<Pair<String, Boolean>>(this.BOUND);
 //		ch1.put(new Pair<String,Boolean>("0",false));
 //		ch1.put(new Pair<String,Boolean>("2",true));
-		main.Channel<Boolean> ch2 = new main.Channel<Boolean>(this.BOUND);
+		main.abp.Channel<Boolean> ch2 = new main.abp.Channel<Boolean>(this.BOUND);
 //		ch2.put(true);
 //		ch2.put(false);
 		Cell<Boolean> f = new Cell<Boolean>(false);
@@ -114,6 +118,27 @@ public class ABPStudy extends CaseStudy {
 		configList.add(((Configuration<String>) config).getChannel2Command());
 
 		return configList;
+	}
+
+	@Override
+	public HeapJPF getHeapJPF() {
+		return new AbpJPF();
+	}
+
+	@Override
+	public void printConfiguration() {
+		System.out.println("This is ABP case study");
+		System.out.println("Channel size is " + ABPStudy.BOUND);
+	}
+
+	@Override
+	public String[] getMaudeFiles() {
+		return this.maude_files;
+	}
+
+	@Override
+	public String getCommand() {
+		return this.command;
 	}
 
 }

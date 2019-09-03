@@ -5,7 +5,7 @@ import java.util.Date;
 /**
  * Date Utility
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class DateUtil {

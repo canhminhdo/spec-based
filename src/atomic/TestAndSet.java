@@ -6,7 +6,7 @@ import gov.nasa.jpf.vm.Verify;
 /**
  * TestAndSet file supports Test&Set protocol
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class TestAndSet {

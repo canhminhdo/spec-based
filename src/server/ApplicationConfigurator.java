@@ -8,7 +8,7 @@ import server.factory.ServerFactory;
  * Bootstrap environment from here. You need configure your case study in this
  * file
  * 
- * @author ogataslab
+ * @author OgataLab
  *
  */
 public class ApplicationConfigurator {

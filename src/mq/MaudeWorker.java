@@ -7,18 +7,22 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
-import jpf.common.OC;
+import config.CaseStudy;
+import maude.OutputParser;
 import server.Application;
 import server.ApplicationConfigurator;
+import utils.AES;
+import utils.PrettyPrinter;
 
 /**
  * Receiver program as RabbitMQ client Whenever receiving a message from
- * RabbitMQ master Start internally JPF program to generate state sequences
+ * RabbitMQ master. Start checking such state sequence that conforms to the
+ * given specification.
  * 
  * @author OgataLab
  *
  */
-public class Receiver {
+public class MaudeWorker {
 
 	/**
 	 * Starting a RabbitMQ client.
@@ -40,25 +44,27 @@ public class Receiver {
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
 
-		channel.queueDeclare(app.getRabbitMQ().getQueueName(), false, false, false, null);
+		channel.queueDeclare(app.getRabbitMQ().getMaudeQueue(), false, false, false, null);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-
+		
+		// Get Maude instance and preload
+		RunMaude maude = RunMaude.getInstance();
+		
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-
-			OC config = SerializationUtils.deserialize(delivery.getBody());
-			System.out.println(" [x] Received '" + config);
-			RunJPF runner = new RunJPF(config);
-			runner.start();
-			try {
-				runner.join();
-				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			String cipher = SerializationUtils.deserialize(delivery.getBody());
+			String seq = AES.decrypt(cipher, CaseStudy.SECRETE_KEY);
+			System.out.println(" [x] Received");
+			maude.checkSeq(app.getCaseStudy().getCommand(), seq, 2);
+			OutputParser output = new OutputParser(maude.getOutput());
+			output.parsing();
+			if (output.getFailure().size() > 0)
+				PrettyPrinter.printList(output.getFailure());
+			if (output.getError().size() > 0)
+				PrettyPrinter.printList(output.getError());
 		};
 
 		boolean autoAck = false;
-		channel.basicConsume(app.getRabbitMQ().getQueueName(), autoAck, deliverCallback, consumerTag -> {
+		channel.basicConsume(app.getRabbitMQ().getMaudeQueue(), autoAck, deliverCallback, consumerTag -> {
 		});
 	}
 
