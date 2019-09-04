@@ -90,16 +90,22 @@ public class MaudeWorker {
 				System.out.println("------> warning");
 			}
 			
-			while(!SequenceStatesService.insert(sequencesStates)) {
-				// Sleep a while, because quickly connect to MySQL
+			do {
 				try {
-					System.out.println(" [MySQL] Waiting 1 sec");
-					TimeUnit.SECONDS.sleep(1);
-				} catch (InterruptedException e) {
+					SequenceStatesService.insert(sequencesStates);
+					break;
+				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
+					System.out.println(" [MySQL] Waiting 3 sec");
+					try {
+						TimeUnit.SECONDS.sleep(3);
+					} catch (InterruptedException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					}
 				}
-			};
+			} while (true);
 			
 			channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		};

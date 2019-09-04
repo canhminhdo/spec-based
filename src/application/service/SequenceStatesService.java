@@ -7,10 +7,7 @@ import com.mysql.jdbc.Connection;
 
 import application.dao.SequenceStatesDao;
 import application.dao.SequenceStatesDaoImpl;
-import application.dao.TestCaseDao;
-import application.dao.TestCaseDaoImpl;
 import application.model.SequenceStates;
-import application.model.TestCase;
 import database.ConnectionFactory;
 
 public class SequenceStatesService {
@@ -37,7 +34,7 @@ public class SequenceStatesService {
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		} finally {
-			ConnectionFactory.closeConnection();
+//			ConnectionFactory.closeConnection();
 		}
 		return result;
 	}
@@ -54,7 +51,7 @@ public class SequenceStatesService {
 		} catch (SQLException ex) {
 			ex.printStackTrace();
 		} finally {
-			ConnectionFactory.closeConnection();
+//			ConnectionFactory.closeConnection();
 		}
 		return result;
 	}

@@ -27,7 +27,7 @@ public class ConnectionFactory {
 	 */
 	public static Connection getConnection() {
 		try {
-			if (conn == null) {
+			if (conn == null || conn.isClosed()) {
 				DriverManager.registerDriver(new Driver());
 				return (Connection) DriverManager.getConnection(URL, USER, PASS);
 			}
