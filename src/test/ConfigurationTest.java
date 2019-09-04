@@ -6,13 +6,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import application.service.TestCaseService;
 import jpf.Node;
 import jpf.abp.Configuration;
 import junit.framework.TestCase;
 import main.abp.Cell;
 import main.abp.Channel;
 import main.abp.Pair;
-import service.TestCaseService;
 
 public class ConfigurationTest extends TestCase {
 	protected Node<Configuration<String>> node1 = new Node<Configuration<String>>();
@@ -21,7 +21,7 @@ public class ConfigurationTest extends TestCase {
 	@Before 
 	public void setUp() {
 		
-		List<model.TestCase> testCases = TestCaseService.getAllTestCases();
+		List<application.model.TestCase> testCases = TestCaseService.getAllTestCases();
 		System.out.println(testCases);
 		
 		

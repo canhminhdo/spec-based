@@ -12,7 +12,10 @@ import jpf.common.OC;
  * @author OgataLab
  */
 public abstract class CaseStudy {
-
+	
+	// runtime
+	public static String RUNTIME = "1.0";
+	
 	// the current version
 	public static String version = "1.0";
 	// using JPF_MODE ?

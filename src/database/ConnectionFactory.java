@@ -14,9 +14,11 @@ import com.mysql.jdbc.Driver;
  */
 public class ConnectionFactory {
 	
-	public static final String URL = "jdbc:mysql://localhost:3306/env";
+	public static final String URL = "jdbc:mysql://localhost:3306/ogatalab";
 	public static final String USER = "root";
 	public static final String PASS = "";
+	
+	public static Connection conn = null;
 	
 	/**
 	 * Get singleton MySQL connection
@@ -25,8 +27,11 @@ public class ConnectionFactory {
 	 */
 	public static Connection getConnection() {
 		try {
-			DriverManager.registerDriver(new Driver());
-			return (Connection) DriverManager.getConnection(URL, USER, PASS);
+			if (conn == null) {
+				DriverManager.registerDriver(new Driver());
+				return (Connection) DriverManager.getConnection(URL, USER, PASS);
+			}
+			return conn;
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error connecting to the database", ex);
 		}
@@ -37,9 +42,9 @@ public class ConnectionFactory {
 	 * 
 	 * @param conn
 	 */
-	public static void closeConnection(Connection conn) {
+	public static void closeConnection() {
 		try {
-			conn.close();
+			if (conn != null) conn.close();
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error closing the database", ex);
 		}
@@ -51,7 +56,9 @@ public class ConnectionFactory {
 	 * @param args
 	 */
 	public static void main(String[] args) {
-		Connection conn = ConnectionFactory.getConnection();
-		System.out.println("Connected !!!");
+		Connection connection = ConnectionFactory.getConnection();
+		if (connection != null)
+			System.out.println("Connected !!!");
+		ConnectionFactory.closeConnection();
 	}
 }

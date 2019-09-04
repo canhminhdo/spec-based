@@ -1,5 +1,7 @@
 package mq;
 
+import java.util.concurrent.TimeUnit;
+
 import org.apache.commons.lang3.SerializationUtils;
 
 import com.rabbitmq.client.Channel;
@@ -7,12 +9,14 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
+import application.model.ErrorMessage;
+import application.model.SequenceStates;
+import application.service.SequenceStatesService;
 import config.CaseStudy;
 import maude.OutputParser;
 import server.Application;
 import server.ApplicationConfigurator;
 import utils.AES;
-import utils.PrettyPrinter;
 
 /**
  * Receiver program as RabbitMQ client Whenever receiving a message from
@@ -58,10 +62,45 @@ public class MaudeWorker {
 			OutputParser output = new OutputParser(maude.getOutput());
 			output.parsing();
 			// TODO:: Should save to database
-			if (output.getFailure().size() > 0)
-				PrettyPrinter.printList(output.getFailure());
-			if (output.getError().size() > 0)
-				PrettyPrinter.printList(output.getError());
+			SequenceStates sequencesStates = new SequenceStates();
+			sequencesStates.setSeq(seq);
+			sequencesStates.setRuntime(CaseStudy.RUNTIME);
+			
+			if (output.getSuccess().size() > 0) {
+				sequencesStates.setType("success");
+				sequencesStates.setResult(output.getSuccessString());
+				System.out.println("------> success");
+			}
+			
+			if (output.getFailure().size() > 0) {
+				sequencesStates.setType("failure");
+				sequencesStates.setResult(output.getFailureString());
+				ErrorMessage msg = output.parseError();
+				if (msg != null) {
+					sequencesStates.setState_from(msg.getFrom());
+					sequencesStates.setState_to(msg.getTo());
+					sequencesStates.setState_index(msg.getIndex());
+					sequencesStates.setDepth(msg.getDepth());
+				}
+				System.out.println("------> failure");
+			}
+			if (output.getError().size() > 0) {
+				sequencesStates.setType("warning");
+				sequencesStates.setResult(output.getErrorString());
+				System.out.println("------> warning");
+			}
+			
+			while(!SequenceStatesService.insert(sequencesStates)) {
+				// Sleep a while, because quickly connect to MySQL
+				try {
+					System.out.println(" [MySQL] Waiting 1 sec");
+					TimeUnit.SECONDS.sleep(1);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+			};
+			
 			channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		};
 

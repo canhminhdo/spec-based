@@ -6,6 +6,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
+import application.service.SequenceStatesService;
 import database.RedisClient;
 import jpf.common.OC;
 import server.Application;
@@ -80,6 +81,9 @@ public class Starter {
 			// Flush all keys and values from Redis server
 			RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().flushAll();
 			
+			// Truncate `sequence_states` table before running
+			if (SequenceStatesService.truncate())
+				System.out.println("Truncate successfully !!!");
 		} catch (Exception e) {
 			e.printStackTrace();
 		}

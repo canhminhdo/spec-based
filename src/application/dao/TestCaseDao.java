@@ -1,9 +1,9 @@
-package dao;
+package application.dao;
 
 import java.sql.SQLException;
 import java.util.List;
 
-import model.TestCase;
+import application.model.TestCase;
 
 public interface TestCaseDao {
 	public List<TestCase> getAllTestCases() throws SQLException;

@@ -1,14 +1,14 @@
-package service;
+package application.service;
 
 import java.sql.SQLException;
 import java.util.List;
 
 import com.mysql.jdbc.Connection;
 
-import dao.TestCaseDao;
-import dao.TestCaseDaoImpl;
+import application.dao.TestCaseDao;
+import application.dao.TestCaseDaoImpl;
+import application.model.TestCase;
 import database.ConnectionFactory;
-import model.TestCase;
 
 public class TestCaseService {
 	

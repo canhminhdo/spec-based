@@ -23,6 +23,19 @@ public class PrettyPrinter {
 		PrettyPrinter.printFooter();
 	}
 	
+	public static void printListToString(ArrayList<String> list) {
+		PrettyPrinter.printHeader();
+		if (list.size() == 0) {
+			return;
+		}
+		String str = list.get(0);
+		for (int i = 1; i < list.size(); i ++) {
+			str += " " + list.get(i).trim();
+		}
+		System.out.println(str);
+		PrettyPrinter.printFooter();
+	}
+	
 	public static void printFooter() {
 		System.out.println("==============================>");
 	}
