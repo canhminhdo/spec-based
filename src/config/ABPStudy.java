@@ -61,14 +61,14 @@ public class ABPStudy extends CaseStudy {
 	@Override
 	public OC getInitialMessage() {
 		Configuration<String> config = new Configuration<String>();
-		List<String> sentPackets = Arrays.asList(this.PACKETS);
+		List<String> sentPackets = Arrays.asList(ABPStudy.PACKETS);
 		List<String> recPackets = new ArrayList<String>();
 //        String packetsRecived[] = { "0" };
 //        List<String> recPackets = Arrays.asList(packetsRecived);
-		main.abp.Channel<Pair<String, Boolean>> ch1 = new main.abp.Channel<Pair<String, Boolean>>(this.BOUND);
+		main.abp.Channel<Pair<String, Boolean>> ch1 = new main.abp.Channel<Pair<String, Boolean>>(ABPStudy.BOUND);
 //		ch1.put(new Pair<String,Boolean>("0",false));
 //		ch1.put(new Pair<String,Boolean>("2",true));
-		main.abp.Channel<Boolean> ch2 = new main.abp.Channel<Boolean>(this.BOUND);
+		main.abp.Channel<Boolean> ch2 = new main.abp.Channel<Boolean>(ABPStudy.BOUND);
 //		ch2.put(true);
 //		ch2.put(false);
 		Cell<Boolean> f = new Cell<Boolean>(false);

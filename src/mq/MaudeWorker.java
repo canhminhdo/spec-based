@@ -57,10 +57,12 @@ public class MaudeWorker {
 			maude.checkSeq(app.getCaseStudy().getCommand(), seq, 2);
 			OutputParser output = new OutputParser(maude.getOutput());
 			output.parsing();
+			// TODO:: Should save to database
 			if (output.getFailure().size() > 0)
 				PrettyPrinter.printList(output.getFailure());
 			if (output.getError().size() > 0)
 				PrettyPrinter.printList(output.getError());
+			channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		};
 
 		boolean autoAck = false;

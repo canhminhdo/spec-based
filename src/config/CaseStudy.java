@@ -26,7 +26,7 @@ public abstract class CaseStudy {
 	// Using for state sequences generation by JPF
 	public static int DEPTH = 100;
 	public static int BOUND = 1000;
-	public static boolean DEPTH_FLAG = false;
+	public static boolean DEPTH_FLAG = true;
 	public static boolean BOUND_FLAG = false;
 
 	public final Boolean IS_REMOTE = false;
