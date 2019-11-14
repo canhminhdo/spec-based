@@ -98,19 +98,29 @@ public class OutputParser {
 		
 		// get "from"
 		String[] parts = str.split(",from:");
+		if (parts.length != 2)
+			return msg;
 		String[] parts_from = parts[1].split(",to:");
+		if (parts_from.length != 2)
+			return msg;
 		msg.setFrom(parts_from[0].trim());
 		
 		// get "to"
 		String[] parts_to = parts_from[1].split(",index:");
+		if (parts_to.length != 2)
+			return msg;
 		msg.setTo(parts_to[0].trim());
 		
 		// get "index"
 		String[] parts_index = parts_to[1].split(",bound:");
+		if (parts_index.length != 2)
+			return msg;
 		msg.setIndex(Integer.parseInt(parts_index[0].trim()));
 		
 		// get "depth"
 		String[] parts_bound = parts_index[1].split("}");
+		if (parts_bound.length == 0)
+			return msg;
 		msg.setDepth(Integer.parseInt(parts_bound[0].trim()));
 		
 		return msg;
