@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 
 import jpf.abp.AbpJPF;
-import jpf.abp.Configuration;
+import jpf.abp.AbpConfiguration;
 import jpf.common.HeapJPF;
 import jpf.common.OC;
 import main.abp.Cell;
@@ -60,7 +60,7 @@ public class ABPStudy extends CaseStudy {
 
 	@Override
 	public OC getInitialMessage() {
-		Configuration<String> config = new Configuration<String>();
+		AbpConfiguration<String> config = new AbpConfiguration<String>();
 		List<String> sentPackets = Arrays.asList(ABPStudy.PACKETS);
 		List<String> recPackets = new ArrayList<String>();
 //        String packetsRecived[] = { "0" };
@@ -101,21 +101,21 @@ public class ABPStudy extends CaseStudy {
 		configList.add(this.MAIN_CLASS);
 
 		// 1st argument: packetsToBeSent
-		configList.add(((Configuration<String>) config).getPacketsToBeSentCommand());
+		configList.add(((AbpConfiguration<String>) config).getPacketsToBeSentCommand());
 		// 2nd argument: packetsReceived
-		configList.add(((Configuration<String>) config).getPacketsReceivedCommand());
+		configList.add(((AbpConfiguration<String>) config).getPacketsReceivedCommand());
 		// 3rd argument: index of packetsToBeSent
-		configList.add(((Configuration<String>) config).getIndexCommand());
+		configList.add(((AbpConfiguration<String>) config).getIndexCommand());
 		// 4th argument: finish flag
-		configList.add(((Configuration<String>) config).getFinishCommand());
+		configList.add(((AbpConfiguration<String>) config).getFinishCommand());
 		// 5th argument: flag1
-		configList.add(((Configuration<String>) config).getFlag1Command());
+		configList.add(((AbpConfiguration<String>) config).getFlag1Command());
 		// 6th argument: flag2
-		configList.add(((Configuration<String>) config).getFlag2Command());
+		configList.add(((AbpConfiguration<String>) config).getFlag2Command());
 		// 7th argument: channel1
-		configList.add(((Configuration<String>) config).getChannel1Command());
+		configList.add(((AbpConfiguration<String>) config).getChannel1Command());
 		// 8th argument: channel2
-		configList.add(((Configuration<String>) config).getChannel2Command());
+		configList.add(((AbpConfiguration<String>) config).getChannel2Command());
 
 		return configList;
 	}
@@ -127,7 +127,7 @@ public class ABPStudy extends CaseStudy {
 
 	@Override
 	public void printConfiguration() {
-		System.out.println("This is ABP case study");
+		super.printConfiguration();
 		System.out.println("Channel size is " + ABPStudy.BOUND);
 	}
 

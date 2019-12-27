@@ -26,7 +26,7 @@ import main.abp.Pair;
 public class AbpJPF extends HeapJPF {
 
 	public AbpJPF() {
-		this.lookupTable = new HashMap<String, Integer>();;
+		this.lookupTable = new HashMap<String, Integer>();
 	}
 	
 	@Override
@@ -42,7 +42,7 @@ public class AbpJPF extends HeapJPF {
 	
 	@Override
 	public OC getConfiguration(Search search) {
-		Configuration<String> config = new Configuration<String>();
+		AbpConfiguration<String> config = new AbpConfiguration<String>();
 		config.setStateId(search.getStateId());
 		config.setDepth(search.getDepth());
 		Heap heap = search.getVM().getHeap();

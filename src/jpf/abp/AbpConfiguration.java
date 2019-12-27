@@ -18,7 +18,7 @@ import main.abp.Pair;
  *
  * @param <P>
  */
-public class Configuration<P> implements Serializable, OC {
+public class AbpConfiguration<P> implements Serializable, OC {
 	
 	private Channel<Pair<P,Boolean>> channel1;
 	private Integer index;
@@ -31,11 +31,11 @@ public class Configuration<P> implements Serializable, OC {
     private Integer stateId;
     private Integer depth;
     
-	public Configuration() {
+	public AbpConfiguration() {
 		
 	}
 
-	public Configuration(Channel<Pair<P, Boolean>> channel1, Channel<Boolean> channel2, Collection<P> packetsToBeSent,
+	public AbpConfiguration(Channel<Pair<P, Boolean>> channel1, Channel<Boolean> channel2, Collection<P> packetsToBeSent,
 			Collection<P> packetsReceived, Cell<Boolean> finish, Boolean flag1, Boolean flag2, int stateId, int depth) {
 		super();
 		this.channel1 = channel1;
@@ -60,7 +60,7 @@ public class Configuration<P> implements Serializable, OC {
 		if (obj == null) {
 			return false;
 		}
-		Configuration<P> other = (Configuration<P>) obj;
+		AbpConfiguration<P> other = (AbpConfiguration<P>) obj;
 		return index.equals(other.getIndex()) &&  
 				flag1.equals(other.getFlag1()) &&
 				flag2.equals(other.getFlag2()) &&

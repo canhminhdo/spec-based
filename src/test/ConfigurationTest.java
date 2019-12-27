@@ -8,15 +8,15 @@ import org.junit.Test;
 
 import application.service.TestCaseService;
 import jpf.Node;
-import jpf.abp.Configuration;
+import jpf.abp.AbpConfiguration;
 import junit.framework.TestCase;
 import main.abp.Cell;
 import main.abp.Channel;
 import main.abp.Pair;
 
 public class ConfigurationTest extends TestCase {
-	protected Node<Configuration<String>> node1 = new Node<Configuration<String>>();
-	protected Node<Configuration<String>> node2 = new Node<Configuration<String>>();
+	protected Node<AbpConfiguration<String>> node1 = new Node<AbpConfiguration<String>>();
+	protected Node<AbpConfiguration<String>> node2 = new Node<AbpConfiguration<String>>();
 	
 	@Before 
 	public void setUp() {
@@ -35,7 +35,7 @@ public class ConfigurationTest extends TestCase {
         ch2.put(false);
         
 		// Node 1
-		Configuration<String> config1 = new Configuration<String>();
+		AbpConfiguration<String> config1 = new AbpConfiguration<String>();
 		config1.setIndex(1);
 		config1.setFlag1(true);
 		config1.setFlag2(true);
@@ -48,7 +48,7 @@ public class ConfigurationTest extends TestCase {
         System.out.println(config1);
         
         // Node 2
-		Configuration<String> config2 = new Configuration<String>();
+		AbpConfiguration<String> config2 = new AbpConfiguration<String>();
 		config2.setIndex(1);
 		config2.setFlag1(true);
 		config2.setFlag2(true);

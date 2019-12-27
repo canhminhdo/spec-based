@@ -153,7 +153,7 @@ public abstract class CaseStudy {
 	 * Print your case study before state sequences generation
 	 */
 	public void printConfiguration() {
-		System.out.println("Case Study");
+		System.out.println("This is " + this.getClass().getSimpleName());
 	}
 	
 	/**
