@@ -43,6 +43,7 @@ public class RunJPF extends Thread {
 			conf.setProperty("report.console.finished", "result");
 			JPF jpf = new JPF(conf);
 			SequenceState seq = new SequenceState();
+//			SimpleDot seq = new SimpleDot(conf, jpf);
 			jpf.addListener(seq);
 			jpf.run();
 			System.out.println("FINISHED RUNNING JOB");

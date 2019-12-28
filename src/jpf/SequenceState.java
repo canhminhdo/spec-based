@@ -58,7 +58,7 @@ public class SequenceState extends ListenerAdapter {
 		sb.append(config);
 		for (int i = 1; i < seq.size(); i++) {
 			if (config.equals(seq.get(i))) {
-//				Logger.log("Dupplicated");
+//				Logger.log("Duplicated");
 				continue;
 			}
 			config = seq.get(i);
@@ -72,14 +72,15 @@ public class SequenceState extends ListenerAdapter {
 	public void writeSeqStringToFile() {
 		try {
 			if (seq.size() > 0) {
-				String seqString = seqToString();
-				String seqSha256 = GFG.getSHA(seqString);
-				if (!jedis.exists(seqSha256)) {
-					jedis.set(seqSha256, seqString);
-					// TODO :: Sending to Maude Queue master
-					mq.Sender.getInstance().sendMaudeJob(seqString);
-					SEQ_UNIQUE_COUNT++;
-				}
+//				String seqString = seqToString();
+//				String seqSha256 = GFG.getSHA(seqString);
+//				if (!jedis.exists(seqSha256)) {
+//					jedis.set(seqSha256, seqString);
+//					// TODO :: Sending to Maude Queue master
+//					mq.Sender.getInstance().sendMaudeJob(seqString);
+//					SEQ_UNIQUE_COUNT++;
+//				}
+				
 				OC lastElement = seq.get(seq.size() - 1);
 				if (lastElement != null) {
 					String elementSha256 = GFG.getSHA(lastElement.toString());
@@ -107,15 +108,18 @@ public class SequenceState extends ListenerAdapter {
 	@Override
 	public void stateAdvanced(Search search) {
 		if (STARTUP == 1) {
-			STARTUP++;
 			heapJPF.startup(search.getVM());
+			if (heapJPF.lookupTable.size() == 0)
+				return;
+			STARTUP++;
 		}
+		
 		OC config = heapJPF.getConfiguration(search);
 //		Configuration<String> config = getConfiguration(search);
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();
-			Logger.log("Finish program at " + search.getDepth());
+			System.out.println("Finish program at " + search.getDepth());
 			COUNT++;
 			writeSeqStringToFile();
 		} else {
@@ -142,6 +146,9 @@ public class SequenceState extends ListenerAdapter {
 
 	@Override
 	public void stateBacktracked(Search search) {
+		if (heapJPF.lookupTable.size() == 0)
+			return;
+		
 		while (seq.size() > 0 && seq.get(seq.size() - 1).getStateId() != search.getStateId()) {
 			seq.remove(seq.size() - 1);
 		}
@@ -149,12 +156,12 @@ public class SequenceState extends ListenerAdapter {
 
 	@Override
 	public void searchStarted(Search search) {
-		Logger.log("Started");
+		System.out.println("Started");
 	}
 
 	@Override
 	public void searchFinished(Search search) {
-		Logger.log(COUNT + " - " + SEQ_UNIQUE_COUNT);
-		Logger.log("Finished");
+		System.out.println(COUNT + " - " + SEQ_UNIQUE_COUNT);
+		System.out.println("Finished");
 	}
 }

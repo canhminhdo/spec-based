@@ -1,7 +1,8 @@
 package server;
 
-import config.ABPStudy;
+import abp.config.ABPStudy;
 import config.CaseStudy;
+import nspk.config.NspkStudy;
 import server.factory.ServerFactory;
 
 /**
@@ -23,7 +24,8 @@ public class ApplicationConfigurator {
 	 */
 	public static ApplicationConfigurator getInstance() {
 		if (_instance == null) {
-			_instance = new ApplicationConfigurator(new ABPStudy());
+			_instance = new ApplicationConfigurator(new NspkStudy());
+//			_instance = new ApplicationConfigurator(new ABPStudy());
 		}
 
 		return _instance;

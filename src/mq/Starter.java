@@ -11,6 +11,7 @@ import database.RedisClient;
 import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
+import utils.GFG;
 
 /**
  * Starter program to kick-off environment by sending the initial message to
@@ -46,6 +47,11 @@ public class Starter {
 
 				// prepare to send a message to queue
 				OC config = app.getCaseStudy().getInitialMessage();
+				
+				// save to Redis cache
+				String configSha256 = GFG.getSHA(config.toString());
+				
+				RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().set(configSha256, config.toString());
 
 				byte[] data = SerializationUtils.serialize(config);
 

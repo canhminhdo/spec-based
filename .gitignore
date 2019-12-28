@@ -5,6 +5,7 @@
 bin/
 *.dot
 *.jpeg
+*.png
 *.ucls
 *~
 maude/data.txt

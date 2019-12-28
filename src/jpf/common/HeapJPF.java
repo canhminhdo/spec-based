@@ -7,19 +7,20 @@ import gov.nasa.jpf.vm.CharArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.ReferenceArrayFields;
 import gov.nasa.jpf.vm.VM;
-import jpf.Logger;
 
 public abstract class HeapJPF {
 
 	public Map<String, Integer> lookupTable;
 
 	public void showLookupTable() {
-		Logger.info("Looup Table");
-		Logger.info("-----------");
-		for (Map.Entry<String, Integer> entry : lookupTable.entrySet()) {
-			Logger.info(entry.getKey() + ":" + entry.getValue());
+		if (lookupTable.size() > 0) {
+			System.out.println("Looup Table");
+			System.out.println("-----------");
+			for (Map.Entry<String, Integer> entry : lookupTable.entrySet()) {
+				System.out.println(entry.getKey() + ":" + entry.getValue());
+			}
+			System.out.println("-----------");
 		}
-		Logger.info("-----------");
 	}
 	
 	public abstract void startup(VM vm);

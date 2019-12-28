@@ -6,13 +6,13 @@ import java.util.List;
 import org.junit.Before;
 import org.junit.Test;
 
+import abp.jpf.AbpConfiguration;
+import abp.main.Cell;
+import abp.main.Channel;
+import abp.main.Pair;
 import application.service.TestCaseService;
 import jpf.Node;
-import jpf.abp.AbpConfiguration;
 import junit.framework.TestCase;
-import main.abp.Cell;
-import main.abp.Channel;
-import main.abp.Pair;
 
 public class ConfigurationTest extends TestCase {
 	protected Node<AbpConfiguration<String>> node1 = new Node<AbpConfiguration<String>>();

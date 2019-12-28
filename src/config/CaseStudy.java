@@ -27,7 +27,7 @@ public abstract class CaseStudy {
 	public static String MAUDE_PROGRAM = "/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";
 	
 	// Using for state sequences generation by JPF
-	public static int DEPTH = 100;
+	public static int DEPTH = 130;
 	public static int BOUND = 1000;
 	public static boolean DEPTH_FLAG = true;
 	public static boolean BOUND_FLAG = false;

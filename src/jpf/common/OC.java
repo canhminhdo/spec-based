@@ -13,4 +13,6 @@ public interface OC extends Serializable {
 	public int getStateId();
 
 	public boolean isFinished();
+	
+	public String getPassedMessage();
 }
