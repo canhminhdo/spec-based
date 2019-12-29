@@ -69,7 +69,7 @@ public class MaudeWorker {
 			if (output.getSuccess().size() > 0) {
 				sequencesStates.setType("success");
 				sequencesStates.setResult(output.getSuccessString());
-				System.out.println("------> success");
+//				System.out.println("------> success");
 			}
 			
 			if (output.getFailure().size() > 0) {
@@ -82,12 +82,12 @@ public class MaudeWorker {
 					sequencesStates.setState_index(msg.getIndex());
 					sequencesStates.setDepth(msg.getDepth());
 				}
-				System.out.println("------> failure");
+				System.out.println("------> failure " + seq);
 			}
 			if (output.getError().size() > 0) {
 				sequencesStates.setType("warning");
 				sequencesStates.setResult(output.getErrorString());
-				System.out.println("------> warning");
+				System.out.println("------> warning " + seq);
 			}
 			
 			do {

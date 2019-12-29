@@ -150,7 +150,7 @@ public class Intruder extends Principal {
 			Principal p = this.prinController.getOne();	// sender
 			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
 			
-			Message<Cipher> m3_fake = new Message<Cipher>(Constants.m1, this, p, q, c3);
+			Message<Cipher> m3_fake = new Message<Cipher>(Constants.m3, this, p, q, c3);
 			if (nw.add(m3_fake)) {
 //				System.out.println(this + " - fake32 - " + nw);
 			}
