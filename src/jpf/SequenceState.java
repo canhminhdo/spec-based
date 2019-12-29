@@ -52,11 +52,26 @@ public class SequenceState extends ListenerAdapter {
 		if (seq.size() == 0) {
 			return "nil";
 		}
-		OC config = seq.get(0);
+		int j = -1;
+		for (int i = 0; i < seq.size(); i++) {
+			if (seq.get(i).isReady()) {
+				j = i;
+				break;
+			}
+		}
+		if (j == -1) {
+			return "nil";
+		}
+		
+		OC config = seq.get(j);
 		StringBuffer sb = new StringBuffer();
 		sb.append("(");
 		sb.append(config);
-		for (int i = 1; i < seq.size(); i++) {
+		
+		for (int i = j + 1; i < seq.size(); i++) {
+			if (!seq.get(i).isReady()) {
+				break;
+			}
 			if (config.equals(seq.get(i))) {
 //				Logger.log("Duplicated");
 				continue;
@@ -88,7 +103,7 @@ public class SequenceState extends ListenerAdapter {
 						jedis.set(elementSha256, lastElement.toString());
 						// TODO :: submit job to the queue broker
 //						if (lastElement.getFinish().get() == false) {
-						if (lastElement.isFinished() == false) {
+						if (lastElement.isFinished() == false && lastElement.isReady() == true) {
 							mq.Sender.getInstance().sendJob(lastElement);
 						}
 					}
@@ -115,7 +130,6 @@ public class SequenceState extends ListenerAdapter {
 		}
 		
 		OC config = heapJPF.getConfiguration(search);
-//		Configuration<String> config = getConfiguration(search);
 		if (config == null) {
 			// Finish program
 			search.requestBacktrack();

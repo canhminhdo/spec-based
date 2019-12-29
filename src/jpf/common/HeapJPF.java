@@ -5,11 +5,13 @@ import java.util.Map;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.CharArrayFields;
 import gov.nasa.jpf.vm.ElementInfo;
+import gov.nasa.jpf.vm.FieldInfo;
 import gov.nasa.jpf.vm.ReferenceArrayFields;
 import gov.nasa.jpf.vm.VM;
 
 public abstract class HeapJPF {
-
+	
+	public boolean isReady;
 	public Map<String, Integer> lookupTable;
 
 	public void showLookupTable() {
@@ -36,5 +38,13 @@ public abstract class HeapJPF {
 		ElementInfo ei_elementData = (ElementInfo) ei.getFieldValueObject("elementData");
 		ReferenceArrayFields rafs = (ReferenceArrayFields) ei_elementData.getArrayFields();
 		return rafs;
+	}
+	
+	public void debug(ElementInfo ei) {
+		System.out.println(ei);
+		FieldInfo[] fis = ei.getClassInfo().getInstanceFields();
+		for (FieldInfo fi : fis) {
+			System.out.println(fi);
+		}
 	}
 }

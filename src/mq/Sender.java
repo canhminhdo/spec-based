@@ -82,7 +82,7 @@ public class Sender {
 	public void sendMaudeJob(String seq) throws Exception {
 		// Encrypt before sending
 		String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
-		channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(cipher));
+		channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(seq));
 		System.out.println(" [x] Sent to Maude '" + seq);
 	}
 

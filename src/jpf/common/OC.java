@@ -9,7 +9,9 @@ import java.io.Serializable;
  *
  */
 public interface OC extends Serializable {
-
+	
+	public boolean isReady();
+	
 	public int getStateId();
 
 	public boolean isFinished();

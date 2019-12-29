@@ -55,9 +55,9 @@ public class MaudeWorker {
 		RunMaude maude = RunMaude.getInstance();
 		
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-			String cipher = SerializationUtils.deserialize(delivery.getBody());
-			String seq = AES.decrypt(cipher, CaseStudy.SECRETE_KEY);
-			System.out.println(" [x] Received");
+			String seq = SerializationUtils.deserialize(delivery.getBody());
+//			String seq = AES.decrypt(cipher, CaseStudy.SECRETE_KEY);
+			System.out.println(" [x] Received ");
 			maude.checkSeq(app.getCaseStudy().getCommand(), seq, 2);
 			OutputParser output = new OutputParser(maude.getOutput());
 			output.parsing();

@@ -27,6 +27,7 @@ public class AbpJPF extends HeapJPF {
 
 	public AbpJPF() {
 		this.lookupTable = new HashMap<String, Integer>();
+		this.isReady = true;
 	}
 	
 	@Override

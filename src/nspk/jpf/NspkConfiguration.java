@@ -9,6 +9,7 @@ import utils.GFG;
 
 public class NspkConfiguration implements Serializable, OC {
 	
+	private boolean isReady;
 	private Integer stateId;
 	private Integer depth;
 	private MultiSet<String> nw;
@@ -117,5 +118,14 @@ public class NspkConfiguration implements Serializable, OC {
 	@Override
 	public String toString() {
 		return "{" + this.nw + " " + this.rand + " " + this.nonces + " " + this.prins + "}";
+	}
+
+	@Override
+	public boolean isReady() {
+		return this.isReady;
+	}
+	
+	public void setReady(boolean isReady) {
+		this.isReady = isReady;
 	}
 }

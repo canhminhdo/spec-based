@@ -20,6 +20,7 @@ import jpf.common.OC;
  */
 public class AbpConfiguration<P> implements Serializable, OC {
 	
+	private boolean isReady;
 	private Channel<Pair<P,Boolean>> channel1;
 	private Integer index;
     private Channel<Boolean> channel2;
@@ -290,4 +291,14 @@ public class AbpConfiguration<P> implements Serializable, OC {
 	public String getPassedMessage() {
 		return getObserverComponents();
 	}
+
+	@Override
+	public boolean isReady() {
+		return this.isReady;
+	}
+	
+	public void setReady(boolean isReady) {
+		this.isReady = isReady;
+	}
+	
 }

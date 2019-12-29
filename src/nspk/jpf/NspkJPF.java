@@ -16,6 +16,7 @@ public class NspkJPF extends HeapJPF {
 	
 	public NspkJPF() {
 		this.lookupTable = new HashMap<String, Integer>();
+		this.isReady = false;
 	}
 
 	@Override
@@ -36,6 +37,17 @@ public class NspkJPF extends HeapJPF {
 		NspkConfiguration config = new NspkConfiguration();
 		config.setStateId(search.getStateId());
 		config.setDepth(search.getDepth());
+		
+		if (!this.isReady) {
+			for (ElementInfo ei : vm.getHeap().liveObjects()) {
+				String name = ei.getClassInfo().getName();
+				if (name.contains("NSPK")) {
+					this.isReady = true;
+				}
+			}
+		}
+		config.setReady(this.isReady);
+		
 		Heap heap = vm.getHeap();
 		{
 			ElementInfo ei = heap.get(lookupTable.get("intrdr"));
