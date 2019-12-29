@@ -23,7 +23,6 @@ import nspk.main.Rand;
 import nspk.main.Response;
 import nspk.main.RewriteRule;
 
-
 /**
  * This class provides an empty implementation of {@link NspkVisitor},
  * which can be extended to create a visitor which only needs to handle a subset

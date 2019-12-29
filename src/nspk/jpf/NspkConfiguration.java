@@ -100,16 +100,8 @@ public class NspkConfiguration implements Serializable, OC {
 		this.intrdrRwController = intrdrRwController;
 	}
 	
-	public String getStateString() {
-		return this.nw + " " + this.rand + " " + this.nonces + " " + this.prins;
-	}
-	
-	public String getRewriteRuleString() {
-		return "rw_p: " + this.pRwController + " rw_q: " + this.qRwController + " rw_intrdr: " + this.intrdrRwController;
-	}
-	
 	public String getPassedMessage() {
-		return this.getStateString() + " " + this.getRewriteRuleString();
+		return "{" + this.nw + " " + this.rand + " " + this.nonces + " " + this.prins + " " + "rw_p: " + this.pRwController + " rw_q: " + this.qRwController + " rw_intrdr: " + this.intrdrRwController + "}";
 	}
 	
 	@Override
@@ -119,11 +111,11 @@ public class NspkConfiguration implements Serializable, OC {
 		}
 		
 		NspkConfiguration other = (NspkConfiguration) obj;
-		return GFG.getSHA(this.getStateString()).equals(GFG.getSHA(other.getStateString()));
+		return GFG.getSHA(this.toString()).equals(GFG.getSHA(other.toString()));
 	}
 
 	@Override
 	public String toString() {
-		return this.getStateString();
+		return "{" + this.nw + " " + this.rand + " " + this.nonces + " " + this.prins + "}";
 	}
 }

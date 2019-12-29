@@ -18,7 +18,9 @@ public class TestNSPK {
 			Principal p = oc.getP();
 			Principal q = oc.getQ();
 			Intruder intrdr = oc.getIntrdr();
-
+			
+			System.out.println(p.getNw() + " " + p.getRand() + " " + p.getNonces() + " " + p.getPrins());
+			
 			if (CaseStudy.JPF_MODE)
 				Verify.endAtomic();
 			

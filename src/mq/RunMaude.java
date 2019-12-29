@@ -50,8 +50,8 @@ public class RunMaude {
 				command.add(maude_file);
 			}
 			builder = new ProcessBuilder(command);
-			builder.redirectErrorStream(true); // we can ignore the error stream by merging error stream with input
-												// stream
+			builder.redirectErrorStream(true); // we can ignore the error stream by merging error stream with input stream
+
 			process = builder.start();
 
 			// Prepare stdin & stdout

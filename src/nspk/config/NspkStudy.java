@@ -22,7 +22,7 @@ import nspk.main.MultiSet;
 public class NspkStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { "/Users/ogataslab/Home/jaist/maude/env/env.maude" };
+	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-nslpk.maude" };
 	// Maude command
 	final String command = "reduce checkConform('NSPK, {{seq}}, {{depth}}) .\n";
 
