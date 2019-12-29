@@ -1,5 +1,6 @@
 package mq;
 
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -16,7 +17,7 @@ import config.CaseStudy;
 import maude.OutputParser;
 import server.Application;
 import server.ApplicationConfigurator;
-import utils.AES;
+import utils.DateUtil;
 
 /**
  * Receiver program as RabbitMQ client Whenever receiving a message from
@@ -27,7 +28,10 @@ import utils.AES;
  *
  */
 public class MaudeWorker {
-
+	
+	public static Long currentTime = DateUtil.getTime();
+	public static int timeOut = 3 * 60 * 1000;	// 3 minutes
+	
 	/**
 	 * Starting a RabbitMQ client.
 	 * 
@@ -54,6 +58,10 @@ public class MaudeWorker {
 		// Get Maude instance and preload
 		RunMaude maude = RunMaude.getInstance();
 		
+		// `list` contains a list of sequenceStates being inserted to DB
+		// we do a batch insert to DB instead of one by one, namely around maximum 100 records per time. 
+		ArrayList<SequenceStates> list = new ArrayList<SequenceStates>();
+		
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 			String seq = SerializationUtils.deserialize(delivery.getBody());
 //			String seq = AES.decrypt(cipher, CaseStudy.SECRETE_KEY);
@@ -69,7 +77,7 @@ public class MaudeWorker {
 			if (output.getSuccess().size() > 0) {
 				sequencesStates.setType("success");
 				sequencesStates.setResult(output.getSuccessString());
-//				System.out.println("------> success");
+				System.out.println("------> success");
 			}
 			
 			if (output.getFailure().size() > 0) {
@@ -92,7 +100,13 @@ public class MaudeWorker {
 			
 			do {
 				try {
-					SequenceStatesService.insert(sequencesStates);
+					list.add(sequencesStates);
+					if (list.size() > 100 || DateUtil.getTime() - MaudeWorker.currentTime > MaudeWorker.timeOut) {
+						SequenceStatesService.insertBatch(list);
+						list.clear();
+						MaudeWorker.currentTime = DateUtil.getTime();
+					}
+//					SequenceStatesService.insert(sequencesStates);
 					break;
 				} catch (Exception e) {
 					// TODO Auto-generated catch block

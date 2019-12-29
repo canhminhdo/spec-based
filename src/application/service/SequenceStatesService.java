@@ -11,7 +11,7 @@ import application.model.SequenceStates;
 import database.ConnectionFactory;
 
 public class SequenceStatesService {
-
+	
 	public static List<SequenceStates> getAllTestCases() {
 		SequenceStatesDao sequenceStateDao = new SequenceStatesDaoImpl(ConnectionFactory.getConnection());
 		try {
