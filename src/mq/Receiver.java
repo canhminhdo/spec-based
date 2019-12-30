@@ -10,6 +10,7 @@ import com.rabbitmq.client.DeliverCallback;
 import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
+import utils.DateUtil;
 
 /**
  * Receiver program as RabbitMQ client Whenever receiving a message from
@@ -39,26 +40,34 @@ public class Receiver {
 		}
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
-
+		
+		// setting prefetch count: how many messages are being sent to the consumer at the same time.
+		channel.basicQos(1);
+		
 		channel.queueDeclare(app.getRabbitMQ().getQueueName(), false, false, false, null);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
-
+			
 			OC config = SerializationUtils.deserialize(delivery.getBody());
+			System.out.println("JPF started at " + DateUtil.getDateTimeString());
 			System.out.println(" [x] Received '" + config);
 			RunJPF runner = new RunJPF(config);
 			runner.start();
 			try {
 				runner.join();
+				System.out.println("JPF finished at " + DateUtil.getDateTimeString());
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+				System.out.println("Sending ack");
 			} catch (InterruptedException e) {
+				System.out.println("waiting jpf and ack to rabbitmq " + e.getMessage());
 				e.printStackTrace();
 			}
 		};
 
 		boolean autoAck = false;
-		channel.basicConsume(app.getRabbitMQ().getQueueName(), autoAck, deliverCallback, consumerTag -> {
+		channel.basicConsume(app.getRabbitMQ().getQueueName(), autoAck, deliverCallback, (consumerTag) -> {
+			System.out.println("Receiver consumer cancelling " + consumerTag);
 		});
 	}
 

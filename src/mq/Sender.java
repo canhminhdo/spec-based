@@ -46,6 +46,7 @@ public class Sender {
 			channel.queueDeclare(this.rabbitMQ.getQueueName(), false, false, false, null);
 			channel.queueDeclare(this.rabbitMQ.getMaudeQueue(), false, false, false, null);
 		} catch (Exception e) {
+			System.out.println("Cannot create a connection to RabbitMQ server");
 			e.printStackTrace();
 		}
 	}
@@ -68,9 +69,14 @@ public class Sender {
 	 * @param config
 	 * @throws Exception
 	 */
-	public void sendJob(OC config) throws Exception {
-		channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
-		System.out.println(" [x] Sent '" + config);
+	public void sendJob(OC config) {
+		try {
+			channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
+			System.out.println(" [x] Sent '" + config);
+		} catch (Exception e) {
+			System.out.println("Cannot send message on queue " + this.rabbitMQ.getQueueName());
+			e.printStackTrace();
+		}
 	}
 	
 	/**
@@ -79,11 +85,17 @@ public class Sender {
 	 * @param config
 	 * @throws Exception
 	 */
-	public void sendMaudeJob(String seq) throws Exception {
-		// Encrypt before sending
-		String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
-		channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(seq));
-		System.out.println(" [x] Sent to Maude '" + seq);
+	public void sendMaudeJob(String seq) {
+		try {
+			// Encrypt before sending
+			String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
+			channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(seq));
+			System.out.println(" [x] Sent to Maude '" + seq);
+		} catch (Exception e) {
+			System.out.println("Cannot send message on queue " + this.rabbitMQ.getMaudeQueue());
+			e.printStackTrace();
+		}
+		
 	}
 
 	/**
@@ -91,9 +103,14 @@ public class Sender {
 	 * 
 	 * @throws Exception
 	 */
-	public void close() throws Exception {
-		_instance = null;
-		channel.close();
-		connection.close();
+	public void close() {
+		try {
+			channel.close();
+			connection.close();
+			_instance = null;
+		} catch (Exception e) {
+			System.out.println("Cannot close the channel and connection");
+			e.printStackTrace();
+		}
 	}
 }

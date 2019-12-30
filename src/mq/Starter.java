@@ -42,6 +42,7 @@ public class Starter {
 				factory.setPassword(app.getRabbitMQ().getPassword());
 			}
 
+			// connection and channel will close automatically after try-with-resources
 			try (Connection connection = factory.newConnection(); Channel channel = connection.createChannel()) {
 				channel.queueDeclare(app.getRabbitMQ().getQueueName(), false, false, false, null);
 
@@ -59,6 +60,7 @@ public class Starter {
 				System.out.println(" [x] Sent '" + config);
 			}
 		} catch (Exception e) {
+			System.out.println("Cannot start up");
 			e.printStackTrace();
 		}
 	}
@@ -91,6 +93,7 @@ public class Starter {
 			if (SequenceStatesService.truncate())
 				System.out.println("Truncate successfully !!!");
 		} catch (Exception e) {
+			System.out.println("Cannot clean up");
 			e.printStackTrace();
 		}
 	}

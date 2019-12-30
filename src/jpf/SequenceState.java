@@ -85,32 +85,27 @@ public class SequenceState extends ListenerAdapter {
 	}
 
 	public void writeSeqStringToFile() {
-		try {
-			if (seq.size() > 0) {
-				String seqString = seqToString();
-				String seqSha256 = GFG.getSHA(seqString);
-				if (!jedis.exists(seqSha256)) {
-					jedis.set(seqSha256, seqString);
-					// TODO :: Sending to Maude Queue master
-					mq.Sender.getInstance().sendMaudeJob(seqString);
-					SEQ_UNIQUE_COUNT++;
-				}
-				
-				OC lastElement = seq.get(seq.size() - 1);
-				if (lastElement != null) {
-					String elementSha256 = GFG.getSHA(lastElement.toString());
-					if (!jedis.exists(elementSha256)) {
-						jedis.set(elementSha256, lastElement.toString());
-						// TODO :: submit job to the queue broker
-//						if (lastElement.getFinish().get() == false) {
-						if (lastElement.isFinished() == false && lastElement.isReady() == true) {
-							mq.Sender.getInstance().sendJob(lastElement);
-						}
+		if (seq.size() > 0) {
+			String seqString = seqToString();
+			String seqSha256 = GFG.getSHA(seqString);
+			if (!jedis.exists(seqSha256)) {
+				jedis.set(seqSha256, seqString);
+				// TODO :: Sending to Maude Queue master
+				mq.Sender.getInstance().sendMaudeJob(seqString);
+				SEQ_UNIQUE_COUNT++;
+			}
+			
+			OC lastElement = seq.get(seq.size() - 1);
+			if (lastElement != null) {
+				String elementSha256 = GFG.getSHA(lastElement.toString());
+				if (!jedis.exists(elementSha256)) {
+					jedis.set(elementSha256, lastElement.toString());
+					// TODO :: submit job to the queue broker
+					if (lastElement.isFinished() == false && lastElement.isReady() == true) {
+						mq.Sender.getInstance().sendJob(lastElement);
 					}
 				}
 			}
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
 	}
 
@@ -177,11 +172,6 @@ public class SequenceState extends ListenerAdapter {
 	public void searchFinished(Search search) {
 		System.out.println(COUNT + " - " + SEQ_UNIQUE_COUNT);
 		System.out.println("Finished");
-		try {
-			mq.Sender.getInstance().close();
-		} catch (Exception e) {
-			System.out.println("Cannot close connection");
-			System.out.println(e.getMessage());
-		}
+		mq.Sender.getInstance().close();
 	}
 }

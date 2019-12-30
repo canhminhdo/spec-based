@@ -48,7 +48,9 @@ public class RunJPF extends Thread {
 			jpf.run();
 			System.out.println("FINISHED RUNNING JOB");
 		} catch (Exception e) {
+			System.out.println("JPF Exception Start");
 			e.printStackTrace();
+			System.out.println("JPF Exception End");
 		}
 	}
 }

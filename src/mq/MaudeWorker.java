@@ -51,7 +51,10 @@ public class MaudeWorker {
 		}
 		Connection connection = factory.newConnection();
 		Channel channel = connection.createChannel();
-
+		
+		// setting prefetch count: how many messages are being sent to the consumer at the same time.
+		channel.basicQos(10);
+		
 		channel.queueDeclare(app.getRabbitMQ().getMaudeQueue(), false, false, false, null);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 		
@@ -61,6 +64,17 @@ public class MaudeWorker {
 		// `list` contains a list of sequenceStates being inserted to DB
 		// we do a batch insert to DB instead of one by one, namely around maximum 100 records per time. 
 		ArrayList<SequenceStates> list = new ArrayList<SequenceStates>();
+		
+//		Runtime.getRuntime().addShutdownHook(new Thread()
+//        {
+//            @Override
+//            public void run()
+//            {
+//                System.out.println("Interrupt received, killing by user ...");
+//                if (list.size() > 0)
+//                	SequenceStatesService.insertBatch(list);
+//            }
+//        });
 		
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 			String seq = SerializationUtils.deserialize(delivery.getBody());
@@ -120,12 +134,12 @@ public class MaudeWorker {
 					}
 				}
 			} while (true);
-			
 			channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		};
 
 		boolean autoAck = false;
-		channel.basicConsume(app.getRabbitMQ().getMaudeQueue(), autoAck, deliverCallback, consumerTag -> {
+		channel.basicConsume(app.getRabbitMQ().getMaudeQueue(), autoAck, deliverCallback, (consumerTag) -> {
+			System.out.println("Maude consumer cancelling " + consumerTag);
 		});
 	}
 
