@@ -22,7 +22,8 @@ import nspk.main.MultiSet;
 public class NspkStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-nslpk.maude" };
+	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-nslpk.maude" };	// iMac
+//	final String[] maude_files = { "/Users/canhdominh/eclipse-workspace/maude/env/env-nslpk.maude" };	// Macbook Pro
 	// Maude command
 	final String command = "reduce checkConform('NSPK, {{seq}}, {{depth}}) .\n";
 
@@ -34,7 +35,8 @@ public class NspkStudy extends CaseStudy {
 	final String MAUDE_QUEUE = "NSPK_MAUDE";
 
 	// if you use "ogataslab" computer at lab
-	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin:/Users/ogataslab/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";
+	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin:/Users/ogataslab/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// iMac
+//	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin:/Users/canhdominh/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// Macbook Pro
 
 	@Override
 	public String getQueueName() {
@@ -83,6 +85,7 @@ public class NspkStudy extends CaseStudy {
 		config.setpRwController(pRwController);
 		config.setqRwController(qRwController);
 		config.setIntrdrRwController(intrdrRwController);
+		config.setCurrentDepth(0);
 		
 		return config;
 	}

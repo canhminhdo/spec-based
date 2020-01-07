@@ -24,13 +24,17 @@ public abstract class CaseStudy {
 	public static String SECRETE_KEY = "OgataLab";
 	
 	// Maude program information
-	public static String MAUDE_PROGRAM = "/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";
-	
+	public static String MAUDE_PROGRAM = "/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";	// iMac
+//	public static String MAUDE_PROGRAM = "/Users/canhdominh/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";	// Macbook pro
+		
 	// Using for state sequences generation by JPF
-	public static int DEPTH = 100;
+	public static int DEPTH = 200;
 	public static int BOUND = 1000;
 	public static boolean DEPTH_FLAG = true;
 	public static boolean BOUND_FLAG = false;
+	
+	public static boolean IS_BOUNDED_MODEL_CHECKING = true;
+	public static int MAX_DEPTH = 200;
 
 	public final Boolean IS_REMOTE = false;
 

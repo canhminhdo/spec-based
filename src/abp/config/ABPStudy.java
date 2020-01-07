@@ -90,7 +90,8 @@ public class ABPStudy extends CaseStudy {
 		config.setChannel1(ch1);
 		// 8th argument: channel2
 		config.setChannel2(ch2);
-
+		config.setCurrentDepth(0);
+		
 		return config;
 	}
 
