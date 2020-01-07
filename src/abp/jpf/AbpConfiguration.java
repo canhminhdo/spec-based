@@ -31,6 +31,7 @@ public class AbpConfiguration<P> implements Serializable, OC {
     private Boolean flag2;
     private Integer stateId;
     private Integer depth;
+    private int currentDepth = 0;
     
 	public AbpConfiguration() {
 		
@@ -299,6 +300,16 @@ public class AbpConfiguration<P> implements Serializable, OC {
 	
 	public void setReady(boolean isReady) {
 		this.isReady = isReady;
+	}
+
+	@Override
+	public int getCurrentDepth() {
+		return currentDepth;
+	}
+
+	@Override
+	public void setCurrentDepth(int currentDepth) {
+		this.currentDepth = currentDepth;
 	}
 	
 }

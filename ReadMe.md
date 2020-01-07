@@ -9,3 +9,7 @@ SBT is an environment to testing concurrent programs based on specifications.
 2. Configure the application with your own case study in server.ApplicationConfiguration
 
 3. Configure database connection as well as redis, please refer to database.ConenectionFactory, database.RedisClient respectively
+
+4. Overwrite the initial message sending to the system for kick off, getInitialMessage method in your CaseStudy
+
+ 

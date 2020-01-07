@@ -18,6 +18,7 @@ import server.ApplicationConfigurator;
 public class RunJPF extends Thread {
 
 	private ArrayList<String> configList;
+	private int currentDepth;
 
 	/**
 	 * RunJPF constructor to generate configList for each case study. Change another
@@ -30,6 +31,7 @@ public class RunJPF extends Thread {
 		Application app = ApplicationConfigurator.getInstance().getApplication();
 		this.configList = app.getCaseStudy().getConfigList(config);
 		app.setHeapJPF(app.getCaseStudy().getHeapJPF());
+		this.currentDepth = config.getCurrentDepth();
 	}
 
 	/**
@@ -42,7 +44,7 @@ public class RunJPF extends Thread {
 			Config conf = JPF.createConfig(configString);
 			conf.setProperty("report.console.finished", "result");
 			JPF jpf = new JPF(conf);
-			SequenceState seq = new SequenceState();
+			SequenceState seq = new SequenceState(this.currentDepth);
 //			SimpleDot seq = new SimpleDot(conf, jpf);
 			jpf.addListener(seq);
 			jpf.run();

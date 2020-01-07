@@ -2,9 +2,9 @@ package nspk.jpf;
 
 import java.io.Serializable;
 
-import abp.jpf.AbpConfiguration;
 import jpf.common.OC;
-import nspk.main.*;
+import nspk.main.Controller;
+import nspk.main.MultiSet;
 import utils.GFG;
 
 public class NspkConfiguration implements Serializable, OC {
@@ -19,6 +19,7 @@ public class NspkConfiguration implements Serializable, OC {
 	private Controller<String> pRwController;
 	private Controller<String> qRwController;
 	private Controller<String> intrdrRwController;
+	private int currentDepth = 0;
 
 	public NspkConfiguration() {
 	}
@@ -127,5 +128,15 @@ public class NspkConfiguration implements Serializable, OC {
 	
 	public void setReady(boolean isReady) {
 		this.isReady = isReady;
+	}
+	
+	@Override
+	public int getCurrentDepth() {
+		return currentDepth;
+	}
+
+	@Override
+	public void setCurrentDepth(int currentDepth) {
+		this.currentDepth = currentDepth;
 	}
 }

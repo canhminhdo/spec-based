@@ -17,4 +17,9 @@ public interface OC extends Serializable {
 	public boolean isFinished();
 	
 	public String getPassedMessage();
+	
+	public int getCurrentDepth();
+	
+	public void setCurrentDepth(int depth);
+
 }

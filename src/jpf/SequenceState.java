@@ -18,8 +18,8 @@ import utils.GFG;
 
 public class SequenceState extends ListenerAdapter {
 
-	private final int DEPTH = CaseStudy.DEPTH;
-	private final int BOUND = CaseStudy.BOUND;
+	private int DEPTH = CaseStudy.DEPTH;
+	private int BOUND = CaseStudy.BOUND;
 	private boolean DEPTH_FLAG = CaseStudy.DEPTH_FLAG;
 	private boolean BOUND_FLAG = CaseStudy.BOUND_FLAG;
 	private int COUNT = 0;
@@ -29,13 +29,24 @@ public class SequenceState extends ListenerAdapter {
 	private ArrayList<OC> seq;
 	private Jedis jedis = null;
 	private HeapJPF heapJPF = null;
+	
+	private boolean is_publish = true;
+	private int nextDepth = 0;
+	
 
 	public SequenceState(Config conf, JPF jpf) {
 		initialize();
 		jedis.flushAll();
 	}
-
-	public SequenceState() {
+	
+	public SequenceState(int currentDepth) {
+		if (CaseStudy.IS_BOUNDED_MODEL_CHECKING) {
+			if (currentDepth + DEPTH >= CaseStudy.MAX_DEPTH) {
+				DEPTH = CaseStudy.MAX_DEPTH - currentDepth;
+				is_publish = false;
+			}
+		}
+		this.nextDepth = currentDepth + DEPTH;
 		initialize();
 	}
 
@@ -101,7 +112,8 @@ public class SequenceState extends ListenerAdapter {
 				if (!jedis.exists(elementSha256)) {
 					jedis.set(elementSha256, lastElement.toString());
 					// TODO :: submit job to the queue broker
-					if (lastElement.isFinished() == false && lastElement.isReady() == true) {
+					if (lastElement.isFinished() == false && lastElement.isReady() == true && is_publish) {
+						lastElement.setCurrentDepth(this.nextDepth);
 						mq.Sender.getInstance().sendJob(lastElement);
 					}
 				}
