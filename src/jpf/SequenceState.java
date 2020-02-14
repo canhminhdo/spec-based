@@ -84,7 +84,7 @@ public class SequenceState extends ListenerAdapter {
 				break;
 			}
 			if (config.equals(seq.get(i))) {
-//				Logger.log("Duplicated");
+//				System.out.println("Duplicated");
 				continue;
 			}
 			config = seq.get(i);

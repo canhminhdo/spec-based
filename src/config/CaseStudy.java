@@ -28,13 +28,13 @@ public abstract class CaseStudy {
 //	public static String MAUDE_PROGRAM = "/Users/canhdominh/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";	// Macbook pro
 		
 	// Using for state sequences generation by JPF
-	public static int DEPTH = 200;
-	public static int BOUND = 1000;
+	public static int DEPTH = 200;	// Depth for each sub state space running by a JPF instance
+	public static int BOUND = 1000;	// Bound for each sub state space running by a JPF instance
 	public static boolean DEPTH_FLAG = true;
 	public static boolean BOUND_FLAG = false;
 	
-	public static boolean IS_BOUNDED_MODEL_CHECKING = true;
-	public static int MAX_DEPTH = 200;
+	public static boolean IS_BOUNDED_MODEL_CHECKING = false;	// If you want to run with a Bounded Model Checking
+	public static int MAX_DEPTH = 200;	// Maximum depth when you run Bounded Model Checking
 
 	public final Boolean IS_REMOTE = false;
 

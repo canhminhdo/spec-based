@@ -28,6 +28,11 @@ public abstract class HeapJPF {
 	public abstract void startup(VM vm);
 	public abstract OC getConfiguration(Search search);
 	
+	public String getEnumType(ElementInfo ei) {
+		ElementInfo ei_enum = (ElementInfo) ei.getFieldValueObject("name");
+		return this.getStringType(ei_enum);
+	}
+	
 	public String getStringType(ElementInfo ei) {
 		ElementInfo ei_value = (ElementInfo) ei.getFieldValueObject("value");
 		CharArrayFields caf = (CharArrayFields) ei_value.getArrayFields();
@@ -41,10 +46,10 @@ public abstract class HeapJPF {
 	}
 	
 	public void debug(ElementInfo ei) {
-		System.out.println(ei);
+		System.out.println("ElementInfo: " + ei);
 		FieldInfo[] fis = ei.getClassInfo().getInstanceFields();
 		for (FieldInfo fi : fis) {
-			System.out.println(fi);
+			System.out.println("FieldInfo: " + fi);
 		}
 	}
 }
