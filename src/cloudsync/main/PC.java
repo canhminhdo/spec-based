@@ -27,6 +27,14 @@ public class PC extends Thread implements Serializable {
 		this.tmp = tmp;
 		this.cloud = cloud;
 	}
+	
+	public Cloud getCloud() {
+		return cloud;
+	}
+
+	public void setCloud(Cloud cloud) {
+		this.cloud = cloud;
+	}
 
 	public String getPid() {
 		return this.pid;

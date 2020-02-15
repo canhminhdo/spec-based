@@ -26,6 +26,11 @@ public class CloudSyncConfiguration implements Serializable, OC {
 		this.isReady = true;
 	}
 	
+	public CloudSyncConfiguration(Cloud cloud, ArrayList<PC> pcList) {
+		this.cloud = cloud;
+		this.pcList = pcList;
+	}
+	
 	@Override
 	public int getStateId() {
 		return stateId;
