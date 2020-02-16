@@ -17,22 +17,33 @@ public class CloudSyncJPF extends HeapJPF {
 	
 	public CloudSyncJPF() {
 		this.lookupTable = new HashMap<String, Integer>();
-		this.isReady = true;
+		this.isReady = false;
 	}
 
 	@Override
 	public void startup(VM vm) {
-		for (ElementInfo ei : vm.getHeap().liveObjects()) {
-			String name = ei.getClassInfo().getName();
-			if (name.equals("cloudsync.main.Cloud")) {
-				lookupTable.put("Cloud", ei.getObjectRef());
-			}
-			if (name.equals("cloudsync.main.PC")) {
-				String id = this.getStringType((ElementInfo) ei.getFieldValueObject("pid"));
-				lookupTable.put(id, ei.getObjectRef());
+		if (!this.isReady) {
+			for (ElementInfo ei : vm.getHeap().liveObjects()) {
+				String name = ei.getClassInfo().getName();
+				if (name.equals("cloudsync.main.CloudSync")) {
+					this.isReady = true;
+				}
 			}
 		}
-		showLookupTable();
+		
+		if (this.isReady) {
+			for (ElementInfo ei : vm.getHeap().liveObjects()) {
+				String name = ei.getClassInfo().getName();
+				if (name.equals("cloudsync.main.Cloud")) {
+					lookupTable.put("Cloud", ei.getObjectRef());
+				}
+				if (name.equals("cloudsync.main.PC")) {
+					String id = this.getStringType((ElementInfo) ei.getFieldValueObject("pid"));
+					lookupTable.put(id, ei.getObjectRef());
+				}
+			}
+			showLookupTable();
+		}
 	}
 
 	@Override
@@ -41,8 +52,8 @@ public class CloudSyncJPF extends HeapJPF {
 		CloudSyncConfiguration config = new CloudSyncConfiguration();
 		config.setStateId(search.getStateId());
 		config.setDepth(search.getDepth());
+		config.setReady(this.isReady);
 		Heap heap = vm.getHeap();
-		
 		// get Cloud information in JPF Heap
 		{
 			ElementInfo ei = heap.get(lookupTable.get("Cloud"));

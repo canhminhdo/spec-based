@@ -153,7 +153,7 @@ public class SequenceState extends ListenerAdapter {
 			}
 			if (DEPTH_FLAG && search.getDepth() >= DEPTH) {
 				// current depth is greater than DEPTH, back track
-//				Logger.log("Reach to the bound depth " + search.getDepth());
+//				System.out.println("Reach to the bound depth " + search.getDepth());
 				search.requestBacktrack();
 				COUNT++;
 				writeSeqStringToFile();
