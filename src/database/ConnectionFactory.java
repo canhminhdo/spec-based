@@ -29,7 +29,7 @@ public class ConnectionFactory {
 		try {
 			if (conn == null || conn.isClosed()) {
 				DriverManager.registerDriver(new Driver());
-				return (Connection) DriverManager.getConnection(URL, USER, PASS);
+				conn = (Connection) DriverManager.getConnection(URL, USER, PASS);
 			}
 			return conn;
 		} catch (SQLException ex) {

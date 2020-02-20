@@ -93,8 +93,7 @@ public class PC extends Thread implements Serializable {
 		synchronized (cloud) {
 			if (isIdlep() && cloud.isIdelc()) {
 				Verify.beginAtomic();
-				// Refresh valp by plus 1, avoiding tedious values
-				setValp(getValp() + 1);
+				this.modval();
 				Verify.endAtomic();
 				
 				Verify.beginAtomic();
@@ -106,6 +105,11 @@ public class PC extends Thread implements Serializable {
 			}
 			return false;
 		}
+	}
+	
+	public void modval() {
+		// Refresh valp by plus 1, avoiding tedious values
+		setValp(getValp() + 1);
 	}
 	
 	public boolean updated() {
