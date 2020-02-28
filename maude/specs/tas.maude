@@ -1,0 +1,48 @@
+---
+--- A mutual exclusion protocol with test&set
+---
+--- lock = false;
+--- ...
+--- Loop: "Remainder Section (RS)"
+---  rs: repeat while test&set(lock) = true;
+---    "Critical Section (CS)"
+---  cs: lock := false;
+---
+--- where test&set(x) atomically does the following:
+--- x is set to "true" and the old value of x is returned.
+---
+--- Initially, lock is false and each process is in
+--- Remainder Section (or at label rs).
+---
+
+fmod LABEL is
+    sort Label .
+    ops rs cs : -> Label [ctor] .
+endfm
+
+fmod PID is
+    sort Pid .
+    ops p1 p2 p3 : -> Pid [ctor] .
+endfm
+
+mod TAS is
+    pr LABEL .
+    pr PID .
+    sorts OComp Soup Config .
+    subsorts OComp < Soup .
+    op {_} : Soup -> Config [ctor] .
+    op empty : -> Soup [ctor] .
+    op _ _ : Soup Soup -> Soup [ctor assoc comm id: empty] .
+    op pc[_]:_ : Pid Label -> OComp [ctor] .
+    op lock:_ : Bool -> OComp [ctor] .
+
+    var I : Pid .
+    var OCs : Soup .
+    var B : Bool .
+
+    rl [enter] : {(pc[I]: rs) (lock: false) OCs} => {(pc[I]: cs) (lock: true) OCs} .
+    rl [exit] : {(pc[I]: cs) (lock: B) OCs} => {(pc[I]: rs) (lock: false) OCs} .
+
+    op init : -> Config .
+    eq init = {(pc[p1]: rs) (pc[p2]: rs) (pc[p3]: rs) (lock: false)} .
+endm

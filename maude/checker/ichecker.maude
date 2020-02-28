@@ -1,0 +1,59 @@
+mod ICHECKER{X :: TRIV} is
+    including META-LEVEL .
+    protecting ILIST{X} * (
+        sort NeIList{X} to NeStateList,
+        sort IList{X} to StateList
+    ) .
+
+    var M : String .
+    var N : Nat .
+    var B : Bound .
+    var mQid : Qid .
+    var stateTransition? : [ResultTriple] .
+    vars S S1 S2 : X$Elt .
+    var L : StateList .
+
+    sorts Result4Conform Result4Conform? .
+    subsort Result4Conform < Result4Conform? .
+    op {msg:_,from:_,to:_,index:_,bound:_} : String X$Elt X$Elt Nat Bound -> Result4Conform? [ctor] .
+    op success : -> Result4Conform [ctor] .
+
+    op getMsg : Result4Conform? -> String .
+    op getFrom : Result4Conform? -> X$Elt .
+    op getTo : Result4Conform? -> X$Elt .
+    op getIndex : Result4Conform? -> Nat .
+    op getBound : Result4Conform? -> Bound .
+    eq getMsg({msg: M, from: S1, to: S2,index: N, bound: B}) = M .
+    eq getFrom({msg: M, from: S1, to: S2, index: N, bound: B}) = S1 .
+    eq getTo({msg: M, from: S1, to: S2, index: N, bound: B}) = S2 .
+    eq getIndex({msg: M, from: S1, to: S2, index: N, bound: B}) = N .
+    eq getBound({msg: M, from: S1, to: S2, index: N, bound: B}) = B .
+
+    sorts Result4Driver Result4Driver? .
+    subsort Result4Driver < Result4Driver? .
+    op {seq:_,msg:_,from:_,to:_,index:_,bound:_} : Nat String X$Elt X$Elt Nat Bound -> Result4Driver? [ctor] .
+    op success : -> Result4Driver [ctor] .
+
+    *** check valid transition from S1 -> S2
+    op checkStateTransition : Qid X$Elt X$Elt Bound -> Bool .
+    ceq checkStateTransition(mQid, S1, S2, B) = if stateTransition? :: ResultTriple
+                                             then true
+                                             else false
+                                             fi
+                                           if stateTransition? := metaSearch(upModule(mQid, false), upTerm(S1), upTerm(S2), nil, '*, B, 0) .
+    eq checkStateTransition(mQid, S1, S2, B) = false [owise] .
+
+    *** check whether specification conforms to a finite list of states.
+    op checkConform : Qid StateList Bound -> Result4Conform? .
+    op checkConform : Qid NeStateList Bound -> Result4Conform? .
+    eq checkConform(mQid, nil, B) = success .
+    eq checkConform(mQid, S | nil, B) = success .
+    eq checkConform(mQid, S1 | S2 | L, B) = $checkConform(mQid, S2 | L, S1, 0, B).
+
+    op $checkConform : Qid NeStateList X$Elt Nat Bound -> Result4Conform? .
+    eq $checkConform(mQid, nil, S, N, B) = success .
+    eq $checkConform(mQid, S2 | L, S1, N, B) = if checkStateTransition(mQid, S1, S2, B)
+                                            then $checkConform(mQid, L, S2, N + 1, B)
+                                            else {msg: "Failure", from: S1, to: S2, index: N, bound: B}
+                                          fi .
+endm

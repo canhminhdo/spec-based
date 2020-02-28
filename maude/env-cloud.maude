@@ -1,0 +1,21 @@
+in utils/utils .
+in utils/meta-utils .
+in specs/cloud .
+in checker/ichecker .
+
+view VIEW-NSPK from TRIV to CONFIG is
+    sort Elt to Config .
+endv
+
+mod TESTER is
+    pr ICHECKER{VIEW-NSPK} * (
+        sort NeStateList to NeIListConfig,
+        sort StateList to ListConfig
+    ).
+endm
+
+***(
+    Testing command:
+    red checkConform('CLOUD, {} | {}, 1) .
+    search [1,1000] in CLOUD : {} =>* {} .
+)

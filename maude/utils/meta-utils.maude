@@ -1,0 +1,73 @@
+*** in model-checker .
+
+fmod META-UTILS is
+    including META-LEVEL .
+    *** including MODEL-CHECKER .
+
+    vars M L : Qid .
+    vars T T1 T2 : Term .
+    var TL : TermList .
+    var LABELS : QidList .
+    var R : Rule .
+    var RS : RuleSet .
+    var AS : AttrSet .
+    var COND : Condition .
+    vars N C : Nat .
+
+    *** ====> START NORMALIZE NUMBER
+    op normalize : Nat -> Nat .
+    eq normalize(N) = N rem 1000 .
+    *** ====> END NORMALIZE NUMBER
+
+
+    *** ====> START GET ALL LABLES
+    ***(
+        Get all rewrite rule lables from a Module => OK
+    )
+    op getLabels : Qid -> QidList .
+    eq getLabels(M) = getAllLabels(getRls(upModule(M, false))) .
+
+    ***(
+        get all rewrite rule lables from a RuleSet => OK
+    )
+    op getAllLabels : RuleSet -> QidList .
+    eq getAllLabels(none) = nil .
+    eq getAllLabels(R RS) = getRuleLabel(R) getAllLabels(RS) .
+
+    ***(
+        get a rewrite rule lable from a Rule => OK
+    )
+    op getRuleLabel : Rule -> Qid .
+    eq getRuleLabel(none) = 'no-label .
+    eq getRuleLabel(rl T1 => T2 [AS].) = getLabel(AS) .
+    eq getRuleLabel(crl(T1)=>(T2)if(COND)[(AS)].) = getLabel(AS) .
+
+    ***(
+        get a label from a AttrSet => OK
+    )
+    op getLabel : AttrSet -> Qid .
+    eq getLabel(label(L) AS) = L .
+    eq getLabel(AS) = 'no-label [owise] .
+
+    *** <==== END GET ALL 
+    
+    *** ====> START TERMLIST UTILS
+    ***(
+        size of term list
+    )
+    op sizeTermList : TermList -> Nat .
+    eq sizeTermList(TL) = $sizeTermList(TL, 0) .
+
+    op $sizeTermList : TermList Nat -> Nat .
+    eq $sizeTermList(empty, C) = C .
+    eq $sizeTermList((T, TL), C) = $sizeTermList(TL, C + 1) .
+
+    ***(
+        get a term by index
+    )
+    op getTermByIndex : TermList Nat -> Term .
+    eq getTermByIndex(empty, N) = empty .
+    eq getTermByIndex((T, TL), 0) = T .
+    eq getTermByIndex((T, TL), N) = getTermByIndex(TL, sd(N, 1)) .
+    *** <==== END TERMLIST UTILS
+endfm

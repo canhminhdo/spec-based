@@ -1,0 +1,73 @@
+in utils/utils .
+in utils/meta-utils .
+in specs/tas .
+in checker/ichecker .
+
+view VIEW-TAS from TRIV to TAS is
+    sort Elt to Config .
+endv
+
+mod ENV-CONFIG is
+    pr ICHECKER{VIEW-TAS} * (
+        sort NeStateList to NeIListConfig,
+        sort StateList to ListConfig
+    ).
+
+    *** define a list of sequences of states
+    sorts NeListSeq ListSeq .
+    subsort ListConfig < NeListSeq < ListSeq .
+
+    op empty : -> ListSeq [ctor] .
+    op _,_ : ListSeq ListSeq -> ListSeq [ctor assoc id: empty prec 25] .
+    op _,_ : NeListSeq ListSeq -> NeListSeq [ctor ditto] .
+    op _,_ : ListSeq NeListSeq -> NeListSeq [ctor ditto] .
+endm
+
+mod TESTER-CONFIG is
+    pr ENV-CONFIG .
+
+    var LC : ListConfig .
+    var LS : ListSeq .
+    var R4C? : [Result4Conform?] .
+    vars mQid : Qid .
+    var N : Nat .
+    var B : Bound .
+
+    ***(
+        make a testing from java source code
+    )
+    op tester : Qid ListSeq Bound -> Result4Driver? .
+    eq tester(mQid, nil, B) = success .
+    eq tester(mQid, (LC , LS), B) = $tester(mQid, (LC , LS), B, 0) .
+
+    op $tester : Qid ListSeq Bound Nat -> Result4Driver? .
+    eq $tester(mQid, empty, B, N) = success .
+    ceq $tester(mQid, (LC , LS), B, N) =  if R4C? :: Result4Conform
+                                            then $tester(mQid, LS, B, N + 1)
+                                            else {seq: N, msg: getMsg(R4C?), from: getFrom(R4C?), to: getTo(R4C?), index: getIndex(R4C?), bound: getBound(R4C?)}
+                                            fi
+                                        if R4C? := checkConform(mQid, LC, B) .
+    *** eq $tester(mQid, LS, B, N) = success [owise] .
+endm
+
+in data/env-data .
+
+mod TESTER is
+    pr TESTER-CONFIG .
+    pr ENV-DATA .
+
+    op checkResult : -> Result4Driver? .
+    eq checkResult = tester('TAS, data , 1) .
+    ***(
+        Parameters:
+        1st: Qid of module - the specification
+        2nd: the list of sequences of states from a specification
+        3rd: a number of bound for searching
+    )
+endm
+
+red checkResult .
+***(
+    Testing command:
+    red checkResult .
+)

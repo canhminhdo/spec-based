@@ -1,0 +1,21 @@
+in utils/utils .
+in utils/meta-utils .
+in specs/nslpk .
+in checker/ichecker .
+
+view VIEW-NSPK from TRIV to CONFIG is
+    sort Elt to Config .
+endv
+
+mod TESTER is
+    pr ICHECKER{VIEW-NSPK} * (
+        sort NeStateList to NeIListConfig,
+        sort StateList to ListConfig
+    ).
+endm
+
+***(
+    Testing command:
+    red checkConform('NSPK, {nw: emp rand: (r1 r2) nonces: emp prins: (p q intrdr)} | {nw: m1(p, p, intrdr, c1(intrdr, n(p, intrdr, r1), p)) rand: r2 nonces: n(p, intrdr, r1) prins: (p q intrdr)}, 1) .
+    search [1,1000] in NSPK : {nw: emp rand: (r1 r2) nonces: emp prins: (p q intrdr)} =>* {nw: m1(p, p, intrdr, c1(intrdr, n(p, intrdr, r1), p)) rand: r2 nonces: n(p, intrdr, r1) prins: (p q intrdr)} .
+)

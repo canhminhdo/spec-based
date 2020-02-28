@@ -1,0 +1,88 @@
+fmod DATA is
+  pr NAT .
+  sort Data .
+  op d : Nat -> Data [ctor] .
+endfm
+
+fmod PAIR {D1 :: TRIV, D2 :: TRIV } is
+  sort Pair{D1,D2} .
+  op <_,_> : D1$Elt D2$Elt -> Pair{D1,D2} [ctor] .
+endfm
+
+view Data from TRIV to DATA is
+  sort Elt to Data .
+endv
+
+fmod DB-PAIR is
+  pr PAIR{Data,Bool} .
+endfm
+
+view DB-Pair from TRIV to DB-PAIR is
+  sort Elt to Pair{Data,Bool} .
+endv
+
+fmod SOUP {D :: TRIV} is
+  sort Soup{D} .
+  subsort D$Elt < Soup{D} .
+  op empty : -> Soup{D} [ctor] .
+  op _ _ : Soup{D} Soup{D} -> Soup{D} [ctor assoc comm id: empty] .
+endfm
+
+fmod OCOMP is
+  pr ILIST{DB-Pair} .
+  pr ILIST{Bool} .
+  pr ILIST{Data} .
+  sort OComp .
+  op (sb:_) : Bool -> OComp [ctor] .
+  op (data:_) : Data -> OComp [ctor] .
+  op (rb:_) : Bool -> OComp [ctor] .
+  op (buf:_) : IList{Data} -> OComp [ctor] .
+  op (dc:_) : IList{DB-Pair} -> OComp [ctor] .
+  op (ac:_) : IList{Bool} -> OComp [ctor] .
+endfm
+
+view OComp from TRIV to OCOMP is
+  sort Elt to OComp .
+endv
+
+fmod OCOMP-SOUP is
+  pr SOUP{OComp} .
+endfm
+
+fmod CONFIG is
+  pr OCOMP-SOUP .
+  sorts Config .
+  op {_} : Soup{OComp} -> Config [ctor] .
+  op init : -> Config .
+  eq init = {(sb: true) (data: d(0)) (rb: true) (buf: nil) (dc: nil) (ac: nil)} .
+endfm
+
+mod ABP is
+  inc CONFIG .
+  vars B B' : Bool .
+  var D : Data .
+  var P : Pair{Data,Bool} .
+  var N : Nat .
+  vars Ps Ps1 Ps2 : IList{DB-Pair} .
+  vars Bs Bs1 Bs2 : IList{Bool} .
+  var Ds : IList{Data} .
+  var OCs : Soup{OComp} .
+  rl [d-snd] : {(sb: B) (data: D) (dc: Ps) OCs} => {(sb: B) (data: D) (dc: (Ps | < D,B >)) OCs} .
+  crl [a-rec1] : {(sb: B) (data: d(N)) (ac: (B' | Bs)) OCs} => {(sb: (not B)) (data: d(N + 1)) (ac: Bs) OCs} if B =/= B' .
+  crl [a-rec2] : {(sb: B) (data: D) (ac: (B' | Bs)) OCs} => {(sb: B) (data: D) (ac: Bs) OCs} if B = B' .
+  rl [a-snd] : {(rb: B) (ac: Bs) OCs} => {(rb: B) (ac: (Bs | B)) OCs} .
+  crl [d-rec1] : {(rb: B) (buf: Ds) (dc: (< D,B' > | Ps)) OCs} => {(rb: (not B)) (buf: (Ds | D)) (dc: Ps) OCs} if B = B' .
+  crl [d-rec2] : {(rb: B) (buf: Ds) (dc: (< D,B' > | Ps)) OCs} => {(rb: B) (buf: Ds) (dc: Ps) OCs} if B =/= B' .
+  rl [d-drp] : {(dc: (Ps1 | P | Ps2)) OCs} => {(dc: (Ps1 | Ps2)) OCs} .
+  rl [d-dup] : {(dc: (Ps1 | P | Ps2)) OCs} => {(dc: (Ps1 | P | P | Ps2)) OCs} .
+  rl [a-drp] : {(ac: (Bs1 | B | Bs2)) OCs} => {(ac: (Bs1 | Bs2)) OCs} .
+  rl [a-drp] : {(ac: (Bs1 | B | Bs2)) OCs} => {(ac: (Bs1 | B | B | Bs2)) OCs} .
+endm
+
+***(
+search [1] in ABP : init =>* {(buf: (d(0) | d(1) | d(2) | d(3) | d(4))) OCs} .
+--> need to set `bound` to 2
+search [1] in ABP : {sb: true data: d(0) rb: true buf: nil dc: < d(0),true > ac: nil} =>* {sb: true data: d(0) rb: false buf: d(0) dc: < d(0),true > ac: nil} .
+--> need to set `bound` to ???
+search [1,10] in ABP : {sb: true data: d(0) rb: false buf: d(0) dc: < d(0),true > ac: nil} =>* {sb: false data: d(0) rb: false buf: d(0) dc: < d(0),true > ac: nil} .
+)***

@@ -1,0 +1,55 @@
+fmod ILIST{X :: TRIV} is
+  protecting NAT .
+  sorts NeIList{X} IList{X} .
+  subsort X$Elt < NeIList{X} < IList{X} .
+
+  op nil : -> IList{X} [ctor] .
+  op _|_ : IList{X} IList{X} -> IList{X} [ctor assoc id: nil prec 25] .
+  op _|_ : NeIList{X} IList{X} -> NeIList{X} [ctor ditto] .
+  op _|_ : IList{X} NeIList{X} -> NeIList{X} [ctor ditto] .
+
+  var E E' : X$Elt .
+  vars A L : IList{X} .
+  var C : Nat .
+
+  op append : IList{X} IList{X} -> IList{X} .
+  op append : NeIList{X} IList{X} -> NeIList{X} .
+  op append : IList{X} NeIList{X} -> NeIList{X} .
+  eq append(A, L) = A | L .
+  
+  op head : IList{X} -> X$Elt .
+  op head : NeIList{X} -> X$Elt .
+  eq head(nil) = nil .
+  eq head(E | L) = E .
+
+  op tail : IList{X} -> X$Elt .
+  op tail : NeIList{X} -> IList{X} .
+  eq tail(nil) = nil .
+  eq tail(E | L) = L .
+
+  op last : NeIList{X} -> X$Elt .
+  eq last(L | E) = E .
+
+  op front : NeIList{X} -> IList{X} .
+  eq front(L | E) = L .
+
+  op occurs : X$Elt IList{X} -> Bool .
+  eq occurs(E, nil) = false .
+  eq occurs(E, E' | L) = if E == E' then true else occurs(E, L) fi .
+
+  op reverse : IList{X} -> IList{X} .
+  op reverse : NeIList{X} -> NeIList{X} .
+  eq reverse(L) = $reverse(L, nil) .
+
+  op $reverse : IList{X} IList{X} -> IList{X} .
+  eq $reverse(nil, A) = A .
+  eq $reverse(E | L, A) = $reverse(L, E | A).
+
+  op size : IList{X} -> Nat .
+  op size : NeIList{X} -> NzNat .
+  eq size(L) = $size(L, 0) .
+
+  op $size : IList{X} Nat -> Nat .
+  eq $size(nil, C) = C .
+  eq $size(E | L, C) = $size(L, C + 1) .
+endfm

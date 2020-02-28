@@ -1,5 +1,0 @@
-mod ENV-DATA is
-pr ENV-CONFIG .
-op data : -> ListSeq .
-op size : -> Nat .
-eq data = 
