@@ -21,7 +21,7 @@ import jpf.common.OC;
 public class ABPStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { "/Users/ogataslab/Home/jaist/maude/env/env.maude" };
+	final String[] maude_files = { "/Users/canhdominh/Home/jaist/maude/env/env.maude" };
 	// Maude command
 	final String command = "reduce checkConform('ABP, {{seq}}, {{depth}}) .\n";
 
@@ -37,12 +37,12 @@ public class ABPStudy extends CaseStudy {
 //	final String CLASS_PATH = "/Users/student/eclipse-workspace/abp/bin";
 
 	// if you use "ogataslab" computer at lab
-	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin";
+	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin";
 
 	// packets will send over network
 	public static String PACKETS[] = { "0", "1", "2", "3" };
 	// channel size
-	public static int BOUND = 2;
+	public static int BOUND = 1;
 
 	@Override
 	public String getQueueName() {

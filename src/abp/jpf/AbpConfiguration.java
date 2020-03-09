@@ -20,7 +20,7 @@ import jpf.common.OC;
  */
 public class AbpConfiguration<P> implements Serializable, OC {
 	
-	private boolean isReady;
+	private boolean isReady = true;
 	private Channel<Pair<P,Boolean>> channel1;
 	private Integer index;
     private Channel<Boolean> channel2;
