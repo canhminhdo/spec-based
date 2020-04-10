@@ -97,13 +97,17 @@ public class SequenceState extends ListenerAdapter {
 
 	public void writeSeqStringToFile() {
 		if (seq.size() > 0) {
-			String seqString = seqToString();
-			String seqSha256 = GFG.getSHA(seqString);
-			if (!jedis.exists(seqSha256)) {
-				jedis.set(seqSha256, seqString);
-				// TODO :: Sending to Maude Queue master
-				mq.Sender.getInstance().sendMaudeJob(seqString);
-				SEQ_UNIQUE_COUNT++;
+			
+			if (CaseStudy.MAUDE_WORKER_IS_ENABLE) {
+				String seqString = seqToString();
+				String seqSha256 = GFG.getSHA(seqString);
+				
+				if (!jedis.exists(seqSha256)) {
+					jedis.set(seqSha256, seqString);
+					// TODO :: Sending to Maude Queue master
+					mq.Sender.getInstance().sendMaudeJob(seqString);
+					SEQ_UNIQUE_COUNT++;
+				}
 			}
 			
 			if (DEPTH_FLAG) {

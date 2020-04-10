@@ -7,6 +7,7 @@ import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 
 import application.service.SequenceStatesService;
+import config.CaseStudy;
 import database.RedisClient;
 import jpf.common.OC;
 import server.Application;
@@ -90,7 +91,7 @@ public class Starter {
 			RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().flushAll();
 			
 			// Truncate `sequence_states` table before running
-			if (SequenceStatesService.truncate())
+			if (CaseStudy.MYSQL_IS_ENABLE && SequenceStatesService.truncate())
 				System.out.println("Truncate successfully !!!");
 		} catch (Exception e) {
 			System.out.println("Cannot clean up");

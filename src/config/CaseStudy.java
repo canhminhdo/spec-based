@@ -26,6 +26,7 @@ public abstract class CaseStudy {
 	// Maude program information
 	public static String MAUDE_PROGRAM = AppConfig.getInstance().getConfig().getProperty("maude.program");
 	public static Integer MAUDE_DEPTH =  Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("maude.depth"));
+	public static Boolean MAUDE_WORKER_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("maude.worker.isEnable"));
 		
 	// Using for state sequences generation by JPF
 	public static int DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.depth"));	// Depth for each sub state space running by a JPF instance
@@ -56,6 +57,9 @@ public abstract class CaseStudy {
 	// -> local mode
 	public final String REDIS_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("redis.local.host");;
 	public final Integer REDIS_LOCAL_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.local.port"));
+	
+	// MySQL
+	public static Boolean MYSQL_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("mysql.isEnable"));
 	
 	/**
 	 * Get CLASS_PATH where you program is locate

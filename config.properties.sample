@@ -1,5 +1,5 @@
 # version
-version=1.0
+version=0.0.1
 secreteKey=OgataLab
 
 # cloudsync
@@ -16,11 +16,11 @@ maude.depth=2
 
 # jpf configuration
 jpf.mode=true
-jpf.depth=200
+jpf.bmc.isEnable=true
+jpf.depth=100
+jpf.depth.isEnable=true
 jpf.bound=1000
-jpf.depth.isEnable=false
 jpf.bound.isEnable=false
-jpf.bmc.isEnable=false
 
 env.isRemote=false
 # rabbitmq remote
@@ -38,6 +38,9 @@ redis.remote.port=6379
 # redis local
 redis.local.host=localhost
 redis.local.port=6379
+
+# saving results to MySQL database
+mysql.isEnable=false
 
 # mysql remote
 mysql.remote.host=
