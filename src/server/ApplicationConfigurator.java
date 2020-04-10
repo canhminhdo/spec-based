@@ -3,6 +3,7 @@ package server;
 import abp.config.ABPStudy;
 import nspk.config.NspkStudy;
 import cloudsync.config.CloudSyncStudy;
+import config.AppConfig;
 import config.CaseStudy;
 import server.factory.ServerFactory;
 
@@ -24,12 +25,16 @@ public class ApplicationConfigurator {
 	 * @return
 	 */
 	public static ApplicationConfigurator getInstance() {
-		if (_instance == null) {
-			_instance = new ApplicationConfigurator(new CloudSyncStudy());
-//			_instance = new ApplicationConfigurator(new NspkStudy());
-//			_instance = new ApplicationConfigurator(new ABPStudy());
+		if (_instance == null) {	
+			String caseStudy = AppConfig.getInstance().getConfig().getProperty("caseStudy");
+			if (caseStudy.equals("nspk")) {
+				_instance = new ApplicationConfigurator(new NspkStudy());
+			} else if (caseStudy.equals("cloudsync")) {
+				_instance = new ApplicationConfigurator(new CloudSyncStudy());
+			} else if (caseStudy.equals("abp")) {
+				_instance = new ApplicationConfigurator(new ABPStudy());
+			}
 		}
-
 		return _instance;
 	}
 

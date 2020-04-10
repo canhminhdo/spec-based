@@ -6,6 +6,9 @@ import java.sql.SQLException;
 import com.mysql.jdbc.Connection;
 import com.mysql.jdbc.Driver;
 
+import config.AppConfig;
+import config.CaseStudy;
+
 /**
  * Singleton MySQL instance
  * 
@@ -14,9 +17,9 @@ import com.mysql.jdbc.Driver;
  */
 public class ConnectionFactory {
 	
-	public static final String URL = "jdbc:mysql://localhost:3306/ogatalab";
-	public static final String USER = "root";
-	public static final String PASS = "";
+	public static String URL = null;
+	public static String USER = null;
+	public static String PASS = null;
 	
 	public static Connection conn = null;
 	
@@ -28,6 +31,7 @@ public class ConnectionFactory {
 	public static Connection getConnection() {
 		try {
 			if (conn == null || conn.isClosed()) {
+				getConfig();
 				DriverManager.registerDriver(new Driver());
 				conn = (Connection) DriverManager.getConnection(URL, USER, PASS);
 			}
@@ -35,6 +39,26 @@ public class ConnectionFactory {
 		} catch (SQLException ex) {
 			throw new RuntimeException("Error connecting to the database", ex);
 		}
+	}
+	
+	public static void getConfig() {
+		String host = null;
+		String port = null;
+		String db = null;
+		if (CaseStudy.IS_REMOTE) {
+			host = AppConfig.getInstance().getConfig().getProperty("mysql.remote.host");
+			port = AppConfig.getInstance().getConfig().getProperty("mysql.remote.port");
+			db = AppConfig.getInstance().getConfig().getProperty("mysql.remote.database");
+			USER = AppConfig.getInstance().getConfig().getProperty("mysql.remote.username");
+			PASS = AppConfig.getInstance().getConfig().getProperty("mysql.remote.password");
+		} else {
+			host = AppConfig.getInstance().getConfig().getProperty("mysql.local.host");
+			port = AppConfig.getInstance().getConfig().getProperty("mysql.local.port");
+			db = AppConfig.getInstance().getConfig().getProperty("mysql.local.database");
+			USER = AppConfig.getInstance().getConfig().getProperty("mysql.local.username");
+			PASS = AppConfig.getInstance().getConfig().getProperty("mysql.local.password");
+		}
+		URL = String.format("jdbc:mysql://%s:%s/%s", host, port, db);
 	}
 	
 	/**

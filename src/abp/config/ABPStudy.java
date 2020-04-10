@@ -21,7 +21,7 @@ import jpf.common.OC;
 public class ABPStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { "/Users/canhdominh/Home/jaist/maude/env/env.maude" };
+	final String[] maude_files = { CaseStudy.PROJECT_BASE + "/maude/env.maude" };
 	// Maude command
 	final String command = "reduce checkConform('ABP, {{seq}}, {{depth}}) .\n";
 
@@ -30,14 +30,6 @@ public class ABPStudy extends CaseStudy {
 	// name of queue when using RabbitMQ
 	final String QUEUE_NAME = "ABP";
 	final String MAUDE_QUEUE = "ABP_MAUDE";
-	// Path to abp program
-//	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/abp/bin";
-
-	// if you use "student" computer at lab
-//	final String CLASS_PATH = "/Users/student/eclipse-workspace/abp/bin";
-
-	// if you use "ogataslab" computer at lab
-	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin";
 
 	// packets will send over network
 	public static String PACKETS[] = { "0", "1", "2", "3" };
@@ -52,11 +44,6 @@ public class ABPStudy extends CaseStudy {
 	@Override
 	public String getMaudeQueue() {
 		return MAUDE_QUEUE;
-	}
-
-	@Override
-	public String getClassPath() {
-		return CLASS_PATH;
 	}
 
 	@Override
@@ -99,7 +86,7 @@ public class ABPStudy extends CaseStudy {
 	public ArrayList<String> getConfigList(OC config) {
 
 		ArrayList<String> configList = new ArrayList<String>();
-		configList.add("+classpath=" + this.CLASS_PATH);
+		configList.add("+classpath=" + this.getClassPath());
 		configList.add(this.MAIN_CLASS);
 
 		// 1st argument: packetsToBeSent

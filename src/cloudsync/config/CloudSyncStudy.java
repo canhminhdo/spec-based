@@ -20,8 +20,7 @@ import jpf.common.OC;
 public class CloudSyncStudy extends CaseStudy {
 
 	// Maude files
-//	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-cloud.maude" };	// iMac
-	final String[] maude_files = { "/Users/canhdominh/Home/JAIST/maude/env/env-cloud.maude" };	// Macbook Pro
+	final String[] maude_files = { CaseStudy.PROJECT_BASE + "/maude/env-cloud.maude" };
 	// Maude command
 	final String command = "reduce checkConform('CLOUD, {{seq}}, {{depth}}) .\n";
 
@@ -32,10 +31,6 @@ public class CloudSyncStudy extends CaseStudy {
 	final String QUEUE_NAME = "CLOUD";
 	final String MAUDE_QUEUE = "CLOUD_MAUDE";
 
-	// if you use "ogataslab" computer at lab
-//	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin:/Users/ogataslab/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// iMac
-	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin:/Users/canhdominh/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// Macbook Pro
-
 	@Override
 	public String getQueueName() {
 		return QUEUE_NAME;
@@ -44,11 +39,6 @@ public class CloudSyncStudy extends CaseStudy {
 	@Override
 	public String getMaudeQueue() {
 		return MAUDE_QUEUE;
-	}
-
-	@Override
-	public String getClassPath() {
-		return CLASS_PATH;
 	}
 
 	@Override
@@ -75,7 +65,7 @@ public class CloudSyncStudy extends CaseStudy {
 	public ArrayList<String> getConfigList(OC config) {
 
 		ArrayList<String> configList = new ArrayList<String>();
-		configList.add("+classpath=" + this.CLASS_PATH);
+		configList.add("+classpath=" + this.getClassPath());
 		configList.add(this.MAIN_CLASS);
 
 		configList.add(((CloudSyncConfiguration) config).getPassedMessage());

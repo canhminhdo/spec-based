@@ -13,55 +13,58 @@ import jpf.common.OC;
  */
 public abstract class CaseStudy {
 	
+	public static String PROJECT_BASE = AppConfig.getInstance().getConfig().getProperty("project.base");
+	
 	// runtime
-	public static String RUNTIME = "1.0";
+	public static String RUNTIME = AppConfig.getInstance().getConfig().getProperty("version");
 	
-	// the current version
-	public static String version = "1.0";
-	// using JPF_MODE ?
-	public static Boolean JPF_MODE = true;
+	// using JPF_MODE
+	public static Boolean JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode"));
 	
-	public static String SECRETE_KEY = "OgataLab";
+	public static String SECRETE_KEY = AppConfig.getInstance().getConfig().getProperty("secreteKey");
 	
 	// Maude program information
-//	public static String MAUDE_PROGRAM = "/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";	// iMac
-	public static String MAUDE_PROGRAM = "/Users/canhdominh/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64";	// Macbook pro
+	public static String MAUDE_PROGRAM = AppConfig.getInstance().getConfig().getProperty("maude.program");
+	public static Integer MAUDE_DEPTH =  Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("maude.depth"));
 		
 	// Using for state sequences generation by JPF
-	public static int DEPTH = 200;	// Depth for each sub state space running by a JPF instance
-	public static int BOUND = 1000;	// Bound for each sub state space running by a JPF instance
-	public static boolean DEPTH_FLAG = false;
-	public static boolean BOUND_FLAG = false;
+	public static int DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.depth"));	// Depth for each sub state space running by a JPF instance
+	public static int BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
+	public static boolean DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
+	public static boolean BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
 	
-	public static boolean IS_BOUNDED_MODEL_CHECKING = false;	// If you want to run with a Bounded Model Checking
+	// If you want to run with a Bounded Model Checking
+	public static boolean IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
 	public static int MAX_DEPTH = 400;	// Maximum depth when you run Bounded Model Checking
 
-	public final Boolean IS_REMOTE = false;
+	public static Boolean IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("isRemote"));
 
 	// RABBITMQ
 	// -> remote mode
-	public final String RABBITMQ_REMOTE_HOST = "45.32.43.1";
-	public final String RABBITMQ_REMOTE_USERNAME = "dev";
-	public final String RABBITMQ_REMOTE_PASSWORD = "pdev";
+	public final String RABBITMQ_REMOTE_HOST = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.host");
+	public final String RABBITMQ_REMOTE_USERNAME = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.username");
+	public final String RABBITMQ_REMOTE_PASSWORD = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.password");
 	// -> local mode
-	public final String RABBITMQ_LOCAL_HOST = "localhost";
-	public final String RABBITMQ_LOCAL_USERNAME = "";
-	public final String RABBITMQ_LOCAL_PASSWORD = "";
+	public final String RABBITMQ_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.host");
+	public final String RABBITMQ_LOCAL_USERNAME = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.username");
+	public final String RABBITMQ_LOCAL_PASSWORD = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.password");
 
 	// REDIS
 	// -> remote mode
-	public final String REDIS_REMOTE_HOST = "45.32.43.1";
-	public final Integer REDIS_REMOTE_PORT = 6379;
+	public final String REDIS_REMOTE_HOST = AppConfig.getInstance().getConfig().getProperty("redis.remote.host");
+	public final Integer REDIS_REMOTE_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.remote.port"));
 	// -> local mode
-	public final String REDIS_LOCAL_HOST = "localhost";
-	public final Integer REDIS_LOCAL_PORT = 6379;
-
+	public final String REDIS_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("redis.local.host");;
+	public final Integer REDIS_LOCAL_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.local.port"));
+	
 	/**
 	 * Get CLASS_PATH where you program is locate
 	 * 
 	 * @return {@link String}
 	 */
-	public abstract String getClassPath();
+	public String getClassPath() {
+		return System.getProperty("java.class.path");
+	}
 
 	/**
 	 * This is to get the initial message to send to the master queue

@@ -1,0 +1,53 @@
+# version
+version=1.0
+secreteKey=OgataLab
+
+# cloudsync
+# abp
+# nspk
+caseStudy=nspk
+
+# project base location
+project.base=/Users/ogataslab/eclipse-workspace/spec-based
+
+# maude program
+maude.program=/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64
+maude.depth=2
+
+# jpf configuration
+jpf.mode=true
+jpf.depth=200
+jpf.bound=1000
+jpf.depth.isEnable=false
+jpf.bound.isEnable=false
+jpf.bmc.isEnable=false
+
+env.isRemote=false
+# rabbitmq remote
+rabbitmq.remote.host=45.32.43.1
+rabbitmq.remote.username=dev
+rabbitmq.remote.password=pdev
+# rabbitmq local
+rabbitmq.local.host=localhost
+rabbitmq.local.username=
+rabbitmq.local.password=
+
+# redis remote
+redis.remote.host=45.32.43.1
+redis.remote.port=6379
+# redis local
+redis.local.host=localhost
+redis.local.port=6379
+
+# mysql remote
+mysql.remote.host=
+mysql.remote.port=3306
+mysql.remote.username=
+mysql.remote.password=
+mysql.remote.database=
+# mysql local
+mysql.local.host=localhost
+mysql.local.port=3306
+mysql.local.username=root
+mysql.local.password=
+mysql.local.database=ogatalab

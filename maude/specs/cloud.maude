@@ -93,5 +93,6 @@ mod CLOUD is
     rl [getval] : {(cloud: < idlec,CVal >) (pc[P]: < idlep,PVal,OldCVal >) OCs} => {(cloud: < busy,CVal >) (pc[P]: < gotval,PVal,CVal >) OCs} .
     crl [update1] : {(cloud: < busy,CVal >) (pc[P]: < gotval,PVal,GotCVal >) OCs} => {(cloud: < busy,CVal >) (pc[P]: < updated,GotCVal,GotCVal >) OCs} if GotCVal >= PVal .
     crl [update2] : {(cloud: < busy,CVal >) (pc[P]: < gotval,PVal,GotCVal >) OCs} => {(cloud: < busy,PVal >) (pc[P]: < updated,PVal,PVal >) OCs} if GotCVal < PVal .
-    rl [gotoidle] : {(cloud: < busy,CVal >) (pc[P]: < updated,PVal,OldCVal >) OCs} => {(cloud: < idlec,CVal >) (pc[P]: < idlep,PVal,OldCVal >) OCs} .
+    --- rl [gotoidle] : {(cloud: < busy,CVal >) (pc[P]: < updated,PVal,OldCVal >) OCs} => {(cloud: < idlec,CVal >) (pc[P]: < idlep,PVal,OldCVal >) OCs} .
+    rl [gotoidle] : {(cloud: < busy,CVal >) (pc[P]: < updated,PVal,OldCVal >) OCs} => {(cloud: < idlec,CVal >) (pc[P]: < idlep,PVal,0 >) OCs} .
 endm

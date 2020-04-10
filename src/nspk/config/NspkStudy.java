@@ -22,8 +22,7 @@ import nspk.main.MultiSet;
 public class NspkStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-nslpk.maude" };	// iMac
-//	final String[] maude_files = { "/Users/canhdominh/eclipse-workspace/maude/env/env-nslpk.maude" };	// Macbook Pro
+	final String[] maude_files = { CaseStudy.PROJECT_BASE + "/maude/env-nslpk.maude" };
 	// Maude command
 	final String command = "reduce checkConform('NSPK, {{seq}}, {{depth}}) .\n";
 
@@ -34,10 +33,6 @@ public class NspkStudy extends CaseStudy {
 	final String QUEUE_NAME = "NSPK";
 	final String MAUDE_QUEUE = "NSPK_MAUDE";
 
-	// if you use "ogataslab" computer at lab
-	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin:/Users/ogataslab/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// iMac
-//	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin:/Users/canhdominh/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// Macbook Pro
-
 	@Override
 	public String getQueueName() {
 		return QUEUE_NAME;
@@ -46,11 +41,6 @@ public class NspkStudy extends CaseStudy {
 	@Override
 	public String getMaudeQueue() {
 		return MAUDE_QUEUE;
-	}
-
-	@Override
-	public String getClassPath() {
-		return CLASS_PATH;
 	}
 
 	@Override
@@ -94,7 +84,7 @@ public class NspkStudy extends CaseStudy {
 	public ArrayList<String> getConfigList(OC config) {
 
 		ArrayList<String> configList = new ArrayList<String>();
-		configList.add("+classpath=" + this.CLASS_PATH);
+		configList.add("+classpath=" + this.getClassPath());
 		configList.add(this.MAIN_CLASS);
 
 		configList.add(((NspkConfiguration) config).getPassedMessage());
