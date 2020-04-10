@@ -5,18 +5,19 @@ secreteKey=OgataLab
 # cloudsync
 # abp
 # nspk
-caseStudy=nspk
+caseStudy=abp
 
 # project base location
 project.base=/Users/ogataslab/eclipse-workspace/spec-based
 
 # maude program
+maude.worker.isEnable=false
 maude.program=/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64
 maude.depth=2
 
 # jpf configuration
 jpf.mode=true
-jpf.bmc.isEnable=true
+jpf.bmc.isEnable=false
 jpf.depth=100
 jpf.depth.isEnable=true
 jpf.bound=1000
@@ -44,7 +45,7 @@ mysql.isEnable=false
 
 # mysql remote
 mysql.remote.host=
-mysql.remote.port=3306
+mysql.remote.port=
 mysql.remote.username=
 mysql.remote.password=
 mysql.remote.database=

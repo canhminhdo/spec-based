@@ -16,13 +16,8 @@ public class DDropper<P,B> extends Thread {
             catch (InterruptedException e) { }
             if (finish.get()) break;
             
-            channel1.getLock().requestCS();
             P p = channel1.get();
-            channel1.getLock().releaseCS();
-            
-            channel2.getLock().requestCS();
             B b = channel2.get();
-            channel2.getLock().releaseCS();
             
 //            if (p != null)
 //                System.out.println("dropped1: " + p);
