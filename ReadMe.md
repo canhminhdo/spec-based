@@ -13,7 +13,7 @@ Brevity, for a formal specification S and a concurrent program P, state sequence
 - Parallelize the whole process of environment from generating state sequences to checking such state sequences whether conform to specification or not.
 
 ## Dependences
-- MySQL is a relational database which is used to save all state sequences after checked by Maude programs.
+- MySQL is a relational database which is used to save all state sequences after checked by Maude programs.
 - Redis is used as a cache memory to avoid duplicate states as well as state sequences.
 - RabbitMQ is used as message broker to deliver messages to workers.
 - Maude is used to load specification and test state sequences by using meta-programing supported by itself.
