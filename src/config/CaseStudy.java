@@ -38,7 +38,7 @@ public abstract class CaseStudy {
 	public static boolean IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
 	public static int MAX_DEPTH = 400;	// Maximum depth when you run Bounded Model Checking
 
-	public static Boolean IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("isRemote"));
+	public static Boolean IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
 
 	// RABBITMQ
 	// -> remote mode
