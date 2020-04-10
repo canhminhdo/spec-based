@@ -20,8 +20,8 @@ import jpf.common.OC;
 public class CloudSyncStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-cloud.maude" };	// iMac
-//	final String[] maude_files = { "/Users/canhdominh/eclipse-workspace/maude/env/env-cloud.maude" };	// Macbook Pro
+//	final String[] maude_files = { "/Users/ogataslab/Home/JAIST/maude/env/env-cloud.maude" };	// iMac
+	final String[] maude_files = { "/Users/canhdominh/Home/JAIST/maude/env/env-cloud.maude" };	// Macbook Pro
 	// Maude command
 	final String command = "reduce checkConform('CLOUD, {{seq}}, {{depth}}) .\n";
 
@@ -33,8 +33,8 @@ public class CloudSyncStudy extends CaseStudy {
 	final String MAUDE_QUEUE = "CLOUD_MAUDE";
 
 	// if you use "ogataslab" computer at lab
-	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin:/Users/ogataslab/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// iMac
-//	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin:/Users/canhdominh/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// Macbook Pro
+//	final String CLASS_PATH = "/Users/ogataslab/eclipse-workspace/spec-based/bin:/Users/ogataslab/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// iMac
+	final String CLASS_PATH = "/Users/canhdominh/eclipse-workspace/spec-based/bin:/Users/canhdominh/eclipse-workspace/spec-based/lib/antlr-4.7.1-complete.jar";	// Macbook Pro
 
 	@Override
 	public String getQueueName() {

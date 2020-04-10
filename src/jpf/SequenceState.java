@@ -106,15 +106,17 @@ public class SequenceState extends ListenerAdapter {
 				SEQ_UNIQUE_COUNT++;
 			}
 			
-			OC lastElement = seq.get(seq.size() - 1);
-			if (lastElement != null) {
-				String elementSha256 = GFG.getSHA(lastElement.toString());
-				if (!jedis.exists(elementSha256)) {
-					jedis.set(elementSha256, lastElement.toString());
-					// TODO :: submit job to the queue broker
-					if (lastElement.isFinished() == false && lastElement.isReady() == true && is_publish) {
-						lastElement.setCurrentDepth(this.nextDepth);
-						mq.Sender.getInstance().sendJob(lastElement);
+			if (DEPTH_FLAG) {
+				OC lastElement = seq.get(seq.size() - 1);
+				if (lastElement != null) {
+					String elementSha256 = GFG.getSHA(lastElement.toString());
+					if (!jedis.exists(elementSha256)) {
+						jedis.set(elementSha256, lastElement.toString());
+						// TODO :: submit job to the queue broker
+						if (lastElement.isFinished() == false && lastElement.isReady() == true && is_publish) {
+							lastElement.setCurrentDepth(this.nextDepth);
+							mq.Sender.getInstance().sendJob(lastElement);
+						}
 					}
 				}
 			}

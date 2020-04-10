@@ -80,7 +80,7 @@ public class MaudeWorker {
 			String seq = SerializationUtils.deserialize(delivery.getBody());
 //			String seq = AES.decrypt(cipher, CaseStudy.SECRETE_KEY);
 			System.out.println(" [x] Received ");
-			maude.checkSeq(app.getCaseStudy().getCommand(), seq, 2);
+			maude.checkSeq(app.getCaseStudy().getCommand(), seq, 1);
 			OutputParser output = new OutputParser(maude.getOutput());
 			output.parsing();
 			// TODO:: Should save to database
