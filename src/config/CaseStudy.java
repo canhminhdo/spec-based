@@ -12,55 +12,99 @@ import jpf.common.OC;
  * @author OgataLab
  */
 public abstract class CaseStudy {
-	
-	public static String PROJECT_BASE = AppConfig.getInstance().getConfig().getProperty("project.base");
+	static {
+	    initStaticFields();
+	}
+	public static String PROJECT_BASE;
 	
 	// runtime
-	public static String RUNTIME = AppConfig.getInstance().getConfig().getProperty("version");
+	public static String RUNTIME;
 	
 	// using JPF_MODE
-	public static Boolean JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode"));
+	public static Boolean JPF_MODE;
 	
-	public static String SECRETE_KEY = AppConfig.getInstance().getConfig().getProperty("secreteKey");
+	public static String SECRETE_KEY;
 	
 	// Maude program information
-	public static String MAUDE_PROGRAM = AppConfig.getInstance().getConfig().getProperty("maude.program");
-	public static Integer MAUDE_DEPTH =  Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("maude.depth"));
-	public static Boolean MAUDE_WORKER_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("maude.worker.isEnable"));
+	public static String MAUDE_PROGRAM;
+	public static Integer MAUDE_DEPTH;
+	public static Boolean MAUDE_WORKER_IS_ENABLE;
 		
 	// Using for state sequences generation by JPF
-	public static int DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.depth"));	// Depth for each sub state space running by a JPF instance
-	public static int BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
-	public static boolean DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
-	public static boolean BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
+	public static int DEPTH;	// Depth for each sub state space running by a JPF instance
+	public static int BOUND;	// Bound for each sub state space running by a JPF instance
+	public static boolean DEPTH_FLAG;
+	public static boolean BOUND_FLAG;
 	
 	// If you want to run with a Bounded Model Checking
-	public static boolean IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
-	public static int MAX_DEPTH = 400;	// Maximum depth when you run Bounded Model Checking
+	public static boolean IS_BOUNDED_MODEL_CHECKING;
+	public static int MAX_DEPTH;	// Maximum depth when you run Bounded Model Checking
 
-	public static Boolean IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
+	public static Boolean IS_REMOTE;
 
 	// RABBITMQ
 	// -> remote mode
-	public final String RABBITMQ_REMOTE_HOST = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.host");
-	public final String RABBITMQ_REMOTE_USERNAME = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.username");
-	public final String RABBITMQ_REMOTE_PASSWORD = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.password");
+	public static String RABBITMQ_REMOTE_HOST;
+	public static String RABBITMQ_REMOTE_USERNAME;
+	public static String RABBITMQ_REMOTE_PASSWORD;
 	// -> local mode
-	public final String RABBITMQ_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.host");
-	public final String RABBITMQ_LOCAL_USERNAME = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.username");
-	public final String RABBITMQ_LOCAL_PASSWORD = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.password");
+	public static String RABBITMQ_LOCAL_HOST;
+	public static String RABBITMQ_LOCAL_USERNAME;
+	public static String RABBITMQ_LOCAL_PASSWORD;
 
 	// REDIS
 	// -> remote mode
-	public final String REDIS_REMOTE_HOST = AppConfig.getInstance().getConfig().getProperty("redis.remote.host");
-	public final Integer REDIS_REMOTE_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.remote.port"));
+	public static String REDIS_REMOTE_HOST;
+	public static Integer REDIS_REMOTE_PORT;
 	// -> local mode
-	public final String REDIS_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("redis.local.host");;
-	public final Integer REDIS_LOCAL_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.local.port"));
+	public static String REDIS_LOCAL_HOST;
+	public static Integer REDIS_LOCAL_PORT;
 	
 	// MySQL
-	public static Boolean MYSQL_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("mysql.isEnable"));
+	public static Boolean MYSQL_IS_ENABLE;
 	
+	static void initStaticFields() {
+		PROJECT_BASE = AppConfig.getInstance().getConfig().getProperty("project.base");
+		RUNTIME = AppConfig.getInstance().getConfig().getProperty("version");
+		JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode"));
+		SECRETE_KEY = AppConfig.getInstance().getConfig().getProperty("secreteKey");
+		MAUDE_PROGRAM = AppConfig.getInstance().getConfig().getProperty("maude.program");
+		MAUDE_DEPTH =  Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("maude.depth"));
+		MAUDE_WORKER_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("maude.worker.isEnable"));
+			
+		// Using for state sequences generation by JPF
+		DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.depth"));	// Depth for each sub state space running by a JPF instance
+		BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
+		DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
+		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
+		
+		// If you want to run with a Bounded Model Checking
+		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
+		MAX_DEPTH = 400;	// Maximum depth when you run Bounded Model Checking
+
+		IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
+
+		// RABBITMQ
+		// -> remote mode
+		RABBITMQ_REMOTE_HOST = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.host");
+		RABBITMQ_REMOTE_USERNAME = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.username");
+		RABBITMQ_REMOTE_PASSWORD = AppConfig.getInstance().getConfig().getProperty("rabbitmq.remote.password");
+		// -> local mode
+		RABBITMQ_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.host");
+		RABBITMQ_LOCAL_USERNAME = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.username");
+		RABBITMQ_LOCAL_PASSWORD = AppConfig.getInstance().getConfig().getProperty("rabbitmq.local.password");
+
+		// REDIS
+		// -> remote mode
+		REDIS_REMOTE_HOST = AppConfig.getInstance().getConfig().getProperty("redis.remote.host");
+		REDIS_REMOTE_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.remote.port"));
+		// -> local mode
+		REDIS_LOCAL_HOST = AppConfig.getInstance().getConfig().getProperty("redis.local.host");;
+		REDIS_LOCAL_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.local.port"));
+		
+		// MySQL
+		MYSQL_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("mysql.isEnable"));
+	}
 	/**
 	 * Get CLASS_PATH where you program is locate
 	 * 

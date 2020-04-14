@@ -10,4 +10,8 @@ bin/
 *~
 /.gradle/
 config.properties
+.idea/
+gradle/
+gradlew
+gradlew.bat
 
