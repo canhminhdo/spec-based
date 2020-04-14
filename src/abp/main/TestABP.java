@@ -113,6 +113,10 @@ public class TestABP {
 		abp.begin(sentPackets, recPackets, ch1, ch2, index, finish, flag1, flag2);
 //        System.out.println("Packets sent: " + sentPackets);
 //        System.out.println("Packets rec: " + recPackets);
-//        assert sentPackets.equals(recPackets);
+		if (CaseStudy.JPF_MODE)
+			Verify.beginAtomic();
+        assert sentPackets.equals(recPackets) : "Packets sent and Packets rec are not same";
+        if (CaseStudy.JPF_MODE)
+			Verify.endAtomic();
 	}
 }
