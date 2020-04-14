@@ -80,7 +80,7 @@ public abstract class CaseStudy {
 		
 		// If you want to run with a Bounded Model Checking
 		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
-		MAX_DEPTH = 400;	// Maximum depth when you run Bounded Model Checking
+		MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.max_depth"));;	// Maximum depth when you run Bounded Model Checking
 
 		IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
 

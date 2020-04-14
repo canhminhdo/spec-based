@@ -17,6 +17,7 @@ maude.depth=2
 # jpf configuration
 jpf.mode=true
 jpf.bmc.isEnable=true
+jpf.bmc.max_depth=400
 jpf.depth=100
 jpf.depth.isEnable=true
 jpf.bound=1000
