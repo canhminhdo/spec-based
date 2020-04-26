@@ -28,7 +28,13 @@ public class Intruder extends Principal {
 //			System.out.println(this.id);
 			Verify.endAtomic();
 			rr.execute(this);
+			checkOneToManyAgreementProperty();
 		}
+	}
+	
+	@Override
+	public boolean isIntruder() {
+		return true;
 	}
 	
 	public void fake() {

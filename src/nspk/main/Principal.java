@@ -57,7 +57,15 @@ public class Principal extends Thread {
 //			System.out.println(this.id);
 			Verify.endAtomic();
 			rr.execute(this);
+			checkOneToManyAgreementProperty();
 		}
+	}
+	
+	protected void checkOneToManyAgreementProperty() {
+		Verify.beginAtomic();
+		this.nw.oneToManyAgreementProperty();
+//		System.out.println(this.nw.getAll().size());
+		Verify.endAtomic();
 	}
 	
 	public void challenge() {
@@ -171,6 +179,10 @@ public class Principal extends Thread {
 			m1.getReceiver().do_intruder(c3.getNonce());
 			Verify.endAtomic();
 		}
+	}
+	
+	public boolean isIntruder() {
+		return false;
 	}
 	
 	public void do_intruder(Nonce n) {}
