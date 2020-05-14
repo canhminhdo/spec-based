@@ -33,6 +33,11 @@ public class Intruder extends Principal {
 	}
 	
 	@Override
+	public void initialize() {
+		this.prinController = new Controller<Principal>(this.prins.getAll());
+	}
+	
+	@Override
 	public boolean isIntruder() {
 		return true;
 	}

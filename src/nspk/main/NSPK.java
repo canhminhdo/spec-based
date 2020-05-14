@@ -27,5 +27,34 @@ public class NSPK {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+//		p.initialize();
+//		intrdr.initialize();
+//		q.initialize();
+//		p.challenge();
+//		System.out.println("Challenge");
+//		System.out.println(p.nw);
+//		System.out.println(p.rand);
+//		System.out.println(p.nonces);
+//		intrdr.fake();
+//		System.out.println("fake11");
+//		System.out.println(p.nw);
+//		System.out.println(p.rand);
+//		System.out.println(p.nonces);
+//		q.response();
+//		System.out.println("response");
+//		System.out.println(p.nw);
+//		System.out.println(p.rand);
+//		System.out.println(p.nonces);
+//		intrdr.fake();
+//		System.out.println("fake22");
+//		System.out.println(p.nw);
+//		System.out.println(p.rand);
+//		System.out.println(p.nonces);
+//		p.confirmation();
+//		System.out.println("confirmation");
+//		System.out.println(p.nw);
+//		System.out.println(p.rand);
+//		System.out.println(p.nonces);
+		
 	}
 }
