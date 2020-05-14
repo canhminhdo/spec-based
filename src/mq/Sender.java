@@ -72,7 +72,7 @@ public class Sender {
 	public void sendJob(OC config) {
 		try {
 			channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
-			System.out.println(" [x] Sent '" + config);
+//			System.out.println(" [x] Sent '" + config);
 		} catch (Exception e) {
 			System.out.println("Cannot send message on queue " + this.rabbitMQ.getQueueName());
 			e.printStackTrace();

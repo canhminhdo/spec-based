@@ -42,7 +42,7 @@ public class Network<E extends Message<Cipher>> extends MultiSet<E> {
 								
 								Cipher2 c2 = (Cipher2) m2.getCipher();
 								if (c2.getEnc().equals(m2.getReceiver()) &&
-										c2.getGen().equals(m2.getSender()) &&
+//										c2.getGen().equals(m2.getSender()) &&
 										c2.getNonce1().equals(c1.getNonce())
 								) {
 									Pair<Message<Cipher>, Message<Cipher>> pair = new Pair<Message<Cipher>, Message<Cipher>>(m1, m2);
@@ -96,7 +96,8 @@ public class Network<E extends Message<Cipher>> extends MultiSet<E> {
 				m2.getSender().equals(q) &&
 				m2.getReceiver().equals(p)) {
 			Cipher2 c2 = (Cipher2) m2.getCipher();
-			if (c2.getGen().equals(q) &&
+			if (
+//					c2.getGen().equals(q) &&
 					c2.getEnc().equals(p) &&
 					c2.getNonce1().equals(c1.getNonce())) {
 				return true;
@@ -133,7 +134,7 @@ public class Network<E extends Message<Cipher>> extends MultiSet<E> {
 			Cipher2 c2 = (Cipher2) m2.getCipher();
 			Nonce n2 = c2.getNonce2();
 			if (c2.getEnc().equals(p) && 
-					c2.getGen().equals(q) &&
+//					c2.getGen().equals(q) &&
 					n2.getGen().equals(q) && 
 					n2.getForWhom().equals(p)) {
 				return true;

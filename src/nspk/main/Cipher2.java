@@ -33,9 +33,9 @@ public class Cipher2 implements Cipher {
 		return n2;
 	}
 	
-	public Principal getGen() {
-		return q;
-	}
+//	public Principal getGen() {
+//		return q;
+//	}
 	
 	public Principal getEnc() {
 		return p;
@@ -55,8 +55,8 @@ public class Cipher2 implements Cipher {
 		
 		return this.p.equals(c2.getEnc()) &&
 				this.n1.equals(c2.getNonce1()) &&
-				this.n2.equals(c2.getNonce2()) &&
-				this.q.equals(c2.getGen());
+//				this.q.equals(c2.getGen()) &&
+				this.n2.equals(c2.getNonce2());
 	}
 
 	@Override
