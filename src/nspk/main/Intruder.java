@@ -32,10 +32,10 @@ public class Intruder extends Principal {
 		}
 	}
 	
-	@Override
-	public void initialize() {
-		this.prinController = new Controller<Principal>(this.prins.getAll());
-	}
+//	@Override
+//	public void initialize() {
+//		this.prinController = new Controller<Principal>(this.prins.getAll());
+//	}
 	
 	@Override
 	public boolean isIntruder() {
@@ -57,8 +57,8 @@ public class Intruder extends Principal {
 			Controller<Nonce> nonceController = new Controller<Nonce>(this.nonces.getAll());
 			Nonce n = nonceController.getOne();	// automatically select one Nonce
 			
-			Principal p = this.prinController.getOne();	// sender
-			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
+			Principal p = this.fullController.getOne();	// sender
+			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
 			
 			Cipher1 c1 = new Cipher1(q, n, p);
 			Message<Cipher> m1_fake = new Message<Cipher>(Constants.m1, this, p, q, c1);
@@ -79,8 +79,8 @@ public class Intruder extends Principal {
 			Message<Cipher> m1 = messageController.getOne();	// automatically select one m1 message
 			Cipher c1 = m1.getCipher();
 			
-			Principal p = this.prinController.getOne();	// sender
-			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
+			Principal p = this.fullController.getOne();	// sender
+			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
 			
 			Message<Cipher> m1_fake = new Message<Cipher>(Constants.m1, this, p, q, c1);
 			if (nw.add(m1_fake)) {
@@ -97,8 +97,8 @@ public class Intruder extends Principal {
 			Nonce n1 = nonceController.getOne();
 			Nonce n2 = nonceController.getNext(new ArrayList<Nonce>(Arrays.asList(n1)));
 			
-			Principal p = this.prinController.getOne();	// receiver
-			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// sender
+			Principal p = this.fullController.getOne();	// receiver
+			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// sender
 			
 			Cipher2 c2 = new Cipher2(p, n1, n2, q);
 			Message<Cipher> m2_fake = new Message<Cipher>(Constants.m2, this, q, p, c2);
@@ -119,8 +119,8 @@ public class Intruder extends Principal {
 			Message<Cipher> m2 = messageController.getOne();	// automatically select one m2 message
 			Cipher c2 = m2.getCipher();
 			
-			Principal p = this.prinController.getOne();	// receiver
-			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// sender
+			Principal p = this.fullController.getOne();	// receiver
+			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// sender
 			
 			Message<Cipher> m2_fake = new Message<Cipher>(Constants.m2, this, q, p, c2);
 			if (nw.add(m2_fake)) {
@@ -136,8 +136,8 @@ public class Intruder extends Principal {
 			Controller<Nonce> nonceController = new Controller<Nonce>(this.nonces.getAll());
 			Nonce n = nonceController.getOne();	// automatically select one Nonce
 			
-			Principal p = this.prinController.getOne();	// sender
-			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
+			Principal p = this.fullController.getOne();	// sender
+			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
 			Cipher3 c3 = new Cipher3(q, n);
 			
 			Message<Cipher> m3_fake = new Message<Cipher>(Constants.m3, this, p, q, c3);
@@ -158,8 +158,8 @@ public class Intruder extends Principal {
 			Message<Cipher> m3 = messageController.getOne();	// automatically select one m3 message
 			Cipher c3 = m3.getCipher();
 			
-			Principal p = this.prinController.getOne();	// sender
-			Principal q = this.prinController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
+			Principal p = this.fullController.getOne();	// sender
+			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// receiver
 			
 			Message<Cipher> m3_fake = new Message<Cipher>(Constants.m3, this, p, q, c3);
 			if (nw.add(m3_fake)) {

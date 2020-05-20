@@ -40,6 +40,13 @@ public abstract class CaseStudy {
 	public static boolean IS_BOUNDED_MODEL_CHECKING;
 	public static int MAX_DEPTH;	// Maximum depth when you run Bounded Model Checking
 
+	
+	// Random mode
+	public static boolean RANDOM_MODE;
+	public static int RANDOM_DEPTH;
+	public static int RANDOM_NUMBER;
+	public static int RANDOM_PERCENTAGE;
+	
 	public static Boolean IS_REMOTE;
 
 	// RABBITMQ
@@ -77,6 +84,11 @@ public abstract class CaseStudy {
 		BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
 		DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
 		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
+		// Random mode
+		RANDOM_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.random.mode"));
+		RANDOM_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.depth"));
+		RANDOM_NUMBER = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.number"));
+		RANDOM_PERCENTAGE = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.percentage"));
 		
 		// If you want to run with a Bounded Model Checking
 		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));

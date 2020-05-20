@@ -13,6 +13,7 @@ public class Principal extends Thread {
 	protected MultiSet<Principal> prins;
 	protected Controller<RewriteRule> rwController;
 	protected Controller<Principal> prinController;
+	protected Controller<Principal> fullController;
 	
 	public Principal(String id) {
 		this.id = id;
@@ -43,6 +44,7 @@ public class Principal extends Thread {
 
 	public void initialize() {
 		this.prinController = new Controller<Principal>(this.prins.getAll(), new ArrayList<Principal>(Arrays.asList(this)));
+		this.fullController = new Controller<Principal>(this.prins.getAll());
 	}
 
 	@Override

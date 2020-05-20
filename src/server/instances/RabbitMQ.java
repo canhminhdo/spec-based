@@ -12,6 +12,7 @@ public class RabbitMQ {
 	String userName = null;
 	String password = null;
 	String queueName = null;
+	String queueNameAtDepth = null;
 	String maudeQueue = null;
 
 	public RabbitMQ(String host, String userName, String password, String queueName, String maudeQueue) {
@@ -20,6 +21,7 @@ public class RabbitMQ {
 		this.password = password;
 		this.queueName = queueName;
 		this.maudeQueue = maudeQueue;
+		this.queueNameAtDepth = queueName + "_DEPTH";
 	}
 
 	public String getHost() {
@@ -40,6 +42,10 @@ public class RabbitMQ {
 	
 	public String getMaudeQueue() {
 		return maudeQueue;
+	}
+	
+	public String getQueueNameAtDepth() {
+		return queueNameAtDepth;
 	}
 
 }

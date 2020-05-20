@@ -3,6 +3,7 @@ package jpf;
 import java.util.ArrayList;
 
 import config.CaseStudy;
+import database.JedisUtil;
 import database.RedisClient;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
@@ -33,7 +34,6 @@ public class SequenceState extends ListenerAdapter {
 	private boolean is_publish = true;
 	private int nextDepth = 0;
 	
-
 	public SequenceState(Config conf, JPF jpf) {
 		initialize();
 		jedis.flushAll();
@@ -102,8 +102,8 @@ public class SequenceState extends ListenerAdapter {
 				String seqString = seqToString();
 				String seqSha256 = GFG.getSHA(seqString);
 				
-				if (!jedis.exists(seqSha256)) {
-					jedis.set(seqSha256, seqString);
+				if (!JedisUtil.exists(jedis, JedisUtil.SEQ_TYPE, seqSha256)) {
+					JedisUtil.add(jedis, JedisUtil.SEQ_TYPE, seqSha256);
 					// TODO :: Sending to Maude Queue master
 					mq.Sender.getInstance().sendMaudeJob(seqString);
 					SEQ_UNIQUE_COUNT++;
@@ -114,12 +114,26 @@ public class SequenceState extends ListenerAdapter {
 				OC lastElement = seq.get(seq.size() - 1);
 				if (lastElement != null) {
 					String elementSha256 = GFG.getSHA(lastElement.toString());
-					if (!jedis.exists(elementSha256)) {
-						jedis.set(elementSha256, lastElement.toString());
-						// TODO :: submit job to the queue broker
-						if (lastElement.isFinished() == false && lastElement.isReady() == true && is_publish) {
-							lastElement.setCurrentDepth(this.nextDepth);
-							mq.Sender.getInstance().sendJob(lastElement);
+					if (!JedisUtil.exists(jedis, JedisUtil.STATE_TYPE, elementSha256)) {
+						if (lastElement.isFinished() == false && lastElement.isReady() == true) {
+							if (is_publish) {
+								// if a state does not located at the maximum depth
+								JedisUtil.add(jedis, JedisUtil.STATE_TYPE, elementSha256);	// saving cache
+								
+								if (CaseStudy.RANDOM_MODE && JedisUtil.exists(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256)) {
+									// if it exists, remove. Because, we do not need to check anymore
+									JedisUtil.remove(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256);
+								}
+								
+								lastElement.setCurrentDepth(this.nextDepth);
+								mq.Sender.getInstance().sendJob(lastElement);
+							} else {
+								// if states located at the maximum depth
+								if (CaseStudy.RANDOM_MODE && !JedisUtil.exists(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256)) {
+									JedisUtil.add(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256);	// saving cache
+									mq.Sender.getInstance().sendJobAtDepth(lastElement);
+								}	
+							}
 						}
 					}
 				}

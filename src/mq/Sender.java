@@ -44,7 +44,10 @@ public class Sender {
 			connection = factory.newConnection();
 			channel = connection.createChannel();
 			channel.queueDeclare(this.rabbitMQ.getQueueName(), false, false, false, null);
-			channel.queueDeclare(this.rabbitMQ.getMaudeQueue(), false, false, false, null);
+			if (CaseStudy.MAUDE_WORKER_IS_ENABLE)
+				channel.queueDeclare(this.rabbitMQ.getMaudeQueue(), false, false, false, null);
+			if (CaseStudy.RANDOM_MODE)
+				channel.queueDeclare(this.rabbitMQ.getQueueNameAtDepth(), false, false, false, null);
 		} catch (Exception e) {
 			System.out.println("Cannot create a connection to RabbitMQ server");
 			e.printStackTrace();
@@ -75,6 +78,21 @@ public class Sender {
 //			System.out.println(" [x] Sent '" + config);
 		} catch (Exception e) {
 			System.out.println("Cannot send message on queue " + this.rabbitMQ.getQueueName());
+			e.printStackTrace();
+		}
+	}
+	
+	/**
+	 * Send message to store all states at maximum depth
+	 * 
+	 * @param config
+	 * @throws Exception
+	 */
+	public void sendJobAtDepth(OC config) {
+		try {
+			channel.basicPublish("", this.rabbitMQ.getQueueNameAtDepth(), null, SerializationUtils.serialize(config));
+		} catch (Exception e) {
+			System.out.println("Cannot send message on queue " + this.rabbitMQ.getQueueNameAtDepth());
 			e.printStackTrace();
 		}
 	}

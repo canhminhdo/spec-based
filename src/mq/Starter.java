@@ -8,8 +8,10 @@ import com.rabbitmq.client.ConnectionFactory;
 
 import application.service.SequenceStatesService;
 import config.CaseStudy;
+import database.JedisUtil;
 import database.RedisClient;
 import jpf.common.OC;
+import redis.clients.jedis.Jedis;
 import server.Application;
 import server.ApplicationConfigurator;
 import utils.GFG;
@@ -53,7 +55,9 @@ public class Starter {
 				// save to Redis cache
 				String configSha256 = GFG.getSHA(config.toString());
 				
-				RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection().set(configSha256, config.toString());
+				Jedis jedis = RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection();
+				
+				JedisUtil.add(jedis, JedisUtil.STATE_TYPE, configSha256);
 
 				byte[] data = SerializationUtils.serialize(config);
 
@@ -78,13 +82,17 @@ public class Starter {
 			// Purge queue from RabbitMQ
 			if (!app.getServerFactory().isRemote()) {
 				Process p1 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
-						+ app.getCaseStudy().getQueueName());
+						+ app.getRabbitMQ().getQueueName());
 				
 				Process p2 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
-						+ app.getCaseStudy().getMaudeQueue());
+						+ app.getRabbitMQ().getMaudeQueue());
+				
+				Process p3 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
+						+ app.getRabbitMQ().getQueueNameAtDepth());
 				
 				p1.waitFor();
 				p2.waitFor();
+				p3.waitFor();
 			}
 
 			// Flush all keys and values from Redis server
