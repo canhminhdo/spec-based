@@ -1,6 +1,7 @@
 # version
 version=0.0.1
 secreteKey=OgataLab
+log4j.path=/Users/ogataslab/eclipse-workspace/spec-based/logs/log.out
 
 # cloudsync
 # abp
@@ -11,17 +12,24 @@ caseStudy=nspk
 project.base=/Users/ogataslab/eclipse-workspace/spec-based
 
 # maude program
+maude.worker.isEnable=false
 maude.program=/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darwin64
 maude.depth=2
 
 # jpf configuration
 jpf.mode=true
 jpf.bmc.isEnable=true
-jpf.bmc.max_depth=400
-jpf.depth=100
+jpf.bmc.max_depth=150
+jpf.depth=75
 jpf.depth.isEnable=true
-jpf.bound=1000
+jpf.bound=100
 jpf.bound.isEnable=false
+
+# jpf random from max depth BMC
+jpf.random.mode=true
+jpf.random.max_depth=300
+jpf.random.depth=75
+jpf.random.percentage=10
 
 env.isRemote=false
 # rabbitmq remote
@@ -45,7 +53,7 @@ mysql.isEnable=false
 
 # mysql remote
 mysql.remote.host=
-mysql.remote.port=3306
+mysql.remote.port=
 mysql.remote.username=
 mysql.remote.password=
 mysql.remote.database=

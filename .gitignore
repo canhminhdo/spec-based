@@ -14,4 +14,5 @@ config.properties
 gradle/
 gradlew
 gradlew.bat
+logs/*
 

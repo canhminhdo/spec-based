@@ -1,6 +1,8 @@
 package mq;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -55,8 +57,10 @@ public class MaudeWorker {
 		
 		// setting prefetch count: how many messages are being sent to the consumer at the same time.
 		channel.basicQos(10);
-		
-		channel.queueDeclare(app.getRabbitMQ().getMaudeQueue(), false, false, false, null);
+		// enable lazy queues
+		Map<String, Object> args = new HashMap<String, Object>();
+		args.put("x-queue-mode", "lazy");
+		channel.queueDeclare(app.getRabbitMQ().getMaudeQueue(), false, false, false, args);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
 		
 		// Get Maude instance and preload

@@ -2,8 +2,10 @@ package jpf;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+
 import config.CaseStudy;
-import database.JedisUtil;
 import database.RedisClient;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
@@ -11,6 +13,7 @@ import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.search.Search;
 import jpf.common.HeapJPF;
 import jpf.common.OC;
+import redis.api.RedisQueueSet;
 import redis.clients.jedis.Jedis;
 import server.Application;
 import server.ApplicationConfigurator;
@@ -18,8 +21,9 @@ import server.instances.Redis;
 import utils.GFG;
 
 public class SequenceState extends ListenerAdapter {
-
-	private int DEPTH = CaseStudy.DEPTH;
+	
+	private static Logger logger = (Logger) LogManager.getLogger();
+	private int DEPTH = CaseStudy.CURRENT_DEPTH;
 	private int BOUND = CaseStudy.BOUND;
 	private boolean DEPTH_FLAG = CaseStudy.DEPTH_FLAG;
 	private boolean BOUND_FLAG = CaseStudy.BOUND_FLAG;
@@ -28,7 +32,7 @@ public class SequenceState extends ListenerAdapter {
 
 	private int STARTUP = 1;
 	private ArrayList<OC> seq;
-	private Jedis jedis = null;
+	private RedisQueueSet jedisSet = null;
 	private HeapJPF heapJPF = null;
 	
 	private boolean is_publish = true;
@@ -36,13 +40,13 @@ public class SequenceState extends ListenerAdapter {
 	
 	public SequenceState(Config conf, JPF jpf) {
 		initialize();
-		jedis.flushAll();
+		jedisSet.flushAll();
 	}
 	
 	public SequenceState(int currentDepth) {
 		if (CaseStudy.IS_BOUNDED_MODEL_CHECKING) {
-			if (currentDepth + DEPTH >= CaseStudy.MAX_DEPTH) {
-				DEPTH = CaseStudy.MAX_DEPTH - currentDepth;
+			if (currentDepth + DEPTH >= CaseStudy.CURRENT_MAX_DEPTH) {
+				DEPTH = CaseStudy.CURRENT_MAX_DEPTH - currentDepth;
 				is_publish = false;
 			}
 		}
@@ -53,7 +57,8 @@ public class SequenceState extends ListenerAdapter {
 	private void initialize() {
 		Application app = ApplicationConfigurator.getInstance().getApplication();
 		Redis redis = app.getRedis();
-		jedis = RedisClient.getInstance(redis.getHost(), redis.getPort()).getConnection();
+		Jedis jedisInstance = RedisClient.getInstance(redis.getHost(), redis.getPort()).getConnection();
+		jedisSet = new RedisQueueSet(jedisInstance);
 		seq = new ArrayList<OC>();
 		heapJPF = app.getHeapJPF();
 		app.getCaseStudy().printConfiguration();
@@ -84,7 +89,7 @@ public class SequenceState extends ListenerAdapter {
 				break;
 			}
 			if (config.equals(seq.get(i))) {
-//				System.out.println("Duplicated");
+				logger.info("Duplicated");
 				continue;
 			}
 			config = seq.get(i);
@@ -94,53 +99,62 @@ public class SequenceState extends ListenerAdapter {
 		sb.append(" | nil)");
 		return sb.toString();
 	}
-
-	public void writeSeqStringToFile() {
-		if (seq.size() > 0) {
-			
-			if (CaseStudy.MAUDE_WORKER_IS_ENABLE) {
-				String seqString = seqToString();
-				String seqSha256 = GFG.getSHA(seqString);
-				
-				if (!JedisUtil.exists(jedis, JedisUtil.SEQ_TYPE, seqSha256)) {
-					JedisUtil.add(jedis, JedisUtil.SEQ_TYPE, seqSha256);
-					// TODO :: Sending to Maude Queue master
-					mq.Sender.getInstance().sendMaudeJob(seqString);
-					SEQ_UNIQUE_COUNT++;
-				}
-			}
-			
-			if (DEPTH_FLAG) {
-				OC lastElement = seq.get(seq.size() - 1);
-				if (lastElement != null) {
-					String elementSha256 = GFG.getSHA(lastElement.toString());
-					if (!JedisUtil.exists(jedis, JedisUtil.STATE_TYPE, elementSha256)) {
-						if (lastElement.isFinished() == false && lastElement.isReady() == true) {
-							if (is_publish) {
-								// if a state does not located at the maximum depth
-								JedisUtil.add(jedis, JedisUtil.STATE_TYPE, elementSha256);	// saving cache
-								
-								if (CaseStudy.RANDOM_MODE && JedisUtil.exists(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256)) {
-									// if it exists, remove. Because, we do not need to check anymore
-									JedisUtil.remove(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256);
-								}
-								
-								lastElement.setCurrentDepth(this.nextDepth);
-								mq.Sender.getInstance().sendJob(lastElement);
-							} else {
-								// if states located at the maximum depth
-								if (CaseStudy.RANDOM_MODE && !JedisUtil.exists(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256)) {
-									JedisUtil.add(jedis, JedisUtil.STATE_AT_DEPTH_TYPE, elementSha256);	// saving cache
-									mq.Sender.getInstance().sendJobAtDepth(lastElement);
-								}	
-							}
-						}
-					}
-				}
+	
+	public void seqHandle() {
+		String seqString = seqToString();
+		String seqSha256 = GFG.getSHA(seqString);
+		
+		if (!jedisSet.sismember(RedisQueueSet.SEQ_SET, seqSha256)) {
+			jedisSet.sadd(RedisQueueSet.SEQ_SET, seqSha256);
+			//sending seqString to Maude Queue master
+			mq.Sender.getInstance().sendMaudeJob(seqString);
+			SEQ_UNIQUE_COUNT++;
+		}
+	}
+	
+	public void stateHandle() {
+		OC lastElement = seq.get(seq.size() - 1);
+		if (lastElement == null)
+			return;
+		String elementSha256 = GFG.getSHA(lastElement.toString());
+		lastElement.setCurrentDepth(this.nextDepth);
+		// if already existing is depth set
+		if (jedisSet.sismember(jedisSet.getDepthSetName(this.nextDepth), elementSha256))
+			return;
+		
+		if (!lastElement.isFinished() && lastElement.isReady()) {
+			jedisSet.sadd(jedisSet.getDepthSetName(this.nextDepth), elementSha256);
+			if (is_publish) {
+				mq.Sender.getInstance().sendJob(lastElement);
+			} else {
+				// if states located at the maximum depth
+				if (CaseStudy.RANDOM_MODE) {
+					mq.Sender.getInstance().sendJobAtDepth(lastElement);
+				}	
 			}
 		}
 	}
-
+	
+	public void writeSeqStringToFile() {
+		if (seq.size() > 0) {
+			if (CaseStudy.MAUDE_WORKER_IS_ENABLE) {
+				seqHandle();
+			}
+			if (DEPTH_FLAG) {
+				stateHandle();
+			}
+		}
+	}
+	
+	public boolean isReadyAndStartup(Search search) {
+		if (STARTUP == 1) {
+			heapJPF.startup(search.getVM());
+			if (heapJPF.lookupTable.size() == 0)
+				return false;
+			STARTUP++;
+		}
+		return true;
+	}
 	/**
 	 * got the next state
 	 * 
@@ -149,31 +163,26 @@ public class SequenceState extends ListenerAdapter {
 	 */
 	@Override
 	public void stateAdvanced(Search search) {
-		if (STARTUP == 1) {
-			heapJPF.startup(search.getVM());
-			if (heapJPF.lookupTable.size() == 0)
-				return;
-			STARTUP++;
-		}
+		if (!isReadyAndStartup(search))
+			return;
 		
 		OC config = heapJPF.getConfiguration(search);
 		if (config == null) {
-			// Finish program
+			// finish program
 			search.requestBacktrack();
-			System.out.println("Finish program at " + search.getDepth());
+			logger.info("Finish program at " + search.getDepth());
 			COUNT++;
 			writeSeqStringToFile();
 		} else {
 			seq.add(config);
 			if (search.isEndState() || !search.isNewState()) {
-				// End state or is not new state (visited state). JPF will back track
-				// automatically
+				// JPF will back track automatically
 				COUNT++;
 				writeSeqStringToFile();
 			}
 			if (DEPTH_FLAG && search.getDepth() >= DEPTH) {
-				// current depth is greater than DEPTH, back track
-//				System.out.println("Reach to the bound depth " + search.getDepth());
+				// backtrack if current depth is greater or equal than DEPTH, 
+				logger.debug("Reach to the bound depth " + search.getDepth());
 				search.requestBacktrack();
 				COUNT++;
 				writeSeqStringToFile();
@@ -196,14 +205,8 @@ public class SequenceState extends ListenerAdapter {
 	}
 
 	@Override
-	public void searchStarted(Search search) {
-		System.out.println("Started");
-	}
-
-	@Override
 	public void searchFinished(Search search) {
-		System.out.println(COUNT + " - " + SEQ_UNIQUE_COUNT);
-		System.out.println("Finished");
+		logger.debug("Finished: " + COUNT + " - " + SEQ_UNIQUE_COUNT);
 		mq.Sender.getInstance().close();
 	}
 }

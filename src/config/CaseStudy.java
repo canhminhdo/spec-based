@@ -15,10 +15,16 @@ public abstract class CaseStudy {
 	static {
 	    initStaticFields();
 	}
+	
+	public static String SYSTEM_MODE;
+	
 	public static String PROJECT_BASE;
 	
 	// runtime
 	public static String RUNTIME;
+	
+	// log4j file path
+	public static String LOG4J_PATH;
 	
 	// using JPF_MODE
 	public static Boolean JPF_MODE;
@@ -39,12 +45,14 @@ public abstract class CaseStudy {
 	// If you want to run with a Bounded Model Checking
 	public static boolean IS_BOUNDED_MODEL_CHECKING;
 	public static int MAX_DEPTH;	// Maximum depth when you run Bounded Model Checking
-
+	public static int CURRENT_MAX_DEPTH;
+	public static int CURRENT_DEPTH;
+	
 	
 	// Random mode
 	public static boolean RANDOM_MODE;
+	public static int RANDOM_MAX_DEPTH;
 	public static int RANDOM_DEPTH;
-	public static int RANDOM_NUMBER;
 	public static int RANDOM_PERCENTAGE;
 	
 	public static Boolean IS_REMOTE;
@@ -75,6 +83,9 @@ public abstract class CaseStudy {
 		RUNTIME = AppConfig.getInstance().getConfig().getProperty("version");
 		JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode"));
 		SECRETE_KEY = AppConfig.getInstance().getConfig().getProperty("secreteKey");
+		
+		LOG4J_PATH = AppConfig.getInstance().getConfig().getProperty("log4j.path");
+		
 		MAUDE_PROGRAM = AppConfig.getInstance().getConfig().getProperty("maude.program");
 		MAUDE_DEPTH =  Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("maude.depth"));
 		MAUDE_WORKER_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("maude.worker.isEnable"));
@@ -86,14 +97,16 @@ public abstract class CaseStudy {
 		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
 		// Random mode
 		RANDOM_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.random.mode"));
+		RANDOM_MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.max_depth"));
 		RANDOM_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.depth"));
-		RANDOM_NUMBER = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.number"));
 		RANDOM_PERCENTAGE = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.percentage"));
 		
 		// If you want to run with a Bounded Model Checking
 		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
 		MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.max_depth"));;	// Maximum depth when you run Bounded Model Checking
-
+		CURRENT_MAX_DEPTH = MAX_DEPTH;
+		CURRENT_DEPTH = DEPTH;
+		
 		IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
 
 		// RABBITMQ

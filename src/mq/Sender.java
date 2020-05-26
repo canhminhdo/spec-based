@@ -1,18 +1,19 @@
 package mq;
 
+import java.util.HashMap;
+import java.util.Map;
 import org.apache.commons.lang3.SerializationUtils;
-
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
-
 import config.CaseStudy;
 import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
 import server.factory.ServerFactory;
 import server.instances.RabbitMQ;
-import utils.AES;
 
 /**
  * Sending message back to RabbitMQ master from RabbitMQ client
@@ -21,6 +22,7 @@ import utils.AES;
  *
  */
 public class Sender {
+	private static Logger logger = (Logger) LogManager.getLogger();
 	private static Sender _instance = null;
 	private Connection connection;
 	private Channel channel;
@@ -43,13 +45,18 @@ public class Sender {
 			}
 			connection = factory.newConnection();
 			channel = connection.createChannel();
-			channel.queueDeclare(this.rabbitMQ.getQueueName(), false, false, false, null);
+			Map<String, Object> args = new HashMap<String, Object>();
+			args.put("x-queue-mode", "lazy");
+			
+			for (int i = 0; i < Consumer.size; i ++) {
+				channel.queueDeclare(this.rabbitMQ.getQueueName() + i, false, false, false, args);
+			}
 			if (CaseStudy.MAUDE_WORKER_IS_ENABLE)
-				channel.queueDeclare(this.rabbitMQ.getMaudeQueue(), false, false, false, null);
+				channel.queueDeclare(this.rabbitMQ.getMaudeQueue(), false, false, false, args);
 			if (CaseStudy.RANDOM_MODE)
-				channel.queueDeclare(this.rabbitMQ.getQueueNameAtDepth(), false, false, false, null);
+				channel.queueDeclare(this.rabbitMQ.getQueueNameAtDepth(), false, false, false, args);
 		} catch (Exception e) {
-			System.out.println("Cannot create a connection to RabbitMQ server");
+			logger.error("Cannot make a connection to RabbitMQ server");
 			e.printStackTrace();
 		}
 	}
@@ -65,7 +72,11 @@ public class Sender {
 
 		return _instance;
 	}
-
+	
+	public String getQueueServe() {
+		return this.rabbitMQ.getQueueName() + ((Consumer.current + 1) % Consumer.size);
+	}
+	
 	/**
 	 * Send message to RabbitMQ master
 	 * 
@@ -74,8 +85,8 @@ public class Sender {
 	 */
 	public void sendJob(OC config) {
 		try {
-			channel.basicPublish("", this.rabbitMQ.getQueueName(), null, SerializationUtils.serialize(config));
-//			System.out.println(" [x] Sent '" + config);
+			channel.basicPublish("", getQueueServe(), null, SerializationUtils.serialize(config));
+			logger.debug(" [x] Sent '" + config);
 		} catch (Exception e) {
 			System.out.println("Cannot send message on queue " + this.rabbitMQ.getQueueName());
 			e.printStackTrace();
@@ -92,7 +103,7 @@ public class Sender {
 		try {
 			channel.basicPublish("", this.rabbitMQ.getQueueNameAtDepth(), null, SerializationUtils.serialize(config));
 		} catch (Exception e) {
-			System.out.println("Cannot send message on queue " + this.rabbitMQ.getQueueNameAtDepth());
+			logger.error("Cannot send message on queue " + this.rabbitMQ.getQueueNameAtDepth());
 			e.printStackTrace();
 		}
 	}
@@ -106,11 +117,11 @@ public class Sender {
 	public void sendMaudeJob(String seq) {
 		try {
 			// Encrypt before sending
-			String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
+//			String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
 			channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(seq));
 			System.out.println(" [x] Sent to Maude '" + seq);
 		} catch (Exception e) {
-			System.out.println("Cannot send message on queue " + this.rabbitMQ.getMaudeQueue());
+			logger.error("Cannot send message on queue " + this.rabbitMQ.getMaudeQueue());
 			e.printStackTrace();
 		}
 		
@@ -127,7 +138,7 @@ public class Sender {
 			connection.close();
 			_instance = null;
 		} catch (Exception e) {
-			System.out.println("Cannot close the channel and connection");
+			logger.error("Cannot close the channel and connection");
 			e.printStackTrace();
 		}
 	}
