@@ -159,7 +159,7 @@ public class Consumer {
 		current = getMaxCurrentQueue(consumers);
 		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
 		if (allowToChangeQueue(queues))
-			current ++;
+			moveToNextCurrent();
 	}
 	
 	public int getMaxCurrentQueue(ArrayList<RabbitConsumer> consumers) {
