@@ -50,6 +50,8 @@ public class Consumer {
 		this.initialize();
 		this.loadConfigFromJedis();
 		this.setCurrent();
+		if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE))
+			turnOnRandomFlag();
 		if (this.isMaster)
 			logger.debug("I am master worker");
 	}
