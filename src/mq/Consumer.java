@@ -121,14 +121,14 @@ public class Consumer {
 			
 			if (isCheckedMessage(config)) {
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.info("Duplicate state in previous layers");
+				logger.info("Duplicate state in previous layers at depth " + currentDepth);
 				return;
 			}
 
 			if (CaseStudy.IS_BOUNDED_MODEL_CHECKING && currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
 				// Do not check these states anymore
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.info("Should not have this state in queues");
+				logger.info("Should not have this state in queues at depth " + currentDepth);
 				return;
 			}
 
