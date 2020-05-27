@@ -44,6 +44,7 @@ public class Consumer {
 	protected RedisQueueSet jedisSet;
 	protected RedisSystemInfo jedisSysInfo;
 	protected boolean isMaster = false;
+	protected boolean randomFlag = false;
 	
 	public Consumer() {
 		this.initialize();
@@ -113,21 +114,21 @@ public class Consumer {
 				String configSha256 = GFG.getSHA(config.toString());
 				if (!jedisSet.sismember(jedisSet.getDepthSetName(currentDepth), configSha256)) {
 					channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-					logger.debug("Dropped state with at depth " + currentDepth);
+					logger.info("Dropped state with at depth " + currentDepth);
 					return;
 				}
 			}
 			
 			if (isCheckedMessage(config)) {
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.debug("Duplicate state in previous layers");
+				logger.info("Duplicate state in previous layers");
 				return;
 			}
 
 			if (CaseStudy.IS_BOUNDED_MODEL_CHECKING && currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
 				// Do not check these states anymore
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.debug("Should not have this state in queues");
+				logger.info("Should not have this state in queues");
 				return;
 			}
 
@@ -166,14 +167,20 @@ public class Consumer {
 		int maxCurrent = 0;
 		for (int i = 0; i < consumers.size(); i ++) {
 			String queueName = consumers.get(i).getQueueName();
-			String strCurrent = queueName.substring(app.getRabbitMQ().getQueueName().length());
-			int current = Integer.valueOf(strCurrent);
-			if (maxCurrent < current)
-				maxCurrent = current;
+			if (matchedQueueName(queueName)) {
+				String strCurrent = queueName.substring(app.getRabbitMQ().getQueueName().length());
+				int current = Integer.valueOf(strCurrent);
+				if (maxCurrent < current)
+					maxCurrent = current;
+			}
 		}
 		return maxCurrent;
 	}
-
+	
+	public boolean matchedQueueName(String queueName) {
+		return queueName.matches("^[a-zA-Z]+[0-9]+$");
+	}
+	
 	public void handle() {
 		try {
 			this.consumerTag = channel.basicConsume(getCurrentQueueName(), false, deliverCallback,
@@ -190,7 +197,7 @@ public class Consumer {
 		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
 		if (isEmtpyQueues(queues)) {
 			// Bounded Model Checking done
-			if (CaseStudy.RANDOM_MODE) {
+			if (CaseStudy.RANDOM_MODE && !randomFlag) {
 				if (this.isMaster) {
 					if (!CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
 						// Only master worker do this
@@ -202,15 +209,17 @@ public class Consumer {
 						saveRandomConfigToRedis();
 						loadConfigFromJedis();
 						handle();
+						turnOnRandomFlag();
 						logger.info("Starting random mode at " + getCurrentQueueName());
 					}
 				} else {
 					if (!CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
 						tryToCancelConsumerTagAndReset();
 						loadConfigFromJedis();
-					} else {
+					} else {						
 						setCurrent();
 						handle();
+						turnOnRandomFlag();
 						logger.info("Starting random mode at " + getCurrentQueueName());
 					}
 				}
@@ -227,6 +236,10 @@ public class Consumer {
 			logger.debug("To " + getCurrentQueueName());
 			handle();
 		}
+	}
+	
+	public void turnOnRandomFlag() {
+		randomFlag = true;
 	}
 	
 	public boolean allowToChangeQueue(HashMap<String, RabbitQueue> queues) {
