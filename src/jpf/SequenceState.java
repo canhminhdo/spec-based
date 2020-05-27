@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
+import application.model.SystemInfo;
 import config.CaseStudy;
 import database.RedisClient;
 import gov.nasa.jpf.Config;
@@ -128,7 +129,7 @@ public class SequenceState extends ListenerAdapter {
 				mq.Sender.getInstance().sendJob(lastElement);
 			} else {
 				// if states located at the maximum depth
-				if (CaseStudy.RANDOM_MODE) {
+				if (CaseStudy.RANDOM_MODE && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
 					mq.Sender.getInstance().sendJobAtDepth(lastElement);
 				}	
 			}

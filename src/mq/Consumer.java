@@ -117,6 +117,7 @@ public class Consumer {
 				if (!jedisSet.sismember(jedisSet.getDepthSetName(currentDepth), configSha256)) {
 					channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 					logger.info("Dropped state with at depth " + currentDepth);
+					this.setConsuming(false);
 					return;
 				}
 			}
@@ -124,13 +125,15 @@ public class Consumer {
 			if (isCheckedMessage(config)) {
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 				logger.info("Duplicate state in previous layers at depth " + currentDepth);
+				this.setConsuming(false);
 				return;
 			}
 
 			if (CaseStudy.IS_BOUNDED_MODEL_CHECKING && currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
 				// Do not check these states anymore
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.info("Should not have this state in queues at depth " + currentDepth);
+				logger.info("Should not have this state in " + getCurrentQueueName() + " at depth " + currentDepth);
+				this.setConsuming(false);
 				return;
 			}
 
@@ -215,10 +218,9 @@ public class Consumer {
 						logger.info("Starting random mode at " + getCurrentQueueName());
 					}
 				} else {
-					if (!CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-						tryToCancelConsumerTagAndReset();
-						loadConfigFromJedis();
-					} else {						
+					tryToCancelConsumerTagAndReset();
+					loadConfigFromJedis();
+					if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
 						setCurrent();
 						handle();
 						turnOnRandomFlag();
