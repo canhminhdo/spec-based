@@ -1,15 +1,11 @@
 package mq;
 
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import org.apache.commons.lang3.SerializationUtils;
 
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import application.model.ErrorMessage;
@@ -37,32 +33,15 @@ public class MaudeWorker {
 	
 	/**
 	 * Starting a RabbitMQ client.
-	 * 
-	 * @param argv Unsed.
-	 * @throws Exception
 	 */
 	public static void main(String[] argv) throws Exception {
-		// Initialize application with configuration
 		Application app = ApplicationConfigurator.getInstance().getApplication();
-
-		// rabbitMQ connection
-		ConnectionFactory factory = new ConnectionFactory();
-		factory.setHost(app.getRabbitMQ().getHost());
-		if (app.getServerFactory().isRemote()) {
-			factory.setUsername(app.getRabbitMQ().getUserName());
-			factory.setPassword(app.getRabbitMQ().getPassword());
-		}
-		Connection connection = factory.newConnection();
-		Channel channel = connection.createChannel();
-		
-		// setting prefetch count: how many messages are being sent to the consumer at the same time.
-		channel.basicQos(10);
-		// enable lazy queues
-		Map<String, Object> args = new HashMap<String, Object>();
-		args.put("x-queue-mode", "lazy");
-		channel.queueDeclare(app.getRabbitMQ().getMaudeQueue(), false, false, false, args);
+		RabbitMQClient rabbitClient = RabbitMQClient.getInstance();
+		Channel channel = rabbitClient.getChannel();
+		String queueName = app.getRabbitMQ().getMaudeQueue();
+		rabbitClient.queueDeclare(queueName);
 		System.out.println(" [*] Waiting for messages. To exit press CTRL+C");
-		
+
 		// Get Maude instance and preload
 		RunMaude maude = RunMaude.getInstance();
 		
@@ -96,25 +75,20 @@ public class MaudeWorker {
 			
 			channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 		};
-
-		boolean autoAck = false;
-		channel.basicConsume(app.getRabbitMQ().getMaudeQueue(), autoAck, deliverCallback, (consumerTag) -> {
-			System.out.println("Maude consumer cancelling " + consumerTag);
-		});
+		rabbitClient.setDeliverCallBack(deliverCallback);
+		rabbitClient.basicConsume(queueName);
 	}
 	
 	public static void saving_to_mysql(ArrayList<SequenceStates> list, OutputParser output, String seq) {
 		SequenceStates sequencesStates = new SequenceStates();
 		sequencesStates.setSeq(seq);
 		sequencesStates.setRuntime(CaseStudy.RUNTIME);
-		
 		if (output.getSuccess().size() > 0) {
 			if (CaseStudy.MYSQL_IS_ENABLE) {
 				sequencesStates.setType("success");
 				sequencesStates.setResult(output.getSuccessString());
 			}
 		}
-		
 		if (output.getFailure().size() > 0) {
 			ErrorMessage msg = output.parseError();
 			sequencesStates.setType("failure");
@@ -126,12 +100,10 @@ public class MaudeWorker {
 				sequencesStates.setDepth(msg.getDepth());
 			}
 		}
-		
 		if (output.getError().size() > 0) {
 			sequencesStates.setType("warning");
 			sequencesStates.setResult(output.getErrorString());
 		}
-		
 		do {
 			try {
 				list.add(sequencesStates);
@@ -142,7 +114,6 @@ public class MaudeWorker {
 				}
 				break;
 			} catch (Exception e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 				System.out.println(" [MySQL] Waiting 3 sec");
 				try {
@@ -154,5 +125,4 @@ public class MaudeWorker {
 			}
 		} while (true);
 	}
-
 }

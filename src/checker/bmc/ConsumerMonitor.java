@@ -1,4 +1,4 @@
-package mq;
+package checker.bmc;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
@@ -6,7 +6,7 @@ import org.apache.logging.log4j.core.Logger;
 public class ConsumerMonitor extends Thread {
 	
 	protected static Logger logger = (Logger) LogManager.getLogger();
-	private static int TIMEOUT = 5 * 60 * 1000;	// 5 minutes
+	private static int TIMEOUT = 5 * 1000;	// 5 secs
 	private Consumer consumer;
 
 	public ConsumerMonitor(Consumer consumer) {
@@ -16,8 +16,8 @@ public class ConsumerMonitor extends Thread {
 	public void run() {
 		try {
 			while (true) {
-				synchronized (Receiver.LOCK) {
-					Receiver.LOCK.wait(TIMEOUT);
+				synchronized (BmcConsumer.LOCK) {
+					BmcConsumer.LOCK.wait(TIMEOUT);
 					consumer.checkToChangeQueueOrNot();
 				}
 			}

@@ -1,11 +1,15 @@
 package mq;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
+
+import checker.bmc.Consumer;
 
 public class ConsumerTest {
 	Consumer consumer;
@@ -18,7 +22,15 @@ public class ConsumerTest {
 	@After
 	public void tearDown() throws Exception {
 	}
-
+	
+	@Ignore
+	@Test
+	public void initializeTest() {
+		assertEquals(0, Consumer.current);
+		assertEquals(false, consumer.randomFlag);
+		assertEquals(true, consumer.isMaster);
+	}
+	
 	@Test
 	public void matchedQueueNameTest() {
 		assertTrue(consumer.matchedQueueName("NSPK0"));

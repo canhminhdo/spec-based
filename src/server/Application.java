@@ -1,5 +1,8 @@
 package server;
 
+import checker.bmc.BmcChecker;
+import checker.factory.ModelChecker;
+import checker.nonbmc.NonBmcChecker;
 import config.CaseStudy;
 import jpf.common.HeapJPF;
 import server.factory.ServerFactory;
@@ -19,16 +22,25 @@ public class Application {
 	ServerFactory serverFactory = null;
 	Redis redis = null;
 	RabbitMQ rabbitMQ = null;
+	ModelChecker mc = null;
 
 	public Application(ServerFactory serverFactory, CaseStudy cs) {
 		this.serverFactory = serverFactory;
 		this.cs = cs;
 		this.createServer();
+		this.createModelChecker();
 	}
 
 	private void createServer() {
 		this.redis = this.serverFactory.createRedis();
 		this.rabbitMQ = this.serverFactory.createRabbitMQ();
+	}
+	
+	private void createModelChecker() {
+		if (cs.isBmcModelChecking())
+			mc = new BmcChecker();
+		else
+			mc = new NonBmcChecker();
 	}
 	
 	/**
@@ -78,5 +90,8 @@ public class Application {
 	public HeapJPF getHeapJPF() {
 		return this.heap;
 	}
-
+	
+	public ModelChecker getModelChecker() {
+		return mc;
+	}
 }

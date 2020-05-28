@@ -249,4 +249,8 @@ public abstract class CaseStudy {
 	 * @return [@link String]
 	 */
 	public abstract String getCommand();
+	
+	public boolean isBmcModelChecking() {
+		return this.IS_BOUNDED_MODEL_CHECKING;
+	}
 }

@@ -2,12 +2,15 @@ package redis.api;
 
 import java.util.Set;
 
-import redis.clients.jedis.Jedis;
+import database.RedisClient;
+import server.Application;
+import server.ApplicationConfigurator;
 
 public class RedisSet extends RedisApi {
 
-	public RedisSet(Jedis jedis) {
-		super(jedis);
+	public RedisSet() {
+		Application app = ApplicationConfigurator.getInstance().getApplication();
+		this.jedis = RedisClient.getInstance(app.getRedis().getHost(), app.getRedis().getPort()).getConnection();
 	}
 
 	public boolean sismember(String setName, String member) {

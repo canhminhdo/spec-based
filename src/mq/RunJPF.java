@@ -2,9 +2,13 @@ package mq;
 
 import java.util.ArrayList;
 
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.core.Logger;
+
+import checker.factory.ModelChecker;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
-import jpf.SequenceState;
+import jpf.StateSequence;
 import jpf.common.OC;
 import server.Application;
 import server.ApplicationConfigurator;
@@ -16,9 +20,11 @@ import server.ApplicationConfigurator;
  *
  */
 public class RunJPF extends Thread {
-
+	
+	private static Logger logger = (Logger) LogManager.getLogger();
 	private ArrayList<String> configList;
-	private int currentDepth;
+	private Application app;
+	private OC message;
 
 	/**
 	 * RunJPF constructor to generate configList for each case study. Change another
@@ -26,12 +32,11 @@ public class RunJPF extends Thread {
 	 * 
 	 * @param config
 	 */
-	public RunJPF(OC config) {
-		// TODO: Customize with each case study here.
-		Application app = ApplicationConfigurator.getInstance().getApplication();
-		this.configList = app.getCaseStudy().getConfigList(config);
+	public RunJPF(OC message) {
+		app = ApplicationConfigurator.getInstance().getApplication();
+		this.configList = app.getCaseStudy().getConfigList(message);
 		app.setHeapJPF(app.getCaseStudy().getHeapJPF());
-		this.currentDepth = config.getCurrentDepth();
+		this.message = message;
 	}
 
 	/**
@@ -44,15 +49,14 @@ public class RunJPF extends Thread {
 			Config conf = JPF.createConfig(configString);
 			conf.setProperty("report.console.finished", "result");
 			JPF jpf = new JPF(conf);
-			SequenceState seq = new SequenceState(this.currentDepth);
+			ModelChecker mc = app.getModelChecker();
+			StateSequence seq = mc.createStateSequence(message);
 //			SimpleDot seq = new SimpleDot(conf, jpf);
 			jpf.addListener(seq);
 			jpf.run();
-			System.out.println("FINISHED RUNNING JOB");
+			logger.info("FINISHED RUNNING JOB");
 		} catch (Exception e) {
-			System.out.println("JPF Exception Start");
 			e.printStackTrace();
-			System.out.println("JPF Exception End");
 		}
 	}
 }

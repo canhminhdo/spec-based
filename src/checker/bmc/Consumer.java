@@ -1,94 +1,77 @@
-package mq;
+package checker.bmc;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Map;
+
 import org.apache.commons.lang3.SerializationUtils;
 import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
+
 import com.rabbitmq.client.Channel;
-import com.rabbitmq.client.Connection;
-import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
 
 import application.model.RabbitConsumer;
 import application.model.RabbitQueue;
 import application.model.SystemInfo;
 import config.CaseStudy;
-import database.RedisClient;
 import jpf.common.OC;
+import mq.RabbitMQClient;
+import mq.RunJPF;
 import mq.api.RabbitMQManagementAPI;
 import redis.api.RedisQueueSet;
 import redis.api.RedisSystemInfo;
-import redis.clients.jedis.Jedis;
 import server.Application;
 import server.ApplicationConfigurator;
-import server.instances.Redis;
 import utils.GFG;
 
 public class Consumer {
 	
 	protected static Logger logger = (Logger) LogManager.getLogger();
-	protected HashMap<Integer, Integer> analyzer = new HashMap<Integer, Integer>();
-	protected static int current = 0;
-	protected static int size = 3;
 	public static Object lock = new Object();
+	public static int current = 0;
+	protected final static int SIZE = 3;
+	protected HashMap<Integer, Integer> analyzer = new HashMap<Integer, Integer>();
 	protected boolean isConsuming = false;
 	protected Application app;
-	protected Connection connection;
-	protected Channel channel;
 	protected String consumerTag;
-	protected DeliverCallback deliverCallback;
 	protected RedisQueueSet jedisSet;
 	protected RedisSystemInfo jedisSysInfo;
 	protected boolean isMaster = false;
 	protected boolean randomFlag = false;
+	protected RabbitMQClient rabbitClient;
+	private Channel channel;
 	
 	public Consumer() {
+		app = ApplicationConfigurator.getInstance().getApplication();
 		this.initialize();
 		this.loadConfigFromJedis();
 		this.setCurrent();
-		if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE))
-			turnOnRandomFlag();
-		if (this.isMaster)
-			logger.debug("I am master worker");
+		if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) turnOnRandomFlag();
+		if (this.isMaster) logger.debug("I am master worker");
 	}
 
 	public void initialize() {
 		try {
-			// Initialize application with configuration
-			app = ApplicationConfigurator.getInstance().getApplication();
-			
-			Redis redis = app.getRedis();
-			Jedis jedisInstance = RedisClient.getInstance(redis.getHost(), redis.getPort()).getConnection();
-			jedisSet = new RedisQueueSet(jedisInstance);
-			jedisSysInfo = new RedisSystemInfo(jedisInstance);
-			
-			// rabbitMQ connection
-			ConnectionFactory factory = new ConnectionFactory();
-			factory.setHost(app.getRabbitMQ().getHost());
-			if (app.getServerFactory().isRemote()) {
-				factory.setUsername(app.getRabbitMQ().getUserName());
-				factory.setPassword(app.getRabbitMQ().getPassword());
-			}
-			connection = factory.newConnection();
-			channel = connection.createChannel();
-
-			// prefetch count
-			channel.basicQos(1);
-
-			// enable lazy queues
-			Map<String, Object> args = new HashMap<String, Object>();
-			args.put("x-queue-mode", "lazy");
-			for (int i = 0; i < size; i++)
-				channel.queueDeclare(app.getRabbitMQ().getQueueName() + i, false, false, false, args);
-
-			buildDeliverCallback();
+			buildRabbiMQClient();
+			buildRedisClient();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	public void buildRabbiMQClient() throws IOException {
+		rabbitClient = RabbitMQClient.getInstance();
+		channel = rabbitClient.getChannel();
+		for (int i = 0; i < SIZE; i++)
+			rabbitClient.queueDeclare(app.getRabbitMQ().getQueueName() + i);
+		rabbitClient.setDeliverCallBack(getDeliverCallback());
+	}
+	
+	public void buildRedisClient() {
+		jedisSet = new RedisQueueSet();
+		jedisSysInfo = new RedisSystemInfo();
 	}
 	
 	public synchronized boolean isConsuming() {
@@ -106,8 +89,8 @@ public class Consumer {
 		CaseStudy.CURRENT_MAX_DEPTH = sysInfo.getCurrentMaxDepth();
 	}
 	
-	public void buildDeliverCallback() {
-		deliverCallback = (consumerTag, delivery) -> {
+	public DeliverCallback getDeliverCallback() {
+		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 			OC config = SerializationUtils.deserialize(delivery.getBody());
 			int currentDepth = config.getCurrentDepth();
 			logger.info(" [x] Received " + config + " at depth " + currentDepth);
@@ -129,7 +112,7 @@ public class Consumer {
 				return;
 			}
 
-			if (CaseStudy.IS_BOUNDED_MODEL_CHECKING && currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
+			if (currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
 				// Do not check these states anymore
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 				logger.info("Should not have this state in " + getCurrentQueueName() + " at depth " + currentDepth);
@@ -145,14 +128,15 @@ public class Consumer {
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
 				this.setConsuming(false);
 				logger.info("Sending ack");
-				synchronized (Receiver.LOCK) {
-					Receiver.LOCK.notify();
+				synchronized (BmcConsumer.LOCK) {
+					BmcConsumer.LOCK.notify();
 				}
 			} catch (InterruptedException e) {
 				logger.error("waiting jpf and ack to rabbitmq " + e.getMessage());
 				e.printStackTrace();
 			}
 		};
+		return deliverCallback;
 	}
 
 	public void setCurrent() {
@@ -163,9 +147,9 @@ public class Consumer {
 			return;
 		}
 		current = getMaxCurrentQueue(consumers);
-		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
-		if (allowToChangeQueue(queues))
-			moveToNextCurrent();
+//		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
+//		if (allowToChangeQueue(queues))
+//			moveToNextCurrent();
 	}
 	
 	public int getMaxCurrentQueue(ArrayList<RabbitConsumer> consumers) {
@@ -187,18 +171,11 @@ public class Consumer {
 	}
 	
 	public void handle() {
-		try {
-			this.consumerTag = channel.basicConsume(getCurrentQueueName(), false, deliverCallback,
-					(consumerTag) -> {
-						logger.warn("Receiver consumer cancelling " + consumerTag);
-					});
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
+		consumerTag = rabbitClient.basicConsume(getCurrentQueueName());
 	}
 	
 	public void checkToChangeQueueOrNot() throws InterruptedException, IOException {
-		logger.debug("Checking queues information");
+		logger.debug("Checking queues information at " + getCurrentQueueName());
 		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
 		if (isEmtpyQueues(queues)) {
 			// Bounded Model Checking done
@@ -234,6 +211,7 @@ public class Consumer {
 		}
 		
 		if (allowToChangeQueue(queues)) {
+			logger.debug(isConsuming);
 			logger.debug("From: " + getCurrentQueueName());
 			tryToCancelConsumerTagAndReset();
 			moveToNextCurrent();
@@ -256,7 +234,7 @@ public class Consumer {
 	}
 	
 	public String getPreviousQueueName() {
-		return app.getRabbitMQ().getQueueName() + ((current + 2) % size);
+		return app.getRabbitMQ().getQueueName() + ((current + 2) % SIZE);
 	}
 	
 	public String getCurrentQueueName() {
@@ -272,19 +250,17 @@ public class Consumer {
 	}
 	
 	public void moveToNextCurrent() {
-		current = (current + 1) % size;
+		current = (current + 1) % SIZE;
 	}
 	
 	public void tryToCancelConsumerTagAndReset() throws IOException {
-		if (!consumerTag.isEmpty()) {
-			channel.basicCancel(consumerTag);
-			resetConsumerTag();
-		}
+		rabbitClient.cancelConsume(consumerTag);
+		resetConsumerTag();
 	}
 	
 	public boolean isEmtpyQueues(HashMap<String, RabbitQueue> queues) {
 		boolean isEmpty = true;
-		for (int i = 0; i < size; i ++) {
+		for (int i = 0; i < SIZE; i ++) {
 			if (!queues.get(app.getRabbitMQ().getQueueName() + i).isEmpty()) {
 				isEmpty = false;
 				break;
@@ -298,7 +274,7 @@ public class Consumer {
 		if (currentDepth == 0)
 			return false;
 		if (!CaseStudy.IS_BOUNDED_MODEL_CHECKING)
-			return true;
+			return false;
 		String configSha256 = GFG.getSHA(config.toString());
 		if (currentDepth <= CaseStudy.MAX_DEPTH) {
 			return checkExistingInPreviousLayers(configSha256, currentDepth, 0, CaseStudy.DEPTH);

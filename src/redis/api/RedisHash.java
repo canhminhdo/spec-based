@@ -2,12 +2,10 @@ package redis.api;
 
 import java.util.Map;
 
-import redis.clients.jedis.Jedis;
-
 public class RedisHash extends RedisApi {
 
-	public RedisHash(Jedis jedis) {
-		super(jedis);
+	public RedisHash() {
+		super();
 	}
 	
 	public boolean hexist(String key, String field) {
