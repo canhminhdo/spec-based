@@ -204,8 +204,6 @@ public class Consumer {
 						logger.info("Starting random mode at " + getCurrentQueueName());
 					}
 				}
-			} else {
-				System.exit(0);
 			}
 			return;
 		}
