@@ -38,8 +38,8 @@ public class Consumer {
 	protected String consumerTag;
 	protected RedisQueueSet jedisSet;
 	protected RedisSystemInfo jedisSysInfo;
-	protected boolean isMaster = false;
-	protected boolean randomFlag = false;
+	public boolean isMaster = false;
+	public boolean randomFlag = false;
 	protected RabbitMQClient rabbitClient;
 	private Channel channel;
 	
