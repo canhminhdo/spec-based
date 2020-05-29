@@ -152,12 +152,11 @@ public class Consumer {
 	}
 
 	public void setCurrent() {
-		ArrayList<RabbitConsumer> consumers = RabbitMQManagementAPI.getInstance().getConsumerInfo();
-		if (consumers.size() == 0) {
+		if (consumer.getId().equals("1")) {
 			current = 0;
 			this.isMaster = true;
-			return;
 		}
+		ArrayList<RabbitConsumer> consumers = RabbitMQManagementAPI.getInstance().getConsumerInfo();
 		current = getMaxCurrentQueue(consumers);
 //		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
 //		if (allowToChangeQueue(queues))
@@ -201,16 +200,18 @@ public class Consumer {
 					updateConsumerToStopStatus();
 					buildDistinctStateSet();
 					buildRandomStates();
-					resetCurrent();
+					logger.info(consumer);
 				}
 				
 				if (consumer.isStop() && checkAllConsumerStopping()){
 					// If all consumers are stopping, should do only one time
+					resetCurrent();
 					updateConsumerToWorkingStatus();
 					moveMessagesToCurrentQueue();
 					saveRandomConfigToRedis();
 					loadConfigFromJedis();
 					handle();
+					logger.info(consumer);
 					logger.info("Starting random mode at " + getCurrentQueueName());
 				}
 			}
@@ -220,7 +221,8 @@ public class Consumer {
 					// Should do only one time
 					tryToCancelConsumerTagAndReset();
 					updateConsumerToStopStatus();
-				} 
+					logger.info(consumer);
+				}
 				
 				if (consumer.isStop()) {
 					loadConfigFromJedis();
@@ -228,10 +230,12 @@ public class Consumer {
 						updateConsumerToWorkingStatus();
 						setCurrent();
 						handle();
+						logger.info(consumer);
 						logger.info("Starting random mode at " + getCurrentQueueName());
 					}
 				}
 			}
+			return;
 		}
 		
 		if (allowToChangeQueue(queues)) {

@@ -6,7 +6,7 @@ public class ConsumerStatus {
 	public final static String STOP_STATUS = "STOP";
 	
 	private String id;
-	private String status = "WORKING";
+	private String status;
 	
 	public ConsumerStatus(String id, String status) {
 		this.id = id;
@@ -43,5 +43,10 @@ public class ConsumerStatus {
 	
 	public boolean isStop() {
 		return this.status.equals(STOP_STATUS);
+	}
+
+	@Override
+	public String toString() {
+		return "ConsumerStatus [id=" + id + ", status=" + status + "]";
 	}
 }

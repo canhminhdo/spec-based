@@ -33,6 +33,6 @@ public class RedisConsumerStatus extends RedisHash {
 	}
 	
 	public void updateConsumerStatus(ConsumerStatus consumer) {
-		this.hset(CONSUMER_STATUS_KEY, String.valueOf(consumer.getId()), consumer.getStatus());
+		this.hset(CONSUMER_STATUS_KEY, consumer.getId(), consumer.getStatus());
 	}
 }
