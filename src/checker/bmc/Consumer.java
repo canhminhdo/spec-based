@@ -213,6 +213,7 @@ public class Consumer {
 					handle();
 					logger.info(consumer);
 					logger.info("Starting random mode at " + getCurrentQueueName());
+					return;
 				}
 			}
 			
@@ -234,6 +235,7 @@ public class Consumer {
 				handle();
 				logger.info(consumer);
 				logger.info("Starting random mode at " + getCurrentQueueName());
+				return;
 			}
 		}
 		
