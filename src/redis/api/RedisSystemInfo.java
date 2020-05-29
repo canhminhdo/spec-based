@@ -18,5 +18,10 @@ public class RedisSystemInfo extends RedisHash {
 		sysInfo.loadFromMap(sysInfoMap);
 		return sysInfo;
 	}
-
+	
+	public void updateSystemInfo(SystemInfo sysInfo) {
+		this.hset(SYSTEM_KEY, SystemInfo.MODE_KEY, sysInfo.getMode());
+		this.hset(SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, String.valueOf(sysInfo.getCurrentDepth()));
+		this.hset(SYSTEM_KEY, SystemInfo.CURRENT_MAX_DEPTH_KEY, String.valueOf(sysInfo.getCurrentMaxDepth()));
+	}
 }

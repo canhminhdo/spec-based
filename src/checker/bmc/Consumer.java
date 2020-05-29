@@ -12,6 +12,7 @@ import org.apache.logging.log4j.core.Logger;
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 
+import application.model.ConsumerStatus;
 import application.model.RabbitConsumer;
 import application.model.RabbitQueue;
 import application.model.SystemInfo;
@@ -20,6 +21,7 @@ import jpf.common.OC;
 import mq.RabbitMQClient;
 import mq.RunJPF;
 import mq.api.RabbitMQManagementAPI;
+import redis.api.RedisConsumerStatus;
 import redis.api.RedisQueueSet;
 import redis.api.RedisSystemInfo;
 import server.Application;
@@ -38,17 +40,19 @@ public class Consumer {
 	protected String consumerTag;
 	protected RedisQueueSet jedisSet;
 	protected RedisSystemInfo jedisSysInfo;
+	protected RedisConsumerStatus jedisConsumerStatus;
 	public boolean isMaster = false;
-	public boolean randomFlag = false;
 	protected RabbitMQClient rabbitClient;
 	private Channel channel;
+	private ConsumerStatus consumer;
+	private SystemInfo sysInfo;
 	
 	public Consumer() {
 		app = ApplicationConfigurator.getInstance().getApplication();
 		this.initialize();
 		this.loadConfigFromJedis();
+		this.getConsumerStatusAndUpdateToRedis();
 		this.setCurrent();
-		if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) turnOnRandomFlag();
 		if (this.isMaster) logger.debug("I am master worker");
 	}
 
@@ -72,6 +76,7 @@ public class Consumer {
 	public void buildRedisClient() {
 		jedisSet = new RedisQueueSet();
 		jedisSysInfo = new RedisSystemInfo();
+		jedisConsumerStatus = new RedisConsumerStatus();
 	}
 	
 	public synchronized boolean isConsuming() {
@@ -83,10 +88,17 @@ public class Consumer {
 	}
 	
 	public void loadConfigFromJedis() {
-		SystemInfo sysInfo = jedisSysInfo.getSystemInfo();
+		sysInfo = jedisSysInfo.getSystemInfo();
 		CaseStudy.SYSTEM_MODE = sysInfo.getMode();
 		CaseStudy.CURRENT_DEPTH = sysInfo.getCurrentDepth();
 		CaseStudy.CURRENT_MAX_DEPTH = sysInfo.getCurrentMaxDepth();
+	}
+	
+	public void getConsumerStatusAndUpdateToRedis() {
+		int nConsumers = jedisConsumerStatus.getNumberOfConsumer();
+		String id = String.valueOf(nConsumers + 1);
+		this.consumer = new ConsumerStatus(id, ConsumerStatus.WORKING_STATUS);
+		jedisConsumerStatus.updateConsumerStatus(consumer);
 	}
 	
 	public DeliverCallback getDeliverCallback() {
@@ -115,7 +127,7 @@ public class Consumer {
 			if (currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
 				// Do not check these states anymore
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.info("Should not have this state in " + getCurrentQueueName() + " at depth " + currentDepth);
+				logger.info("Should not have this state in " + getCurrentQueueName() + " at depth " + currentDepth + " CURRENT_MAX_DEPTH " + CaseStudy.CURRENT_MAX_DEPTH);
 				this.setConsuming(false);
 				return;
 			}
@@ -178,38 +190,51 @@ public class Consumer {
 		logger.debug("Checking queues information at " + getCurrentQueueName());
 		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
 		if (isEmtpyQueues(queues)) {
-			// Bounded Model Checking done
-			if (CaseStudy.RANDOM_MODE && !randomFlag) {
-				if (this.isMaster) {
-					if (!CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-						// Only master worker do this
-						tryToCancelConsumerTagAndReset();
-						buildDistinctStateSet();
-						buildRandomStates();
-						resetCurrent();
-						moveMessagesToCurrentQueue();
-						saveRandomConfigToRedis();
-						loadConfigFromJedis();
-						handle();
-						turnOnRandomFlag();
-						logger.info("Starting random mode at " + getCurrentQueueName());
-					}
-				} else {
+			if (!CaseStudy.RANDOM_MODE)
+				return;
+			
+			// BMC with Random Mode
+			if (this.isMaster && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
+				if (consumer.isWorking()) {
+					// Should do only one time.
 					tryToCancelConsumerTagAndReset();
+					updateConsumerToStopStatus();
+					buildDistinctStateSet();
+					buildRandomStates();
+					resetCurrent();
+				}
+				
+				if (consumer.isStop() && checkAllConsumerStopping()){
+					// If all consumers are stopping, should do only one time
+					updateConsumerToWorkingStatus();
+					moveMessagesToCurrentQueue();
+					saveRandomConfigToRedis();
+					loadConfigFromJedis();
+					handle();
+					logger.info("Starting random mode at " + getCurrentQueueName());
+				}
+			}
+			
+			if (!this.isMaster) {
+				if (consumer.isWorking() && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
+					// Should do only one time
+					tryToCancelConsumerTagAndReset();
+					updateConsumerToStopStatus();
+				} 
+				
+				if (consumer.isStop()) {
 					loadConfigFromJedis();
 					if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
+						updateConsumerToWorkingStatus();
 						setCurrent();
 						handle();
-						turnOnRandomFlag();
 						logger.info("Starting random mode at " + getCurrentQueueName());
 					}
 				}
 			}
-			return;
 		}
 		
 		if (allowToChangeQueue(queues)) {
-			logger.debug(isConsuming);
 			logger.debug("From: " + getCurrentQueueName());
 			tryToCancelConsumerTagAndReset();
 			moveToNextCurrent();
@@ -218,8 +243,25 @@ public class Consumer {
 		}
 	}
 	
-	public void turnOnRandomFlag() {
-		randomFlag = true;
+	public boolean checkAllConsumerStopping() {
+		if (consumer.isWorking())
+			return false;
+		ArrayList<ConsumerStatus> consumerList = jedisConsumerStatus.getConsumerStatus();
+		for (int i = 0; i < consumerList.size(); i++) {
+			if (consumerList.get(i).isWorking())
+				return false;
+		}
+		return true;
+	}
+	
+	public void updateConsumerToStopStatus() {
+		consumer.setToStopStatus();
+		jedisConsumerStatus.updateConsumerStatus(consumer);
+	}
+	
+	public void updateConsumerToWorkingStatus() {
+		consumer.setToWorkingStatus();
+		jedisConsumerStatus.updateConsumerStatus(consumer);
 	}
 	
 	public boolean allowToChangeQueue(HashMap<String, RabbitQueue> queues) {
@@ -257,14 +299,12 @@ public class Consumer {
 	}
 	
 	public boolean isEmtpyQueues(HashMap<String, RabbitQueue> queues) {
-		boolean isEmpty = true;
 		for (int i = 0; i < SIZE; i ++) {
 			if (!queues.get(app.getRabbitMQ().getQueueName() + i).isEmpty()) {
-				isEmpty = false;
-				break;
+				return false;
 			}
 		}
-		return isEmpty;
+		return true;
 	}
 	
 	public boolean isCheckedMessage(OC config) {
@@ -330,8 +370,9 @@ public class Consumer {
 	}
 
 	public void saveRandomConfigToRedis() {
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.MODE_KEY, SystemInfo.BMC_RANDOM_MODE);
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, String.valueOf(CaseStudy.RANDOM_DEPTH));
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_MAX_DEPTH_KEY, String.valueOf(CaseStudy.RANDOM_MAX_DEPTH));
+		sysInfo.setMode(SystemInfo.BMC_RANDOM_MODE);
+		sysInfo.setCurrentDepth(CaseStudy.RANDOM_DEPTH);
+		sysInfo.setCurrentMaxDepth(CaseStudy.RANDOM_MAX_DEPTH);
+		jedisSysInfo.updateSystemInfo(sysInfo);
 	}
 }

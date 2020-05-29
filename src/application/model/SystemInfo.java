@@ -14,7 +14,7 @@ public class SystemInfo {
 	private String mode;
 	private int currentDepth;
 	private int currentMaxDepth;
-	
+
 	public SystemInfo() {
 		
 	}
@@ -55,7 +55,6 @@ public class SystemInfo {
 		this.currentMaxDepth = currentMaxDepth;
 	}
 	
-
 	@Override
 	public String toString() {
 		return "SystemInfo [mode=" + mode + ", currentDepth=" + currentDepth + ", currentMaxDepth=" + currentMaxDepth

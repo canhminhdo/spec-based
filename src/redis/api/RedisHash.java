@@ -20,4 +20,12 @@ public class RedisHash extends RedisApi {
 		jedis.hset(key, field, value);
 	}
 	
+	public String hget(String key, String field) {
+		return jedis.hget(key, field);
+	}
+	
+	public int hlen(String key) {
+		return jedis.hlen(key).intValue();
+	}
+	
 }
