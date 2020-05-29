@@ -27,7 +27,6 @@ public class ConsumerTest {
 	@Test
 	public void initializeTest() {
 		assertEquals(0, Consumer.current);
-		assertEquals(false, consumer.randomFlag);
 		assertEquals(true, consumer.isMaster);
 	}
 	

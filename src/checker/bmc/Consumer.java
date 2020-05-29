@@ -193,7 +193,7 @@ public class Consumer {
 				return;
 			
 			// BMC with Random Mode
-			if (this.isMaster && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
+			if (isMaster && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
 				if (consumer.isWorking()) {
 					// Should do only one time.
 					tryToCancelConsumerTagAndReset();
@@ -216,29 +216,28 @@ public class Consumer {
 				}
 			}
 			
-			if (!this.isMaster) {
+			if (!isMaster) {
 				if (consumer.isWorking() && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
 					// Should do only one time
 					tryToCancelConsumerTagAndReset();
 					updateConsumerToStopStatus();
 					logger.info(consumer);
 				}
-				
-				if (consumer.isStop()) {
-					loadConfigFromJedis();
-					if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-						updateConsumerToWorkingStatus();
-						setCurrent();
-						handle();
-						logger.info(consumer);
-						logger.info("Starting random mode at " + getCurrentQueueName());
-					}
-				}
 			}
-			return;
 		}
 		
-		if (allowToChangeQueue(queues)) {
+		if (!isMaster && consumer.isStop()) {
+			loadConfigFromJedis();
+			if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
+				updateConsumerToWorkingStatus();
+				setCurrent();
+				handle();
+				logger.info(consumer);
+				logger.info("Starting random mode at " + getCurrentQueueName());
+			}
+		}
+		
+		if (consumer.isWorking() && allowToChangeQueue(queues)) {
 			logger.debug("From: " + getCurrentQueueName());
 			tryToCancelConsumerTagAndReset();
 			moveToNextCurrent();
