@@ -6,7 +6,7 @@ import org.apache.logging.log4j.core.Logger;
 public class ConsumerMonitor extends Thread {
 	
 	protected static Logger logger = (Logger) LogManager.getLogger();
-	private static int TIMEOUT = 5 * 60 * 1000;	// 5 mins
+	private static int TIMEOUT = 2 * 60 * 1000;	// 2 mins
 	private Consumer consumer;
 
 	public ConsumerMonitor(Consumer consumer) {
