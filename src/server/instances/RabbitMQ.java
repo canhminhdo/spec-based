@@ -21,7 +21,6 @@ public class RabbitMQ {
 		this.password = password;
 		this.queueName = queueName;
 		this.maudeQueue = maudeQueue;
-		this.queueNameAtDepth = queueName + "_DEPTH";
 	}
 
 	public String getHost() {
@@ -42,10 +41,6 @@ public class RabbitMQ {
 	
 	public String getMaudeQueue() {
 		return maudeQueue;
-	}
-	
-	public String getQueueNameAtDepth() {
-		return queueNameAtDepth;
 	}
 
 }

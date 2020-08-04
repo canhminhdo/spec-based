@@ -90,6 +90,5 @@ public class NonBmcStarter extends StarterFactory {
 		RedisSystemInfo jedisSysInfo = new RedisSystemInfo();
 		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.MODE_KEY, SystemInfo.NO_BMC_MODE);
 		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, String.valueOf(CaseStudy.DEPTH));
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_MAX_DEPTH_KEY, String.valueOf(Integer.MAX_VALUE));
 	}
 }

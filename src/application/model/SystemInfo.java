@@ -9,11 +9,11 @@ public class SystemInfo {
 	public static String NO_BMC_MODE = "NO_BMC";
 	public static String MODE_KEY = "mode";
 	public static String CURRENT_DEPTH_KEY = "currentDepth";
-	public static String CURRENT_MAX_DEPTH_KEY = "currentMaxDepth";
+	public static String CURRENT_LAYER_KEY = "currentLayer";
 	
 	private String mode;
+	private int currentLayer;
 	private int currentDepth;
-	private int currentMaxDepth;
 
 	public SystemInfo() {
 		
@@ -25,8 +25,8 @@ public class SystemInfo {
 				this.mode = entry.getValue();
 			} else if (entry.getKey().equals(CURRENT_DEPTH_KEY)) {
 				this.currentDepth = Integer.valueOf(entry.getValue());
-			} else if (entry.getKey().equals(CURRENT_MAX_DEPTH_KEY)) {
-				this.currentMaxDepth = Integer.valueOf(entry.getValue());
+			} else if (entry.getKey().equals(CURRENT_LAYER_KEY)) {
+				this.currentLayer = Integer.valueOf(entry.getValue());
 			}
 		}
 	}
@@ -34,30 +34,29 @@ public class SystemInfo {
 	public String getMode() {
 		return mode;
 	}
+	
+	public int getCurrentLayer() {
+		return currentLayer;
+	}
 
 	public int getCurrentDepth() {
 		return currentDepth;
 	}
 
-	public int getCurrentMaxDepth() {
-		return currentMaxDepth;
-	}
-
 	public void setMode(String mode) {
 		this.mode = mode;
+	}
+	
+	public void setCurrentLayer(int currentLayer) {
+		this.currentLayer = currentLayer;
 	}
 
 	public void setCurrentDepth(int currentDepth) {
 		this.currentDepth = currentDepth;
 	}
 
-	public void setCurrentMaxDepth(int currentMaxDepth) {
-		this.currentMaxDepth = currentMaxDepth;
-	}
-	
 	@Override
 	public String toString() {
-		return "SystemInfo [mode=" + mode + ", currentDepth=" + currentDepth + ", currentMaxDepth=" + currentMaxDepth
-				+ "]";
+		return "SystemInfo [mode=" + mode + ", currentLayer=" + currentLayer + ", currentDepth=" + currentDepth + "]";
 	}
 }

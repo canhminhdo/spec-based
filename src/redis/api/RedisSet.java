@@ -36,4 +36,8 @@ public class RedisSet extends RedisApi {
 	public Set<String> spop(String key, int count) {
 		return jedis.spop(key, count);
 	}
+	
+	public void sunion(String dstkey, String... keys) {
+		jedis.sunionstore(dstkey, keys);
+	}
 }

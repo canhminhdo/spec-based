@@ -19,7 +19,7 @@ import utils.GFG;
 public abstract class StateSequence extends ListenerAdapter {
 	
 	private static Logger logger = (Logger) LogManager.getLogger();
-	protected int DEPTH = CaseStudy.CURRENT_DEPTH;
+	protected int DEPTH = CaseStudy.DEPTH;
 	protected int BOUND = CaseStudy.BOUND;
 	protected boolean DEPTH_FLAG = CaseStudy.DEPTH_FLAG;
 	protected boolean BOUND_FLAG = CaseStudy.BOUND_FLAG;

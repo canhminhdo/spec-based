@@ -1,6 +1,5 @@
 package jpf;
 
-import application.model.SystemInfo;
 import config.CaseStudy;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
@@ -18,8 +17,8 @@ public class BmcStateSequence extends StateSequence {
 	}
 	
 	public BmcStateSequence(int currentDepth) {
-		if (currentDepth + DEPTH >= CaseStudy.CURRENT_MAX_DEPTH) {
-			DEPTH = CaseStudy.CURRENT_MAX_DEPTH - currentDepth;
+		if (currentDepth + DEPTH >= CaseStudy.MAX_DEPTH) {
+			DEPTH = CaseStudy.MAX_DEPTH - currentDepth;
 			is_publish = false;
 		}
 		this.nextDepth = currentDepth + DEPTH;
@@ -41,16 +40,7 @@ public class BmcStateSequence extends StateSequence {
 			jedisSet.sadd(jedisSet.getDepthSetName(this.nextDepth), elementSha256);
 			if (is_publish) {
 				sender.sendJob(lastElement);
-			} else {
-				// if states located at the maximum depth
-				if (CaseStudy.RANDOM_MODE && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-					sender.sendJob(getQueueNameAtDepth(), lastElement);
-				}	
 			}
 		}
-	}
-	
-	private String getQueueNameAtDepth() {
-		return app.getRabbitMQ().getQueueNameAtDepth();
 	}
 }

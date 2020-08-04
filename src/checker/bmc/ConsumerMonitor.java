@@ -17,8 +17,8 @@ public class ConsumerMonitor extends Thread {
 		try {
 			while (true) {
 				synchronized (BmcConsumer.LOCK) {
-					consumer.checkToChangeQueueOrNot();
 					BmcConsumer.LOCK.wait(TIMEOUT);
+					consumer.checkToChangeQueueOrNot();
 				}
 			}
 		} catch (Exception e) {

@@ -1,8 +1,6 @@
 package mq;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 
 import org.junit.After;
 import org.junit.Before;
@@ -27,13 +25,5 @@ public class ConsumerTest {
 	@Test
 	public void initializeTest() {
 		assertEquals(0, Consumer.current);
-		assertEquals(true, consumer.isMaster);
 	}
-	
-	@Test
-	public void matchedQueueNameTest() {
-		assertTrue(consumer.matchedQueueName("NSPK0"));
-		assertFalse(consumer.matchedQueueName("NSPK_DEPTH"));
-	}
-
 }

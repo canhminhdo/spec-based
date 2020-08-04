@@ -14,6 +14,14 @@ public class RedisQueueSet extends RedisSet {
 		return DEPTH_SET_PREFIX + "-" + depth;
 	}
 	
+	public String getDepthSetConsumingName(int depth) {
+		return DEPTH_SET_PREFIX + "-" + depth + "-consuming";
+	}
+	
+	public String getDepthSetBackupName(int depth) {
+		return DEPTH_SET_PREFIX + "-" + depth + "-backup";
+	}
+	
 	public String getStateSetQueue() {
 		return SEQ_SET;
 	}

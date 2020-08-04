@@ -45,15 +45,7 @@ public abstract class CaseStudy {
 	// If you want to run with a Bounded Model Checking
 	public static boolean IS_BOUNDED_MODEL_CHECKING;
 	public static int MAX_DEPTH;	// Maximum depth when you run Bounded Model Checking
-	public static int CURRENT_MAX_DEPTH;
-	public static int CURRENT_DEPTH;
-	
-	
-	// Random mode
-	public static boolean RANDOM_MODE;
-	public static int RANDOM_MAX_DEPTH;
-	public static int RANDOM_DEPTH;
-	public static int RANDOM_PERCENTAGE;
+	public static ArrayList<Double> PERCENTAGES;
 	
 	public static Boolean IS_REMOTE;
 
@@ -95,17 +87,16 @@ public abstract class CaseStudy {
 		BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
 		DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
 		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
-		// Random mode
-		RANDOM_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.random.mode"));
-		RANDOM_MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.max_depth"));
-		RANDOM_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.depth"));
-		RANDOM_PERCENTAGE = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.random.percentage"));
 		
 		// If you want to run with a Bounded Model Checking
 		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
-		MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.max_depth"));;	// Maximum depth when you run Bounded Model Checking
-		CURRENT_MAX_DEPTH = MAX_DEPTH;
-		CURRENT_DEPTH = DEPTH;
+		MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.max_depth"));	// Maximum depth when you run Bounded Model Checking
+		String percentagesConfig = AppConfig.getInstance().getConfig().getProperty("jpf.percentages");
+		String[] percentages = percentagesConfig.split(" ");
+		PERCENTAGES = new ArrayList<Double>();
+		for (int i = 0; i < percentages.length; i ++) {
+			PERCENTAGES.add(Double.parseDouble(percentages[i]));
+		}
 		
 		IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
 

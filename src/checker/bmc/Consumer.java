@@ -3,17 +3,16 @@ package checker.bmc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 import org.apache.commons.lang3.SerializationUtils;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
 import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.DeliverCallback;
 
-import application.model.ConsumerStatus;
-import application.model.RabbitConsumer;
+import application.model.ConsumerInfo;
 import application.model.RabbitQueue;
 import application.model.SystemInfo;
 import config.CaseStudy;
@@ -21,7 +20,8 @@ import jpf.common.OC;
 import mq.RabbitMQClient;
 import mq.RunJPF;
 import mq.api.RabbitMQManagementAPI;
-import redis.api.RedisConsumerStatus;
+import redis.api.RedisConsumerInfo;
+import redis.api.RedisLock;
 import redis.api.RedisQueueSet;
 import redis.api.RedisSystemInfo;
 import server.Application;
@@ -32,7 +32,6 @@ public class Consumer {
 	
 	protected static Logger logger = (Logger) LogManager.getLogger();
 	public static Object lock = new Object();
-	public static int current = 0;
 	protected final static int SIZE = 3;
 	protected HashMap<Integer, Integer> analyzer = new HashMap<Integer, Integer>();
 	protected boolean isConsuming = false;
@@ -40,20 +39,21 @@ public class Consumer {
 	protected String consumerTag;
 	protected RedisQueueSet jedisSet;
 	protected RedisSystemInfo jedisSysInfo;
-	protected RedisConsumerStatus jedisConsumerStatus;
+	protected RedisConsumerInfo jedisConsumerInfo;
+	protected RedisLock jedisLock;
 	public boolean isMaster = false;
 	protected RabbitMQClient rabbitClient;
 	private Channel channel;
-	private ConsumerStatus consumer;
+	private ConsumerInfo consumer;
 	private SystemInfo sysInfo;
+	private int currentDepth = 0;
+	public static int current = 0;
 	
 	public Consumer() {
 		app = ApplicationConfigurator.getInstance().getApplication();
 		this.initialize();
 		this.loadConfigFromJedis();
-		this.getConsumerStatusAndUpdateToRedis();
-		this.setCurrent();
-		if (this.isMaster) logger.debug("I am master worker");
+		this.getConsumerInfoAndUpdateToRedis();
 	}
 
 	public void initialize() {
@@ -76,7 +76,8 @@ public class Consumer {
 	public void buildRedisClient() {
 		jedisSet = new RedisQueueSet();
 		jedisSysInfo = new RedisSystemInfo();
-		jedisConsumerStatus = new RedisConsumerStatus();
+		jedisConsumerInfo = new RedisConsumerInfo();
+		jedisLock = new RedisLock();
 	}
 	
 	public synchronized boolean isConsuming() {
@@ -89,50 +90,58 @@ public class Consumer {
 	
 	public void loadConfigFromJedis() {
 		sysInfo = jedisSysInfo.getSystemInfo();
-		CaseStudy.SYSTEM_MODE = sysInfo.getMode();
-		CaseStudy.CURRENT_DEPTH = sysInfo.getCurrentDepth();
-		CaseStudy.CURRENT_MAX_DEPTH = sysInfo.getCurrentMaxDepth();
+		currentDepth = sysInfo.getCurrentDepth();
 	}
 	
-	public void getConsumerStatusAndUpdateToRedis() {
-		int nConsumers = jedisConsumerStatus.getNumberOfConsumer();
-		String id = String.valueOf(nConsumers + 1);
-		this.consumer = new ConsumerStatus(id, ConsumerStatus.WORKING_STATUS);
-		jedisConsumerStatus.updateConsumerStatus(consumer);
+	public void getConsumerInfoAndUpdateToRedis() {
+		int nConsumers = jedisConsumerInfo.getNumberOfConsumer();
+		if (nConsumers > 0) {
+			// TODO :: need to improve here
+			current = 1;
+			currentDepth += CaseStudy.DEPTH;
+		}
+		int id = UUID.randomUUID().hashCode();
+		this.consumer = new ConsumerInfo(id, current);
+		jedisConsumerInfo.updateConsumerInfo(consumer);
 	}
 	
 	public DeliverCallback getDeliverCallback() {
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 			OC config = SerializationUtils.deserialize(delivery.getBody());
-			int currentDepth = config.getCurrentDepth();
-			logger.info(" [x] Received " + config + " at depth " + currentDepth);
+			int depth = config.getCurrentDepth();
+			logger.info(" [x] Received " + config + " at depth " + depth + ", queue " + getCurrentQueueName());
 			
-			if (CaseStudy.RANDOM_MODE && currentDepth == CaseStudy.MAX_DEPTH) {
-				String configSha256 = GFG.getSHA(config.toString());
-				if (!jedisSet.sismember(jedisSet.getDepthSetName(currentDepth), configSha256)) {
-					channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-					logger.info("Dropped state with at depth " + currentDepth);
-					this.setConsuming(false);
-					return;
-				}
+			this.jedisLock.requestCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
+			
+			String configSha256 = GFG.getSHA(config.toString());
+			if (!jedisSet.sismember(jedisSet.getDepthSetName(depth), configSha256)) {
+				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
+				logger.info("Dropped state with at depth " + depth);
+				this.setConsuming(false);
+				this.jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
+				return;
 			}
 			
 			if (isCheckedMessage(config)) {
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.info("Duplicate state in previous layers at depth " + currentDepth);
+				logger.info("Duplicate state in previous layers at depth " + depth);
 				this.setConsuming(false);
+				this.jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
 				return;
 			}
 
-			if (currentDepth >= CaseStudy.CURRENT_MAX_DEPTH) {
+			if (depth >= CaseStudy.MAX_DEPTH) {
 				// Do not check these states anymore
 				channel.basicAck(delivery.getEnvelope().getDeliveryTag(), false);
-				logger.info("Should not have this state in " + getCurrentQueueName() + " at depth " + currentDepth + " CURRENT_MAX_DEPTH " + CaseStudy.CURRENT_MAX_DEPTH);
+				logger.info("Should not have this state in " + getCurrentQueueName() + " at depth " + depth + " MAX_DEPTH " + CaseStudy.MAX_DEPTH);
 				this.setConsuming(false);
+				this.jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
 				return;
 			}
-
+			this.saveToConsumingQueue(config);
+			this.jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
 			this.setConsuming(true);
+			
 			RunJPF runner = new RunJPF(config);
 			runner.start();
 			try {
@@ -150,37 +159,22 @@ public class Consumer {
 		};
 		return deliverCallback;
 	}
+	
+	public void saveToConsumingQueue(OC config) {
+		double percentage = getPercentageAtLayer();
+		if (percentage >= 100) {
+			return;
+		}
+		sysInfo = jedisSysInfo.getSystemInfo();
+		
+		// Need to improve here. please think
+		if (sysInfo.getCurrentDepth() < currentDepth && currentDepth < CaseStudy.MAX_DEPTH) {
+			logger.debug("Saving to consuming queue at " + sysInfo.getCurrentDepth());
+			String configSha256 = GFG.getSHA(config.toString());
+			jedisSet.sadd(jedisSet.getDepthSetConsumingName(currentDepth), configSha256);
+		}
+	}
 
-	public void setCurrent() {
-		if (consumer.getId().equals("1")) {
-			current = 0;
-			this.isMaster = true;
-		}
-		ArrayList<RabbitConsumer> consumers = RabbitMQManagementAPI.getInstance().getConsumerInfo();
-		current = getMaxCurrentQueue(consumers);
-//		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
-//		if (allowToChangeQueue(queues))
-//			moveToNextCurrent();
-	}
-	
-	public int getMaxCurrentQueue(ArrayList<RabbitConsumer> consumers) {
-		int maxCurrent = 0;
-		for (int i = 0; i < consumers.size(); i ++) {
-			String queueName = consumers.get(i).getQueueName();
-			if (matchedQueueName(queueName)) {
-				String strCurrent = queueName.substring(app.getRabbitMQ().getQueueName().length());
-				int current = Integer.valueOf(strCurrent);
-				if (maxCurrent < current)
-					maxCurrent = current;
-			}
-		}
-		return maxCurrent;
-	}
-	
-	public boolean matchedQueueName(String queueName) {
-		return queueName.matches("^[a-zA-Z]+[0-9]+$");
-	}
-	
 	public void handle() {
 		consumerTag = rabbitClient.basicConsume(getCurrentQueueName());
 	}
@@ -189,84 +183,93 @@ public class Consumer {
 		logger.debug("Checking queues information at " + getCurrentQueueName());
 		HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
 		if (isEmtpyQueues(queues)) {
-			if (!CaseStudy.RANDOM_MODE)
-				return;
-			
-			// BMC with Random Mode
-			if (isMaster && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-				if (consumer.isWorking()) {
-					// Should do only one time.
-					tryToCancelConsumerTagAndReset();
-					updateConsumerToStopStatus();
-					buildDistinctStateSet();
-					buildRandomStates();
-					logger.info(consumer);
-				}
-				
-				if (consumer.isStop() && checkAllConsumerStopping()){
-					// If all consumers are stopping, should do only one time
-					resetCurrent();
-					updateConsumerToWorkingStatus();
-					moveMessagesToCurrentQueue();
-					saveRandomConfigToRedis();
-					loadConfigFromJedis();
-					handle();
-					logger.info(consumer);
-					logger.info("Starting random mode at " + getCurrentQueueName());
-					return;
-				}
-			}
-			
-			if (!isMaster) {
-				if (consumer.isWorking() && !CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-					// Should do only one time
-					tryToCancelConsumerTagAndReset();
-					updateConsumerToStopStatus();
-					logger.info(consumer);
-				}
-			}
+			System.exit(0);
 		}
-		
-		if (!isMaster && consumer.isStop()) {
-			loadConfigFromJedis();
-			if (CaseStudy.SYSTEM_MODE.equals(SystemInfo.BMC_RANDOM_MODE)) {
-				updateConsumerToWorkingStatus();
-				setCurrent();
-				handle();
-				logger.info(consumer);
-				logger.info("Starting random mode at " + getCurrentQueueName());
-				return;
+		if (allowToChangeQueue(queues) && currentDepth < CaseStudy.MAX_DEPTH) {
+			jedisLock.requestCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
+			// increase the currentDepth
+			currentDepth += CaseStudy.DEPTH;
+			if (lastWorkerChangeQueue(queues)) {
+				proceedRandom();
+				// only last work update system information
+				// moving to the next layer
+				sysInfo.setCurrentLayer(sysInfo.getCurrentLayer() + 1);
+				// update sysInfo in redis
+				sysInfo.setCurrentDepth(currentDepth);
+				jedisSysInfo.updateSystemInfo(sysInfo);
 			}
-		}
-		
-		if (consumer.isWorking() && allowToChangeQueue(queues)) {
 			logger.debug("From: " + getCurrentQueueName());
+			// stop consuming the current queue and move to the next queue
 			tryToCancelConsumerTagAndReset();
-			moveToNextCurrent();
+			setNextCurrent();
 			logger.debug("To " + getCurrentQueueName());
+			// handle with new queue
 			handle();
+			jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
 		}
 	}
 	
-	public boolean checkAllConsumerStopping() {
-		if (consumer.isWorking())
-			return false;
-		ArrayList<ConsumerStatus> consumerList = jedisConsumerStatus.getConsumerStatus();
-		for (int i = 0; i < consumerList.size(); i++) {
-			if (consumerList.get(i).isWorking())
-				return false;
+	public void proceedRandom() {
+		double percentage = getPercentageAtLayer();
+		assert percentage >= 0 && percentage <= 100 : "Percentage value is invalid";
+		if (percentage == 100) {
+			return;
 		}
-		return true;
+		logger.debug("Percentage " + percentage + " at depth " + currentDepth);
+		
+		// save for back-up
+		jedisSet.sdiffstore(jedisSet.getDepthSetBackupName(currentDepth), jedisSet.getDepthSetName(currentDepth));
+		// build distinct states at currentDepth
+		int depth = 0;
+		while (depth >= currentDepth) {
+			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(depth));
+			depth += CaseStudy.DEPTH;
+		}
+		// calculate the number of removed states
+		long numberOfStates = jedisSet.scard(jedisSet.getDepthSetName(currentDepth));
+		long numberOfConsumingStates = jedisSet.scard(jedisSet.getDepthSetConsumingName(currentDepth));
+		long numberOfKeepStates  = (long) Math.ceil(percentage * (1.0 * numberOfStates / 100));
+		long numberOfRemovedStates = numberOfStates - numberOfKeepStates;
+		
+		logger.debug("numberOfStates = " + numberOfStates);
+		logger.debug("numberOfConsumingStates = " + numberOfConsumingStates);
+		logger.debug("numberOfKeepStates = " + numberOfKeepStates);
+		logger.debug("numberOfRemovedStates = " + numberOfRemovedStates);
+		
+		if (numberOfConsumingStates < numberOfKeepStates) {
+			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(currentDepth));
+			// remove some states
+			jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfRemovedStates);
+		} else {
+			// discard all states
+			jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfStates);
+		}
+		// unnecessary task ???
+		// jedisSet.sunion(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(currentDepth));
 	}
 	
-	public void updateConsumerToStopStatus() {
-		consumer.setToStopStatus();
-		jedisConsumerStatus.updateConsumerStatus(consumer);
+	public double getPercentageAtLayer() {
+		int layer = sysInfo.getCurrentLayer();
+		int size = CaseStudy.PERCENTAGES.size();
+		if (size == 0) {
+			return 100;
+		}
+		if (size < layer) {
+			return CaseStudy.PERCENTAGES.get(size - 1);
+		}
+		return CaseStudy.PERCENTAGES.get(layer - 1);
 	}
 	
-	public void updateConsumerToWorkingStatus() {
-		consumer.setToWorkingStatus();
-		jedisConsumerStatus.updateConsumerStatus(consumer);
+	
+	public boolean lastWorkerChangeQueue(HashMap<String, RabbitQueue> queues) {
+		ArrayList<ConsumerInfo> consumerList = jedisConsumerInfo.getConsumerInfo();
+		int count = 0;
+		for (int i = 0; i < consumerList.size(); i ++) {
+			if (consumerList.get(i).getCurrent() == current) {
+				count ++;
+			}
+		}
+		return count == 1;
 	}
 	
 	public boolean allowToChangeQueue(HashMap<String, RabbitQueue> queues) {
@@ -276,7 +279,7 @@ public class Consumer {
 			return true;
 		}
 		return false;
-	}
+	}			
 	
 	public String getPreviousQueueName() {
 		return app.getRabbitMQ().getQueueName() + ((current + 2) % SIZE);
@@ -286,18 +289,16 @@ public class Consumer {
 		return app.getRabbitMQ().getQueueName() + current;
 	}
 	
-	public void resetCurrent() {
-		current = 0;
-	}
-	
 	public void resetConsumerTag() {
 		consumerTag = "";
 	}
 	
-	public void moveToNextCurrent() {
-		current = (current + 1) % SIZE;
+	public void setNextCurrent() {
+		current = (current + 1 ) % SIZE;
+		consumer.setCurrent(current);
+		jedisConsumerInfo.updateConsumerInfo(this.consumer);
 	}
-	
+
 	public void tryToCancelConsumerTagAndReset() throws IOException {
 		rabbitClient.cancelConsume(consumerTag);
 		resetConsumerTag();
@@ -313,71 +314,20 @@ public class Consumer {
 	}
 	
 	public boolean isCheckedMessage(OC config) {
-		int currentDepth = config.getCurrentDepth();
-		if (currentDepth == 0)
-			return false;
-		if (!CaseStudy.IS_BOUNDED_MODEL_CHECKING)
+		int depth = config.getCurrentDepth();
+		if (depth == 0)
 			return false;
 		String configSha256 = GFG.getSHA(config.toString());
-		if (currentDepth <= CaseStudy.MAX_DEPTH) {
-			return checkExistingInPreviousLayers(configSha256, currentDepth, 0, CaseStudy.DEPTH);
-		}
-		return checkExistingInPreviousLayers(configSha256, currentDepth, CaseStudy.MAX_DEPTH, CaseStudy.RANDOM_DEPTH) || 
-				checkExistingInPreviousLayers(configSha256, currentDepth, 0, CaseStudy.DEPTH);
+		return checkExistingInPreviousLayers(configSha256, depth, 0, CaseStudy.DEPTH);
 	}
 	
-	public boolean checkExistingInPreviousLayers(String member, int currentDepth, int startDepth, int stepDepth) {
-		while (currentDepth - stepDepth >= startDepth) {
-			currentDepth -= stepDepth;
+	public boolean checkExistingInPreviousLayers(String member, int currDepth, int startDepth, int stepDepth) {
+		// TODO :: need to improve when using various depths
+		while (currDepth - stepDepth >= startDepth) {
+			currDepth -= stepDepth;
 			if (jedisSet.sismember(jedisSet.getDepthSetName(startDepth), member))
 				return true;
 		}
 		return false;
-	}
-	
-	public void buildDistinctStateSet() {
-		int stepSize = CaseStudy.DEPTH;
-		int startDepth = 0;
-		int maxDepth = CaseStudy.CURRENT_MAX_DEPTH;
-		while (startDepth <= maxDepth) {
-			buildDistinctStateAtDepth(startDepth);
-			startDepth += stepSize;
-		}
-	}
-	
-	public void buildDistinctStateAtDepth(int maxDepth) {
-		int stepSize = CaseStudy.DEPTH;
-		int startDepth = 0;
-		ArrayList<String> setKeys = new ArrayList<String>();
-		setKeys.add(jedisSet.getDepthSetName(maxDepth));
-		while (startDepth < maxDepth) {
-			setKeys.add(jedisSet.getDepthSetName(startDepth));
-			startDepth += stepSize;
-		}
-		String[] keysParams = setKeys.toArray(new String[0]);
-		jedisSet.sdiffstore(jedisSet.getDepthSetName(maxDepth), keysParams);
-	}
-	
-	public void buildRandomStates() {
-		int maxDepth = CaseStudy.MAX_DEPTH;
-		long numberOfState = jedisSet.scard(jedisSet.getDepthSetName(maxDepth));
-		int percentage = CaseStudy.RANDOM_PERCENTAGE;
-		assert percentage >= 0 && percentage <= 100 : "percentage is invalid";
-		int numberOfRemovedState = (int) Math.round((100 - percentage) * numberOfState / 100);
-		jedisSet.sdiffstore(jedisSet.getDepthSetName(maxDepth) + "-backup", jedisSet.getDepthSetName(maxDepth));
-		jedisSet.spop(jedisSet.getDepthSetName(maxDepth), numberOfRemovedState);
-	}
-	
-	public void moveMessagesToCurrentQueue() throws ClientProtocolException, IOException {
-		String sourceQueue = app.getRabbitMQ().getQueueNameAtDepth();
-		String destQueue = getCurrentQueueName();
-		RabbitMQManagementAPI.getInstance().moveMessagesBetweenQueues(sourceQueue, destQueue);
-	}
-
-	public void saveRandomConfigToRedis() {
-		sysInfo.setMode(SystemInfo.BMC_RANDOM_MODE);
-		sysInfo.setCurrentDepth(CaseStudy.RANDOM_DEPTH);
-		sysInfo.setCurrentMaxDepth(CaseStudy.RANDOM_MAX_DEPTH);
-		jedisSysInfo.updateSystemInfo(sysInfo);
 	}
 }

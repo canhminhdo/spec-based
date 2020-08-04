@@ -35,8 +35,6 @@ public class BmcSender extends SenderFactory {
 			}
 			if (CaseStudy.MAUDE_WORKER_IS_ENABLE)
 				rabbitClient.queueDeclare(app.getRabbitMQ().getMaudeQueue());
-			if (CaseStudy.RANDOM_MODE)
-				rabbitClient.queueDeclare(app.getRabbitMQ().getQueueNameAtDepth());
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

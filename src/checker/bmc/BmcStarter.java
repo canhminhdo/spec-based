@@ -13,6 +13,7 @@ import checker.factory.StarterFactory;
 import config.CaseStudy;
 import jpf.common.OC;
 import mq.RabbitMQClient;
+import redis.api.RedisLock;
 import redis.api.RedisQueueSet;
 import redis.api.RedisSystemInfo;
 import utils.GFG;
@@ -54,20 +55,15 @@ public class BmcStarter extends StarterFactory {
 					"/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name=" + app.getRabbitMQ().getMaudeQueue());
 
 			Process p3 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
-					+ app.getRabbitMQ().getQueueNameAtDepth());
-
-			Process p4 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
 					+ app.getRabbitMQ().getQueueName() + "0");
 
-			Process p5 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
+			Process p4 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
 					+ app.getRabbitMQ().getQueueName() + "1");
 
-			Process p6 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
+			Process p5 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqadmin purge queue name="
 					+ app.getRabbitMQ().getQueueName() + "2");
 			
-			Process p7 = Runtime.getRuntime().exec("/usr/local/opt/rabbitmq/sbin/rabbitmqctl clear_parameter shovel move-messages");
-			
-			Process p8 = Runtime.getRuntime().exec("rm -rf " + CaseStudy.LOG4J_PATH);
+			Process p6 = Runtime.getRuntime().exec("rm -rf " + CaseStudy.LOG4J_PATH);
 
 			p1.waitFor();
 			p2.waitFor();
@@ -75,8 +71,6 @@ public class BmcStarter extends StarterFactory {
 			p4.waitFor();
 			p5.waitFor();
 			p6.waitFor();
-			p7.waitFor();
-			p8.waitFor();
 		}
 	}
 
@@ -87,6 +81,8 @@ public class BmcStarter extends StarterFactory {
 			channel = rabbitClient.getChannel();
 			OC message = app.getCaseStudy().getInitialMessage();
 			String queueName = app.getRabbitMQ().getQueueName() + message.getCurrentDepth();
+			System.out.println(message);
+			System.out.println(queueName);
 			rabbitClient.queueDeclare(queueName);
 			rabbitClient.basicPublish(queueName, SerializationUtils.serialize(message));
 			logger.info(" [x] Sent '" + message);
@@ -108,8 +104,9 @@ public class BmcStarter extends StarterFactory {
 	public void initializeRedisSysInfo() {
 		RedisSystemInfo jedisSysInfo = new RedisSystemInfo();
 		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.MODE_KEY, SystemInfo.BMC_MODE);
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, String.valueOf(CaseStudy.DEPTH));
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_MAX_DEPTH_KEY,
-				String.valueOf(CaseStudy.MAX_DEPTH));
+		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, "0");
+		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_LAYER_KEY, "1");
+		RedisLock jedisLock = new RedisLock();
+		jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
 	}
 }

@@ -145,5 +145,14 @@ public class RabbitMQManagementAPI {
 			System.out.println(consumers.get(i));
 		}
 		RabbitMQManagementAPI.getInstance().moveMessagesBetweenQueues("NSPK_DEPTH", "NSPK0");
+		
+		JSONObject jValue = new JSONObject();
+		jValue.put("id", "123");
+		jValue.put("current", "2");
+		System.out.println(jValue.toString());
+		
+		JSONObject jsonObj = new JSONObject(jValue.toString());
+		System.out.println(jsonObj.getString("current"));
+		System.out.println(jsonObj.getString("id"));
 	}
 }
