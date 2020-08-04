@@ -157,4 +157,9 @@ public abstract class StateSequence extends ListenerAdapter {
 			seq.remove(seq.size() - 1);
 		}
 	}
+	
+	@Override
+	public void propertyViolated(Search search) {
+		logger.info("Property Violated at " + search.getDepth());
+	}
 }
