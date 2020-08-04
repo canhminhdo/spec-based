@@ -17,19 +17,13 @@ maude.program=/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darw
 maude.depth=2
 
 # jpf configuration
-jpf.mode=true
 jpf.bmc.isEnable=true
-jpf.bmc.max_depth=150
-jpf.depth=75
+jpf.bmc.max_depth=300
+jpf.depth=100
+jpf.percentages=10.01 5.1
 jpf.depth.isEnable=true
-jpf.bound=100
-jpf.bound.isEnable=false
-
-# jpf random from max depth BMC
-jpf.random.mode=true
-jpf.random.max_depth=300
-jpf.random.depth=75
-jpf.random.percentage=10
+jpf.bound=10000
+jpf.bound.isEnable=true
 
 env.isRemote=false
 # rabbitmq remote
