@@ -11,7 +11,9 @@ import gov.nasa.jpf.ListenerAdapter;
 import gov.nasa.jpf.search.Search;
 import jpf.common.HeapJPF;
 import jpf.common.OC;
+import redis.api.RedisHash;
 import redis.api.RedisQueueSet;
+import redis.api.RedisStoreStates;
 import server.Application;
 import server.ApplicationConfigurator;
 import utils.GFG;
@@ -27,6 +29,7 @@ public abstract class StateSequence extends ListenerAdapter {
 	private int STARTUP = 1;
 	protected ArrayList<OC> seq;
 	protected RedisQueueSet jedisSet = null;
+	protected RedisStoreStates jedisHash = null;
 	private HeapJPF heapJPF = null;
 	protected Application app;
 	protected SenderFactory sender;
@@ -34,6 +37,7 @@ public abstract class StateSequence extends ListenerAdapter {
 	protected void initialize() {
 		app = ApplicationConfigurator.getInstance().getApplication();
 		jedisSet = new RedisQueueSet();
+		jedisHash = new RedisStoreStates();
 		seq = new ArrayList<OC>();
 		heapJPF = app.getHeapJPF();
 		app.getCaseStudy().printConfiguration();

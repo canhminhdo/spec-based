@@ -5,6 +5,7 @@ import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
 import jpf.common.OC;
 import utils.GFG;
+import utils.SerializationUtilsExt;
 
 public class BmcStateSequence extends StateSequence {
 	
@@ -37,7 +38,10 @@ public class BmcStateSequence extends StateSequence {
 			return;
 		
 		if (!lastElement.isFinished() && lastElement.isReady()) {
+			// saving to set of hash of states at a depth
 			jedisSet.sadd(jedisSet.getDepthSetName(this.nextDepth), elementSha256);
+			// saving to a hash table where key is the hash of a state, value is the encoded string of a state
+			jedisHash.hset(jedisHash.getStoreNameAtDepth(this.nextDepth), elementSha256, SerializationUtilsExt.serializeToStr(lastElement));
 			if (is_publish) {
 				sender.sendJob(lastElement);
 			}
