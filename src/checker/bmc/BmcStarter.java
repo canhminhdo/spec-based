@@ -81,8 +81,6 @@ public class BmcStarter extends StarterFactory {
 			channel = rabbitClient.getChannel();
 			OC message = app.getCaseStudy().getInitialMessage();
 			String queueName = app.getRabbitMQ().getQueueName() + message.getCurrentDepth();
-			System.out.println(message);
-			System.out.println(queueName);
 			rabbitClient.queueDeclare(queueName);
 			rabbitClient.basicPublish(queueName, SerializationUtils.serialize(message));
 			logger.info(" [x] Sent '" + message);

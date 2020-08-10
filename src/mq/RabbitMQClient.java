@@ -11,6 +11,7 @@ import com.rabbitmq.client.Channel;
 import com.rabbitmq.client.Connection;
 import com.rabbitmq.client.ConnectionFactory;
 import com.rabbitmq.client.DeliverCallback;
+import com.rabbitmq.client.MessageProperties;
 
 import server.Application;
 import server.ApplicationConfigurator;
@@ -53,8 +54,9 @@ public class RabbitMQClient {
 		// enable lazy queues
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("x-queue-mode", "lazy");
+		boolean durable = true;
 		for (int i = 0; i < queueList.length; i++) {
-			channel.queueDeclare(queueList[i], false, false, false, args);
+			channel.queueDeclare(queueList[i], durable, false, false, args);
 		}
 	}
 
@@ -62,7 +64,8 @@ public class RabbitMQClient {
 		channel.basicQos(1);
 		Map<String, Object> args = new HashMap<String, Object>();
 		args.put("x-queue-mode", "lazy");
-		channel.queueDeclare(queueName, false, false, false, args);
+		boolean durable = true;
+		channel.queueDeclare(queueName, durable, false, false, args);
 	}
 
 	public void setDeliverCallBack(DeliverCallback deliverCallback) {
@@ -83,7 +86,7 @@ public class RabbitMQClient {
 	}
 	
 	public void basicPublish(String queueName, byte[] body) throws IOException {
-		channel.basicPublish("", queueName, null, body);
+		channel.basicPublish("", queueName, MessageProperties.PERSISTENT_TEXT_PLAIN, body);
 	}
 
 	public void cancelConsume(String consumerTag) {
