@@ -40,4 +40,8 @@ public class RedisSet extends RedisApi {
 	public void sunion(String dstkey, String... keys) {
 		jedis.sunionstore(dstkey, keys);
 	}
+	
+	public Set<String> smembers(String key) {
+		return jedis.smembers(key);
+	}
 }
