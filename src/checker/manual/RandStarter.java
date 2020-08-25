@@ -3,6 +3,7 @@ package checker.manual;
 import java.io.IOException;
 import java.util.Set;
 
+import org.apache.commons.lang3.SerializationUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.core.Logger;
 
@@ -13,11 +14,11 @@ import checker.factory.StarterFactory;
 import config.CaseStudy;
 import jpf.common.OC;
 import mq.RabbitMQClient;
+import redis.api.RedisConsumerInfo;
 import redis.api.RedisLock;
 import redis.api.RedisQueueSet;
 import redis.api.RedisStoreStates;
 import redis.api.RedisSystemInfo;
-import utils.GFG;
 import utils.SerializationUtilsExt;
 
 public class RandStarter extends StarterFactory {
@@ -25,29 +26,35 @@ public class RandStarter extends StarterFactory {
 	RabbitMQClient rabbitClient;
 	Channel channel;
 	int currentDepth;
+	int currentLayer;
+	int nextDepth;
 	double percentage;
 	RedisQueueSet jedisSet = null;
 	RedisStoreStates jedisHash = null;
+	RedisConsumerInfo jedisConsumerInfo = null;
+	RedisSystemInfo jedisSysInfo = null;
+	RedisLock jedisLock = null;
 	int current = 0;
 
 	public RandStarter() {
 		super();
-	}
-	
-	public RandStarter(int currentDepth, double percentage) {
-		super();
-		this.currentDepth = currentDepth;
-		this.percentage = percentage;
+		this.currentDepth = 100;
+		this.nextDepth = this.currentDepth + CaseStudy.DEPTH;
+		this.currentLayer = 2;
+		this.percentage = 100;
 		jedisSet = new RedisQueueSet();
 		jedisHash = new RedisStoreStates();
+		jedisSysInfo = new RedisSystemInfo();
+		jedisConsumerInfo = new RedisConsumerInfo();
+		jedisLock = new RedisLock();
+		
 	}
-
+	
 	@Override
 	public void start() {
 		cleanUp();
 		pushInitialJob();
-//		saveInitialMessageToRedis();
-//		initializeRedisSysInfo();
+		initializeRedisSysInfo();
 	}
 
 	@Override
@@ -80,23 +87,26 @@ public class RandStarter extends StarterFactory {
 	@Override
 	public void pushInitialJob() {
 		try {
-			// TODO :: we need to do pick randomly here and back up also
-//			rabbitClient = RabbitMQClient.getInstance();
-//			channel = rabbitClient.getChannel();
-//			String queueName = app.getRabbitMQ().getQueueName() + current;
-//			rabbitClient.queueDeclare(queueName);
+			// Connect to rabbit message
+			rabbitClient = RabbitMQClient.getInstance();
+			channel = rabbitClient.getChannel();
+			String queueName = app.getRabbitMQ().getQueueName() + current;
+			rabbitClient.queueDeclare(queueName);
+			// Do backup and randomly select states from a set of states in Redis
+			this.proceedRandom();
+			
+			// publish selected states to the rabbit message
 			Set<String> states = jedisSet.smembers(jedisSet.getDepthSetName(currentDepth));
 			for (String key : states) {
 				String state = jedisHash.hget(jedisHash.getStoreNameAtDepth(currentDepth), key);
 				OC message = SerializationUtilsExt.deserialize(state);
-//				rabbitClient.basicPublish(queueName, SerializationUtils.serialize(message));
+				rabbitClient.basicPublish(queueName, SerializationUtils.serialize(message));
 				logger.info("key = " + key);
 				logger.info(" [x] Sent '" + message);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
-
 	}
 	
 	public void proceedRandom() {
@@ -109,12 +119,17 @@ public class RandStarter extends StarterFactory {
 			// copy from a backup set to the current depth set
 			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetBackupName(currentDepth));
 		}
+		
 		// build distinct states at currentDepth
 		int depth = 0;
 		while (depth < currentDepth) {
-			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(depth));
+			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(depth));
 			depth += CaseStudy.DEPTH;
 		}
+		
+		if (percentage == 100)
+			return;
+		
 		// calculate the number of removed states
 		long numberOfStates = jedisSet.scard(jedisSet.getDepthSetName(currentDepth));
 		long numberOfKeepStates  = (long) Math.ceil(percentage * (1.0 * numberOfStates / 100));
@@ -130,23 +145,21 @@ public class RandStarter extends StarterFactory {
 
 	@Override
 	public void saveInitialMessageToRedis() {
-		OC config = app.getCaseStudy().getInitialMessage();
-		String configSha256 = GFG.getSHA(config.toString());
-		RedisQueueSet jedis = new RedisQueueSet();
-		RedisStoreStates jedisHash = new RedisStoreStates();
-		// saving to set of hash of states at a depth
-		jedis.sadd(jedis.getDepthSetName(config.getCurrentDepth()), configSha256);
-		// saving to a hash table where key is the hash of a state, value is the encoded string of a state
-		jedisHash.hset(jedisHash.getStoreNameAtDepth(config.getCurrentDepth()), configSha256, SerializationUtilsExt.serializeToStr(config));
 	}
 
 	@Override
 	public void initializeRedisSysInfo() {
-		RedisSystemInfo jedisSysInfo = new RedisSystemInfo();
+		// update the current system info
 		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.MODE_KEY, SystemInfo.BMC_MODE);
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, "0");
-		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_LAYER_KEY, "1");
-		RedisLock jedisLock = new RedisLock();
+		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_DEPTH_KEY, String.valueOf(this.currentDepth));
+		jedisSysInfo.hset(RedisSystemInfo.SYSTEM_KEY, SystemInfo.CURRENT_LAYER_KEY, String.valueOf(this.currentLayer));
+		// clear all information about worker
+		jedisConsumerInfo.clearWorkers();
+		// release lock if needed
 		jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
+		// clean the next depth if needed
+		jedisSet.deleteKey(jedisSet.getDepthSetName(this.nextDepth));
+		jedisSet.deleteKey(jedisSet.getDepthSetBackupName(this.nextDepth));
+		jedisHash.deleteKey(jedisHash.getStoreNameAtDepth(this.nextDepth));
 	}
 }

@@ -13,7 +13,6 @@ import checker.factory.StarterFactory;
 import config.CaseStudy;
 import jpf.common.OC;
 import mq.RabbitMQClient;
-import redis.api.RedisHash;
 import redis.api.RedisLock;
 import redis.api.RedisQueueSet;
 import redis.api.RedisStoreStates;
@@ -102,7 +101,9 @@ public class BmcStarter extends StarterFactory {
 		// saving to set of hash of states at a depth
 		jedis.sadd(jedis.getDepthSetName(config.getCurrentDepth()), configSha256);
 		// saving to a hash table where key is the hash of a state, value is the encoded string of a state
-		jedisHash.hset(jedisHash.getStoreNameAtDepth(config.getCurrentDepth()), configSha256, SerializationUtilsExt.serializeToStr(config));
+		if (app.getCaseStudy().isStoreStatesInRedis()) {
+			jedisHash.hset(jedisHash.getStoreNameAtDepth(config.getCurrentDepth()), configSha256, SerializationUtilsExt.serializeToStr(config));
+		}
 	}
 
 	@Override

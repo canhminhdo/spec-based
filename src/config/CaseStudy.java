@@ -35,6 +35,9 @@ public abstract class CaseStudy {
 	public static String MAUDE_PROGRAM;
 	public static Integer MAUDE_DEPTH;
 	public static Boolean MAUDE_WORKER_IS_ENABLE;
+	
+	// Store states in Redis
+	public static Boolean IS_STORE_STATES_IN_REDIS;
 		
 	// Using for state sequences generation by JPF
 	public static int DEPTH;	// Depth for each sub state space running by a JPF instance
@@ -87,6 +90,9 @@ public abstract class CaseStudy {
 		BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
 		DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
 		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
+		
+		// if you want to store states in Redis
+		IS_STORE_STATES_IN_REDIS = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.isStoreStates", "false"));
 		
 		// If you want to run with a Bounded Model Checking
 		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
@@ -243,5 +249,9 @@ public abstract class CaseStudy {
 	
 	public boolean isBmcModelChecking() {
 		return this.IS_BOUNDED_MODEL_CHECKING;
+	}
+	
+	public boolean isStoreStatesInRedis() {
+		return this.IS_STORE_STATES_IN_REDIS;
 	}
 }

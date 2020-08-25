@@ -37,4 +37,8 @@ public class RedisConsumerInfo extends RedisHash {
 	public void updateConsumerInfo(ConsumerInfo consumer) {
 		this.hset(CONSUMER_INFO_KEY, String.valueOf(consumer.getId()), String.valueOf(consumer.getCurrent()));
 	}
+	
+	public void clearWorkers() {
+		this.deleteKey(CONSUMER_INFO_KEY);
+	}
 }

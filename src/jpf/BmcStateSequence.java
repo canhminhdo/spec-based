@@ -41,7 +41,9 @@ public class BmcStateSequence extends StateSequence {
 			// saving to set of hash of states at a depth
 			jedisSet.sadd(jedisSet.getDepthSetName(this.nextDepth), elementSha256);
 			// saving to a hash table where key is the hash of a state, value is the encoded string of a state
-			jedisHash.hset(jedisHash.getStoreNameAtDepth(this.nextDepth), elementSha256, SerializationUtilsExt.serializeToStr(lastElement));
+			if (app.getCaseStudy().isStoreStatesInRedis()) {
+				jedisHash.hset(jedisHash.getStoreNameAtDepth(this.nextDepth), elementSha256, SerializationUtilsExt.serializeToStr(lastElement));
+			}
 			if (is_publish) {
 				sender.sendJob(lastElement);
 			}

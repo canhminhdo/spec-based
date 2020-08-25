@@ -17,4 +17,8 @@ public abstract class RedisApi {
 	public void flushAll() {
 		jedis.flushAll();
 	}
+	
+	public void deleteKey(String key) {
+		jedis.del(key);
+	}
 }
