@@ -97,8 +97,11 @@ public class Consumer {
 		int nConsumers = jedisConsumerInfo.getNumberOfConsumer();
 		if (nConsumers > 0) {
 			// TODO :: need to improve here
-			current = 1;
-			currentDepth += CaseStudy.DEPTH;
+			HashMap<String, RabbitQueue> queues = RabbitMQManagementAPI.getInstance().getQueueInfo();
+			if (allowToChangeQueue(queues)) {
+				current = (current + 1 ) % SIZE;
+				currentDepth += CaseStudy.DEPTH;
+			}
 		}
 		int id = UUID.randomUUID().hashCode();
 		this.consumer = new ConsumerInfo(id, current);

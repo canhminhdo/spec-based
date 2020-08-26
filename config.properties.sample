@@ -17,10 +17,11 @@ maude.program=/Users/ogataslab/Downloads/Applications/Maude-2.7.1-osx/maude.darw
 maude.depth=2
 
 # jpf configuration
+jpf.isStoreStates=true
 jpf.bmc.isEnable=true
 jpf.bmc.max_depth=300
-jpf.depth=100
 jpf.percentages=10.01 5.1
+jpf.depth=100
 jpf.depth.isEnable=true
 jpf.bound=10000
 jpf.bound.isEnable=true
