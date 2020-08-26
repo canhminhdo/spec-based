@@ -30,7 +30,7 @@ public abstract class StateSequence extends ListenerAdapter {
 	protected ArrayList<OC> seq;
 	protected RedisQueueSet jedisSet = null;
 	protected RedisStoreStates jedisHash = null;
-	private HeapJPF heapJPF = null;
+	protected HeapJPF heapJPF = null;
 	protected Application app;
 	protected SenderFactory sender;
 	

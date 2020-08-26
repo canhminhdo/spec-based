@@ -12,4 +12,8 @@ public class RedisStoreStates extends RedisHash {
 		return PREFIX_STATE_STORES_NAME + '-' + depth;
 	}
 	
+	public String getStoreErrorNameAtDepth(int depth) {
+		return PREFIX_STATE_STORES_NAME + '-' + depth + "-error";
+	}
+	
 }

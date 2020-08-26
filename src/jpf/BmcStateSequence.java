@@ -3,6 +3,7 @@ package jpf;
 import config.CaseStudy;
 import gov.nasa.jpf.Config;
 import gov.nasa.jpf.JPF;
+import gov.nasa.jpf.search.Search;
 import jpf.common.OC;
 import utils.GFG;
 import utils.SerializationUtilsExt;
@@ -47,6 +48,21 @@ public class BmcStateSequence extends StateSequence {
 			if (is_publish) {
 				sender.sendJob(lastElement);
 			}
+		}
+	}
+
+	@Override
+	public void propertyViolated(Search search) {
+		super.propertyViolated(search);
+		if (app.getCaseStudy().isStoreStatesInRedis()) {
+			OC config = heapJPF.getConfiguration(search);
+			if (config == null)
+				return;
+			String elementSha256 = GFG.getSHA(config.toString());
+			if (jedisSet.sismember(jedisSet.getDepthSetError(this.nextDepth), elementSha256))
+				return;
+			jedisSet.sadd(jedisSet.getDepthSetError(this.nextDepth), elementSha256);
+			jedisHash.hset(jedisHash.getStoreErrorNameAtDepth(this.nextDepth), elementSha256, SerializationUtilsExt.serializeToStr(config));
 		}
 	}
 }
