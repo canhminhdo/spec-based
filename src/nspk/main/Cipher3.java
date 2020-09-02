@@ -26,6 +26,13 @@ public class Cipher3 implements Cipher {
 		return p;
 	}
 	
+	// only use when rand is empty
+	public boolean mustHave() {
+		if (p.isIntruder() && !n.getGen().isIntruder() && !n.getForWhom().isIntruder())
+			return true;
+		return false;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {

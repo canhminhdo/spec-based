@@ -41,6 +41,11 @@ public class Cipher2 implements Cipher {
 		return p;
 	}
 	
+	// only use when rand is empty
+	public boolean mustHave() {
+		return false;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if (obj == null) {

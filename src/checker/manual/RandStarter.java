@@ -1,6 +1,7 @@
 package checker.manual;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Set;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -14,6 +15,12 @@ import checker.factory.StarterFactory;
 import config.CaseStudy;
 import jpf.common.OC;
 import mq.RabbitMQClient;
+import nspk.main.Cipher;
+import nspk.main.Message;
+import nspk.main.Network;
+import nspk.main.Principal;
+import nspk.parser.MessageOC;
+import nspk.parser.NspkMessageParser;
 import redis.api.RedisConsumerInfo;
 import redis.api.RedisLock;
 import redis.api.RedisQueueSet;
@@ -41,7 +48,7 @@ public class RandStarter extends StarterFactory {
 		this.currentDepth = 100; // picking states located currentDepth to generate states in the currentLayer
 		this.nextDepth = this.currentDepth + CaseStudy.DEPTH;
 		this.currentLayer = 2; // currentLayer is working on to generate states
-		this.percentage = 0.05; // the percentage to select states from a set of states located currentDepth
+		this.percentage = 100; // the percentage to select states from a set of states located currentDepth
 		jedisSet = new RedisQueueSet();
 		jedisHash = new RedisStoreStates();
 		jedisSysInfo = new RedisSystemInfo();
@@ -92,6 +99,7 @@ public class RandStarter extends StarterFactory {
 			channel = rabbitClient.getChannel();
 			String queueName = app.getRabbitMQ().getQueueName() + current;
 			rabbitClient.queueDeclare(queueName);
+			
 			// Do backup and randomly select states from a set of states in Redis
 			this.proceedRandom();
 			
@@ -107,6 +115,44 @@ public class RandStarter extends StarterFactory {
 		} catch (Exception ex) {
 			ex.printStackTrace();
 		}
+	}
+	
+	public void filterStates() {
+		Set<String> states = jedisSet.smembers(jedisSet.getDepthSetName(currentDepth));
+		int count = 0;
+		for (String key : states) {
+			String state = jedisHash.hget(jedisHash.getStoreNameAtDepth(currentDepth), key);
+			OC message = SerializationUtilsExt.deserialize(state);
+			
+			MessageOC oc = NspkMessageParser.parse(message.toString());
+			Principal p = oc.getP();
+			if (p.getRand().size() == 2) {
+				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), "key");
+			}
+			
+			if (p.getRand().size() == 1) {
+				count += 1;
+			}
+			
+			if (p.getRand().size() == 0) {
+				Network<Message<Cipher>> nw = p.getNw();
+				ArrayList<Message<Cipher>> nw_list = nw.getAll();
+				boolean flag = false;
+				for (int i = 0; i < nw_list.size(); i ++) {
+					if (nw_list.get(i).getCipher().mustHave()) {
+						flag = true;
+						break;
+					}
+				}
+				if (flag) {
+					count += 1;
+					continue;
+				}
+				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), "key");
+			}
+			
+		}
+		System.out.println(count);
 	}
 	
 	public void proceedRandom() {
@@ -126,6 +172,8 @@ public class RandStarter extends StarterFactory {
 			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(depth));
 			depth += CaseStudy.DEPTH;
 		}
+		
+		this.filterStates();
 		
 		if (percentage == 100)
 			return;

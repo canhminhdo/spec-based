@@ -50,6 +50,11 @@ public class Cipher1 implements Cipher {
 				this.n.equals(c1.getNonce()) &&
 				this.q.equals(c1.getGen());
 	}
+	
+	// only use when rand is empty
+	public boolean mustHave() {
+		return false;
+	}
 
 	@Override
 	public String toString() {
