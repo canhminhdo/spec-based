@@ -118,7 +118,8 @@ public class NspkConfiguration implements Serializable, OC {
 
 	@Override
 	public String toString() {
-		return "{" + this.nw + " " + this.rand + " " + this.nonces + " " + this.prins + "}";
+//		return this.rand + "\t" + this.nonces + "\t" + this.nw; // for analysis
+		return "{" + this.nw + " " + this.rand + " " + this.nonces + " " + this.prins + "}"; // for state
 	}
 
 	@Override

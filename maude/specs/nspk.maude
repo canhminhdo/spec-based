@@ -278,4 +278,18 @@ to the intruder, which can be found by the following:
 
 search [1] in NSPK : init =>* {(nonces: (n(P,Q,R) Ns)) OCs} such that P =/= intrdr /\ Q =/= intrdr .
 show path 181915 .
+
+ONE-TO-MANY AGREEMENT PROPERTY
+invariant (not(p = intruder) and
+          m1(p, p, q, enc1(q, n(p, q, r), p)) \in nw(s) and
+          m2(q1, q, p, enc2(p, n(p, q, r), n, q)) \in nw(s)
+          implies m2(q, q, p, enc2(p, n(p, q, r), n, q)) \in nw(s)),
+
+search [1] in NSPK : init =>* {(nw: ((m1(P,P,Q,c1(Q,n(P,Q,R),P))) (m2(Q',Q,P,c2(P,n(P,Q,R),N))) NW)) OCs} such that not (m2(Q,Q,P,c2(P,n(P,Q,R),N)) \in ((m2(Q',Q,P,c2(P,n(P,Q,R),N))) NW)) /\ P =/= intrdr .
+
+invariant (not(q = intruder) and
+          m2(q, q, p, enc2(p, n, n(q, p, r), q)) \in nw(s) and m3(p1, p, q, enc3(q, n(q, p, r))) \in nw(s)
+          implies m3(p, p, q, enc3(q, n(q, p, r))) \in nw(s)) .
+
+search [1] in NSPK : init =>* {(nw: ((m2(Q,Q,P,c2(P,N,n(Q,P,R)))) (m3(P',P,Q,c3(Q,n(Q,P,R)))) NW)) OCs} such that not (m3(P,P,Q,c3(Q,n(Q,P,R))) \in ((m3(P',P,Q,c3(Q,n(Q,P,R)))) NW)) /\ Q =/= intrdr .
 )***

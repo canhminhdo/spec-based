@@ -27,6 +27,7 @@ public class NSPK {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
+		// NSP property
 //		p.initialize();
 //		intrdr.initialize();
 //		q.initialize();
@@ -55,6 +56,12 @@ public class NSPK {
 //		System.out.println(p.nw);
 //		System.out.println(p.rand);
 //		System.out.println(p.nonces);
-		
+		// One-to-many Agreement Protocol
+//		intrdr.fake();
+//		System.out.println("fake31");
+//		System.out.println(p.nw);
+//		System.out.println(p.rand);
+//		System.out.println(p.nonces);
+//		p.checkOneToManyAgreementProperty();
 	}
 }

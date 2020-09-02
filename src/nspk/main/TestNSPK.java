@@ -8,6 +8,7 @@ import nspk.parser.NspkMessageParser;
 public class TestNSPK {
 	
 	public static void main(String[] args) {
+//		args = new String[] {"{nw: (m1(p,p,intrdr,c1(intrdr,n(p,intrdr,r1),p)) m1(intrdr,p,q,c1(q,n(p,intrdr,r1),p)) m1(intrdr,p,q,c1(intrdr,n(p,intrdr,r1),p)) m3(intrdr,p,q,c3(q,n(p,intrdr,r1))) m2(q,q,p,c2(p,n(p,intrdr,r1),n(q,p,r2),q)) m2(intrdr,intrdr,p,c2(p,n(p,intrdr,r1),n(q,p,r2),q)) m3(p,p,intrdr,c3(intrdr,n(q,p,r2)))) rand: emp nonces: (n(p,intrdr,r1) n(q,p,r2)) prins: (p q intrdr) rw_p: emp rw_q: emp rw_intrdr: (Fake)}"};
 		if (args.length > 0) {
 			// Read arguments
 			if (CaseStudy.JPF_MODE)

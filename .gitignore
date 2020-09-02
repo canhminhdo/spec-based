@@ -16,4 +16,5 @@ gradlew
 gradlew.bat
 logs/*
 resources/log4j2.properties
+analyze/*
 
