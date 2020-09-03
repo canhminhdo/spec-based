@@ -58,6 +58,7 @@ public class BmcStateSequence extends StateSequence {
 			OC config = heapJPF.getConfiguration(search);
 			if (config == null)
 				return;
+			config.setCurrentDepth(this.nextDepth);
 			String elementSha256 = GFG.getSHA(config.toString());
 			if (jedisSet.sismember(jedisSet.getDepthSetError(this.nextDepth), elementSha256))
 				return;

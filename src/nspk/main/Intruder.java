@@ -174,8 +174,8 @@ public class Intruder extends Principal {
 		Verify.beginAtomic();
 		if (this.nonces.add(n)) {
 //			System.out.println(this.nonces);
-//			assert (!n.getGen().isIntruder() && !n.getForWhom().isIntruder()) == false: "Nonce Secrecy Property (NSP) Violation: " + n.toString()
-//					+ "\n" + this.nw + "\n" + this.rand + "\n" + this.prins + "\n" + this.nonces;
+			assert (!n.getGen().isIntruder() && !n.getForWhom().isIntruder()) == false: "Nonce Secrecy Property (NSP) Violation: " + n.toString()
+					+ "\n" + this.nw + "\n" + this.rand + "\n" + this.prins + "\n" + this.nonces;
 		}
 		Verify.endAtomic();
 	}

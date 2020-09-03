@@ -11,9 +11,10 @@ import utils.SerializationUtilsExt;
 public class DumpData {
 	
 	public static void main(String[] argv) {
+		int currentDepth = 200;
 		String fileName = "analyze/state_sequences.txt";
-		int currentDepth = 100;
 		RedisStoreStates jedisStore = new RedisStoreStates();
+		
 		Map<String, String> states = jedisStore.hgetall(jedisStore.getStoreNameAtDepth(currentDepth));
 		try {
 			BufferedWriter writer = new BufferedWriter(new FileWriter(fileName, false));
@@ -29,5 +30,11 @@ public class DumpData {
 			e.printStackTrace();
 		}
 		
+		Map<String, String> error_states = jedisStore.hgetall(jedisStore.getStoreErrorNameAtDepth(currentDepth));
+		for (Map.Entry<String,String> state : error_states.entrySet()) {
+			OC message = SerializationUtilsExt.deserialize(state.getValue());
+			System.out.println(message.getCurrentDepth());
+			System.out.println(message.toString());
+		}
 	}
 }

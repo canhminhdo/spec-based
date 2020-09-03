@@ -48,7 +48,7 @@ public class RandStarter extends StarterFactory {
 		this.currentDepth = 100; // picking states located currentDepth to generate states in the currentLayer
 		this.nextDepth = this.currentDepth + CaseStudy.DEPTH;
 		this.currentLayer = 2; // currentLayer is working on to generate states
-		this.percentage = 100; // the percentage to select states from a set of states located currentDepth
+		this.percentage = 5; // the percentage to select states from a set of states located currentDepth
 		jedisSet = new RedisQueueSet();
 		jedisHash = new RedisStoreStates();
 		jedisSysInfo = new RedisSystemInfo();
@@ -109,8 +109,8 @@ public class RandStarter extends StarterFactory {
 				String state = jedisHash.hget(jedisHash.getStoreNameAtDepth(currentDepth), key);
 				OC message = SerializationUtilsExt.deserialize(state);
 				rabbitClient.basicPublish(queueName, SerializationUtils.serialize(message));
-				logger.info("key = " + key);
-				logger.info(" [x] Sent '" + message);
+				logger.debug("key = " + key);
+				logger.debug(" [x] Sent '" + message);
 			}
 		} catch (Exception ex) {
 			ex.printStackTrace();
@@ -127,7 +127,7 @@ public class RandStarter extends StarterFactory {
 			MessageOC oc = NspkMessageParser.parse(message.toString());
 			Principal p = oc.getP();
 			if (p.getRand().size() == 2) {
-				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), "key");
+				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), key);
 			}
 			
 			if (p.getRand().size() == 1) {
@@ -148,7 +148,7 @@ public class RandStarter extends StarterFactory {
 					count += 1;
 					continue;
 				}
-				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), "key");
+				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), key);
 			}
 			
 		}
