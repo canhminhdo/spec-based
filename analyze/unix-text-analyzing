@@ -1,0 +1,40 @@
+cat state_sequences.txt | cut -d$'\t' -f1,2 | sort | uniq -c
+
+--- 299     rand: (r2)	nonces: (n(p,intrdr,r1))
+--- 269     rand: (r2)	nonces: (n(q,intrdr,r1))
+--- 44      rand: (r2)	nonces: emp
+
+--- 1       rand: (r1 r2)	nonces: emp
+Should ignore, because it is the same as the initial state
+
+--- 19      rand: emp	nonces: (n(p,intrdr,r1) n(intrdr,p,r2))
+--- 5346    rand: emp	nonces: (n(p,intrdr,r1) n(q,intrdr,r2))
+--- 160     rand: emp	nonces: (n(q,intrdr,r1) n(intrdr,q,r2))
+--- 5178    rand: emp	nonces: (n(q,intrdr,r1) n(p,intrdr,r2))
+Shoud ignore, because we cannot get nonces that are in the form of (p,q,(r1|r2))
+
+
+*** Only Confirmation rule can be used to glean nonces -> there must be a c3\(intrdr,n\((p|q),(p|q),(r1|r2)\) so that we are able to glean (p,q,(r1|r2))
+--- 635     rand: emp	nonces: (n(q,intrdr,r2))
+cat state_sequences.txt | grep -E 'rand:\ emp\tnonces:\ \(n\(q,intrdr,r2\)\)' | grep -E 'c3\(intrdr,n\((p|q),(p|q),(r1|r2)\)' | wc -l
+
+--- 1827    rand: emp	nonces: (n(q,intrdr,r1))
+cat state_sequences.txt | grep -E 'rand:\ emp\tnonces:\ \(n\(q,intrdr,r1\)\)' | grep -E 'c3\(intrdr,n\((p|q),(p|q),(r1|r2)\)' | wc -l
+
+--- 635     rand: emp	nonces: (n(p,intrdr,r2))
+cat state_sequences.txt | grep -E 'rand:\ emp\tnonces:\ \(n\(p,intrdr,r2\)\)' | grep -E 'c3\(intrdr,n\((p|q),(p|q),(r1|r2)\)' | wc -l
+
+--- 1707    rand: emp	nonces: (n(p,intrdr,r1))
+cat state_sequences.txt | grep -E 'rand:\ emp\tnonces:\ \(n\(p,intrdr,r1\)\)' | grep -E 'c3\(intrdr,n\((p|q),(p|q),(r1|r2)\)' | wc -l
+
+--- 582     rand: emp	nonces: emp
++ cannot create a new cipher
++ only fake messages based on existing ciphers in the network
+
+cat state_sequences.txt | grep -E 'rand:\ emp\tnonces:\ emp' | grep -E 'c3\(intrdr,n\((p|q),(p|q),(r1|r2)\)' | wc -l
+
+
+*** generalization
++ if rand is empty, then only Challenge can be used to glean nounces
++ so there must be a c3\(intrdr,n\((p|q),(p|q),(r1|r2)\) so that we are able to glean (p,q,(r1|r2))
+cat state_sequences.txt | grep -E 'rand:\ emp' | grep -E 'c3\(intrdr,n\((p|q),(p|q),(r1|r2)\)' | wc -l
