@@ -24,6 +24,7 @@ public class BmcStateSequence extends StateSequence {
 			is_publish = false;
 		}
 		this.nextDepth = currentDepth + DEPTH;
+		System.out.println("Depth = " + DEPTH + ", currentDepth = " + currentDepth + ", nextDepth = " + this.nextDepth);
 		initialize();
 	}
 	
