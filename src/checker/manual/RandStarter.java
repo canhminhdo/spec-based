@@ -45,10 +45,10 @@ public class RandStarter extends StarterFactory {
 
 	public RandStarter() {
 		super();
-		this.currentDepth = 100; // picking states located currentDepth to generate states in the currentLayer
+		this.currentDepth = 200; // picking states located currentDepth to generate states in the currentLayer
 		this.nextDepth = this.currentDepth + CaseStudy.DEPTH;
-		this.currentLayer = 2; // currentLayer is working on to generate states
-		this.percentage = 5; // the percentage to select states from a set of states located currentDepth
+		this.currentLayer = 3; // currentLayer is working on to generate states
+		this.percentage = 0; // the percentage to select states from a set of states located currentDepth
 		jedisSet = new RedisQueueSet();
 		jedisHash = new RedisStoreStates();
 		jedisSysInfo = new RedisSystemInfo();
@@ -102,6 +102,8 @@ public class RandStarter extends StarterFactory {
 			
 			// Do backup and randomly select states from a set of states in Redis
 			this.proceedRandom();
+			// add error states if have
+			this.addErrorStates();
 			
 			// publish selected states to the rabbit message
 			Set<String> states = jedisSet.smembers(jedisSet.getDepthSetName(currentDepth));
@@ -152,11 +154,12 @@ public class RandStarter extends StarterFactory {
 			}
 			
 		}
-		System.out.println(count);
+		logger.debug(count);
 	}
 	
 	public void proceedRandom() {
 		assert percentage >= 0 && percentage <= 100 : "Percentage value is invalid";
+		
 		// save for back-up
 		if (jedisSet.scard(jedisSet.getDepthSetBackupName(currentDepth)) == 0) {
 			// create a backup set from a current depth set
@@ -189,6 +192,10 @@ public class RandStarter extends StarterFactory {
 		
 		// remove some states
 		jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfRemovedStates);
+	}
+	
+	public void addErrorStates() {
+		jedisSet.sunion(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetError(currentDepth));
 	}
 
 	@Override

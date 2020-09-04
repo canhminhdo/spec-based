@@ -35,6 +35,7 @@ public class DumpData {
 			OC message = SerializationUtilsExt.deserialize(state.getValue());
 			System.out.println(message.getCurrentDepth());
 			System.out.println(message.toString());
+			//jedisStore.hset(jedisStore.getStoreErrorNameAtDepth(currentDepth), state.getKey(), SerializationUtilsExt.serializeToStr(message));
 		}
 	}
 }

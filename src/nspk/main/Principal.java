@@ -58,7 +58,8 @@ public class Principal extends Thread {
 			RewriteRule rr = this.rwController.getOne();
 //			System.out.println(this.id);
 			Verify.endAtomic();
-			rr.execute(this);
+			if (rr != null)
+				rr.execute(this);
 			checkOneToManyAgreementProperty();
 		}
 	}

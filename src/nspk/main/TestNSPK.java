@@ -9,6 +9,7 @@ public class TestNSPK {
 	
 	public static void main(String[] args) {
 //		args = new String[] {"{nw: (m1(p,p,intrdr,c1(intrdr,n(p,intrdr,r1),p)) m1(intrdr,p,q,c1(q,n(p,intrdr,r1),p)) m1(intrdr,p,q,c1(intrdr,n(p,intrdr,r1),p)) m3(intrdr,p,q,c3(q,n(p,intrdr,r1))) m2(q,q,p,c2(p,n(p,intrdr,r1),n(q,p,r2),q)) m2(intrdr,intrdr,p,c2(p,n(p,intrdr,r1),n(q,p,r2),q)) m3(p,p,intrdr,c3(intrdr,n(q,p,r2)))) rand: emp nonces: (n(p,intrdr,r1) n(q,p,r2)) prins: (p q intrdr) rw_p: emp rw_q: emp rw_intrdr: (Fake)}"};
+//		args = new String[] {"{nw: (m1(q,q,intrdr,c1(intrdr,n(q,intrdr,r1),q)) m1(intrdr,intrdr,q,c1(intrdr,n(q,intrdr,r1),q)) m1(intrdr,q,p,c1(p,n(q,intrdr,r1),q)) m1(intrdr,p,q,c1(intrdr,n(q,intrdr,r1),q)) m2(p,p,q,c2(q,n(q,intrdr,r1),n(p,q,r2),p)) m2(intrdr,intrdr,q,c2(q,n(q,intrdr,r1),n(p,q,r2),p)) m3(q,q,intrdr,c3(intrdr,n(p,q,r2)))) rand: emp nonces: (n(q,intrdr,r1) n(p,q,r2)) prins: (p q intrdr) rw_p: (Confirmation) rw_q: (Confirmation) rw_intrdr: (Confirmation Fake)}"};
 		if (args.length > 0) {
 			// Read arguments
 			if (CaseStudy.JPF_MODE)
@@ -21,6 +22,12 @@ public class TestNSPK {
 			Intruder intrdr = oc.getIntrdr();
 			
 			System.out.println(p.getNw() + " " + p.getRand() + " " + p.getNonces() + " " + p.getPrins());
+			
+//			if (p.getNonces().size() == 2) {
+//				p.setRwController(new ););
+//				q.getRwController().clear();
+//				intrdr.getRwController().clearExceptFor(new Fake());
+//			}
 			
 			if (CaseStudy.JPF_MODE)
 				Verify.endAtomic();

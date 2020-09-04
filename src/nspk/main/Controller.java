@@ -38,6 +38,15 @@ public class Controller<E> implements Serializable {
 		}
 	}
 	
+//	public void clear() {
+//		this.list = new ArrayList<E>();
+//	}
+//	
+//	public void clearExceptFor(E e) {
+//		this.clear();
+//		this.list.add(e);
+//	}
+	
 	public void add(E e) {
 		if (!list.contains(e))
 			list.add(e);
