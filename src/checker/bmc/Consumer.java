@@ -3,6 +3,7 @@ package checker.bmc;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Set;
 import java.util.UUID;
 
 import org.apache.commons.lang3.SerializationUtils;
@@ -20,13 +21,21 @@ import jpf.common.OC;
 import mq.RabbitMQClient;
 import mq.RunJPF;
 import mq.api.RabbitMQManagementAPI;
+import nspk.main.Cipher;
+import nspk.main.Message;
+import nspk.main.Network;
+import nspk.main.Principal;
+import nspk.parser.MessageOC;
+import nspk.parser.NspkMessageParser;
 import redis.api.RedisConsumerInfo;
 import redis.api.RedisLock;
 import redis.api.RedisQueueSet;
+import redis.api.RedisStoreStates;
 import redis.api.RedisSystemInfo;
 import server.Application;
 import server.ApplicationConfigurator;
 import utils.GFG;
+import utils.SerializationUtilsExt;
 
 public class Consumer {
 	
@@ -41,6 +50,7 @@ public class Consumer {
 	protected RedisSystemInfo jedisSysInfo;
 	protected RedisConsumerInfo jedisConsumerInfo;
 	protected RedisLock jedisLock;
+	protected RedisStoreStates jedisHash;
 	public boolean isMaster = false;
 	protected RabbitMQClient rabbitClient;
 	private Channel channel;
@@ -78,6 +88,7 @@ public class Consumer {
 		jedisSysInfo = new RedisSystemInfo();
 		jedisConsumerInfo = new RedisConsumerInfo();
 		jedisLock = new RedisLock();
+		jedisHash = new RedisStoreStates();
 	}
 	
 	public synchronized boolean isConsuming() {
@@ -212,12 +223,47 @@ public class Consumer {
 		}
 	}
 	
+	public void filterStates() {
+		Set<String> states = jedisSet.smembers(jedisSet.getDepthSetName(currentDepth));
+		int count = 0;
+		for (String key : states) {
+			String state = jedisHash.hget(jedisHash.getStoreNameAtDepth(currentDepth), key);
+			OC message = SerializationUtilsExt.deserialize(state);
+			
+			MessageOC oc = NspkMessageParser.parse(message.toString());
+			Principal p = oc.getP();
+			if (p.getRand().size() == 2) {
+				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), key);
+			}
+			
+			if (p.getRand().size() == 1) {
+				count += 1;
+			}
+			
+			if (p.getRand().size() == 0) {
+				Network<Message<Cipher>> nw = p.getNw();
+				ArrayList<Message<Cipher>> nw_list = nw.getAll();
+				boolean flag = false;
+				for (int i = 0; i < nw_list.size(); i ++) {
+					if (nw_list.get(i).getCipher().mustHave()) {
+						flag = true;
+						break;
+					}
+				}
+				if (flag) {
+					count += 1;
+					continue;
+				}
+				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), key);
+			}
+			
+		}
+		logger.debug(count);
+	}
+	
 	public void proceedRandom() {
 		double percentage = getPercentageAtLayer();
 		assert percentage >= 0 && percentage <= 100 : "Percentage value is invalid";
-		if (percentage == 100) {
-			return;
-		}
 		logger.debug("Percentage " + percentage + " at depth " + currentDepth);
 		
 		// save for back-up
@@ -228,6 +274,18 @@ public class Consumer {
 			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(depth));
 			depth += CaseStudy.DEPTH;
 		}
+		
+		// filter to get interesting states
+		this.filterStates();
+		// store to a filter set of state.
+		jedisSet.sdiffstore(jedisSet.getDepthSetFilterName(currentDepth), jedisSet.getDepthSetName(currentDepth));
+		
+		if (percentage == 100) {
+			return;
+		}
+		
+		// ignore consuming states
+		jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(currentDepth));
 		// calculate the number of removed states
 		long numberOfStates = jedisSet.scard(jedisSet.getDepthSetName(currentDepth));
 		long numberOfConsumingStates = jedisSet.scard(jedisSet.getDepthSetConsumingName(currentDepth));
@@ -239,14 +297,22 @@ public class Consumer {
 		logger.debug("numberOfKeepStates = " + numberOfKeepStates);
 		logger.debug("numberOfRemovedStates = " + numberOfRemovedStates);
 		
-		if (numberOfConsumingStates < numberOfKeepStates) {
-			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(currentDepth));
-			// remove some states
+		// remove some states
+		if (numberOfRemovedStates < numberOfStates) {
 			jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfRemovedStates);
 		} else {
 			// discard all states
 			jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfStates);
 		}
+		
+//		if (numberOfConsumingStates < numberOfKeepStates) {
+//			jedisSet.sdiffstore(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(currentDepth));
+//			// remove some states
+//			jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfRemovedStates);
+//		} else {
+//			// discard all states
+//			jedisSet.spop(jedisSet.getDepthSetName(currentDepth), (int) numberOfStates);
+//		}
 		// unnecessary task ???
 		// jedisSet.sunion(jedisSet.getDepthSetName(currentDepth), jedisSet.getDepthSetConsumingName(currentDepth));
 	}

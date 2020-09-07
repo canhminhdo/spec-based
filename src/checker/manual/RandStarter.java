@@ -48,13 +48,12 @@ public class RandStarter extends StarterFactory {
 		this.currentDepth = 200; // picking states located currentDepth to generate states in the currentLayer
 		this.nextDepth = this.currentDepth + CaseStudy.DEPTH;
 		this.currentLayer = 3; // currentLayer is working on to generate states
-		this.percentage = 0; // the percentage to select states from a set of states located currentDepth
+		this.percentage = 5; // the percentage to select states from a set of states located currentDepth
 		jedisSet = new RedisQueueSet();
 		jedisHash = new RedisStoreStates();
 		jedisSysInfo = new RedisSystemInfo();
 		jedisConsumerInfo = new RedisConsumerInfo();
 		jedisLock = new RedisLock();
-		
 	}
 	
 	@Override

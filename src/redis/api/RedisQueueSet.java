@@ -26,6 +26,10 @@ public class RedisQueueSet extends RedisSet {
 		return DEPTH_SET_PREFIX + "-" + depth + "-error";
 	}
 	
+	public String getDepthSetFilterName(int depth) {
+		return DEPTH_SET_PREFIX + "-" + depth + "-filter";
+	}
+	
 	public String getStateSetQueue() {
 		return SEQ_SET;
 	}
