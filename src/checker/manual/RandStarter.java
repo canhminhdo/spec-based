@@ -34,7 +34,6 @@ public class RandStarter extends StarterFactory {
 	Channel channel;
 	int currentDepth;
 	int currentLayer;
-	int nextDepth;
 	double percentage;
 	RedisQueueSet jedisSet = null;
 	RedisStoreStates jedisHash = null;
@@ -45,10 +44,9 @@ public class RandStarter extends StarterFactory {
 
 	public RandStarter() {
 		super();
-		this.currentDepth = 200; // picking states located currentDepth to generate states in the currentLayer
-		this.nextDepth = this.currentDepth + CaseStudy.DEPTH;
-		this.currentLayer = 3; // currentLayer is working on to generate states
-		this.percentage = 5; // the percentage to select states from a set of states located currentDepth
+		this.currentDepth = 100; // picking states located currentDepth to generate states in the currentLayer
+		this.currentLayer = 2; // currentLayer is working on to generate states
+		this.percentage = 10; // the percentage to select states from a set of states located currentDepth
 		jedisSet = new RedisQueueSet();
 		jedisHash = new RedisStoreStates();
 		jedisSysInfo = new RedisSystemInfo();
@@ -176,7 +174,9 @@ public class RandStarter extends StarterFactory {
 		}
 		
 		this.filterStates();
-		
+		// store to a filter set of state.
+		jedisSet.sdiffstore(jedisSet.getDepthSetFilterName(currentDepth), jedisSet.getDepthSetName(currentDepth));
+				
 		if (percentage == 100)
 			return;
 		
@@ -212,8 +212,17 @@ public class RandStarter extends StarterFactory {
 		// release lock if needed
 		jedisLock.releaseCS(RedisLock.LOCK_MODIFY_INFO_FIELD);
 		// clean the next depth if needed
-		jedisSet.deleteKey(jedisSet.getDepthSetName(this.nextDepth));
-		jedisSet.deleteKey(jedisSet.getDepthSetBackupName(this.nextDepth));
-		jedisHash.deleteKey(jedisHash.getStoreNameAtDepth(this.nextDepth));
+		int nextDepth = this.currentDepth;
+		if (nextDepth < CaseStudy.MAX_DEPTH) {
+			if (nextDepth + CaseStudy.DEPTH > CaseStudy.MAX_DEPTH) {
+				nextDepth = CaseStudy.MAX_DEPTH;
+			} else {
+				nextDepth += CaseStudy.DEPTH;
+			}
+			jedisSet.deleteKey(jedisSet.getDepthSetName(nextDepth));
+			jedisSet.deleteKey(jedisSet.getDepthSetBackupName(nextDepth));
+			jedisHash.deleteKey(jedisHash.getStoreNameAtDepth(nextDepth));
+			jedisHash.deleteKey(jedisHash.getStoreErrorNameAtDepth(nextDepth));
+		}
 	}
 }
