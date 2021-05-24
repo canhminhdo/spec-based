@@ -276,9 +276,9 @@ public class Consumer {
 		}
 		
 		// filter to get interesting states
-		this.filterStates();
+//		this.filterStates();
 		// store to a filter set of state.
-		jedisSet.sdiffstore(jedisSet.getDepthSetFilterName(currentDepth), jedisSet.getDepthSetName(currentDepth));
+//		jedisSet.sdiffstore(jedisSet.getDepthSetFilterName(currentDepth), jedisSet.getDepthSetName(currentDepth));
 		
 		if (percentage == 100) {
 			return;

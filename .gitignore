@@ -9,7 +9,7 @@ bin/
 *.ucls
 *~
 /.gradle/
-config.properties
+jpf.properties
 .idea/
 gradle/
 gradlew

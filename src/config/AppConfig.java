@@ -8,7 +8,7 @@ import java.util.Properties;
 
 public class AppConfig {
 	
-	public final String configFileName = "config.properties";
+	public final String configFileName = "jpf.properties";
 	public static AppConfig _instance = null;
 	public Properties appProps = null;
 
@@ -23,7 +23,7 @@ public class AppConfig {
 		// initialize the app configuration from config.properties file
 		try {
 			String rootPath = System.getProperty("user.dir");
-			String appConfigPath = rootPath + File.separator + "config.properties";
+			String appConfigPath = rootPath + File.separator + "jpf.properties";
 			appProps = new Properties();
 			appProps.load(new FileInputStream(appConfigPath));
 		} catch (FileNotFoundException e) {

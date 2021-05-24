@@ -30,6 +30,9 @@ public class BmcStateSequence extends StateSequence {
 	
 	@Override
 	public void stateHandle() {
+		if (!is_publish && !app.getCaseStudy().isStoreStatesInRedis()) {
+			return;
+		}
 		OC lastElement = seq.get(seq.size() - 1);
 		if (lastElement == null)
 			return;

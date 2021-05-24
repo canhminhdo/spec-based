@@ -59,13 +59,13 @@ public class NspkStudy extends CaseStudy {
 		prins.add(Constants.intrdr);
 		
 		Controller<String> pRwController = new Controller<String>(new ArrayList<String>(
-			Arrays.asList(Constants.challenge, Constants.response, Constants.confirmation)
+			Arrays.asList(Constants.challenge, Constants.confirmation)
 		));
 		Controller<String> qRwController = new Controller<String>(new ArrayList<String>(
-			Arrays.asList(Constants.challenge, Constants.response, Constants.confirmation)
+			Arrays.asList(Constants.response)
 		));
 		Controller<String> intrdrRwController = new Controller<String>(new ArrayList<String>(
-			Arrays.asList(Constants.response, Constants.confirmation, Constants.fake)
+			Arrays.asList(Constants.response, Constants.fake)
 		));
 		
 		config.setNw(nw);

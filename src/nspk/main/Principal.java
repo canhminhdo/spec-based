@@ -66,6 +66,7 @@ public class Principal extends Thread {
 	
 	protected void checkOneToManyAgreementProperty() {
 		Verify.beginAtomic();
+//		System.out.println("Checking one-to-many agreement property: " + this.nw + " " + this.rand + " " + this.prins + " " + this.nonces);
 		this.nw.oneToManyAgreementProperty();
 //		System.out.println(this.nw.getAll().size());
 		Verify.endAtomic();
