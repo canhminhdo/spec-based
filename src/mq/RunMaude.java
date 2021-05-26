@@ -118,9 +118,9 @@ public class RunMaude {
 	 * @param seq
 	 * @param depth
 	 */
-	public void checkSeq(String command, String seq, int depth) {
+	public void checkSeq(String command, String seq, String depth) {
 		try {
-			command = command.replace("{{depth}}", Integer.toString(depth));
+			command = command.replace("{{depth}}", depth);
 			command = command.replace("{{seq}}", seq);
 			byte[] bytes = command.getBytes();
 			this.stdin.write(bytes);

@@ -33,7 +33,7 @@ public abstract class CaseStudy {
 	
 	// Maude program information
 	public static String MAUDE_PROGRAM;
-	public static Integer MAUDE_DEPTH;
+	public static String MAUDE_DEPTH;
 	public static Boolean MAUDE_WORKER_IS_ENABLE;
 	
 	// Store states in Redis
@@ -76,35 +76,35 @@ public abstract class CaseStudy {
 	static void initStaticFields() {
 		PROJECT_BASE = AppConfig.getInstance().getConfig().getProperty("project.base");
 		RUNTIME = AppConfig.getInstance().getConfig().getProperty("version");
-		JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode"));
+		JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode", "true"));
 		SECRETE_KEY = AppConfig.getInstance().getConfig().getProperty("secreteKey");
 		
 		LOG4J_PATH = AppConfig.getInstance().getConfig().getProperty("log4j.path");
 		
 		MAUDE_PROGRAM = AppConfig.getInstance().getConfig().getProperty("maude.program");
-		MAUDE_DEPTH =  Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("maude.depth"));
-		MAUDE_WORKER_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("maude.worker.isEnable"));
+		MAUDE_DEPTH =  AppConfig.getInstance().getConfig().getProperty("maude.depth", "unbounded");
+		MAUDE_WORKER_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("maude.worker.isEnable", "false"));
 			
 		// Using for state sequences generation by JPF
 		DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.depth"));	// Depth for each sub state space running by a JPF instance
 		BOUND = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bound"));	// Bound for each sub state space running by a JPF instance
-		DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable"));
-		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable"));
+		DEPTH_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.depth.isEnable", "true"));
+		BOUND_FLAG = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bound.isEnable", "false"));
 		
 		// if you want to store states in Redis
 		IS_STORE_STATES_IN_REDIS = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.isStoreStates", "false"));
 		
 		// If you want to run with a Bounded Model Checking
-		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable"));
-		MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.max_depth"));	// Maximum depth when you run Bounded Model Checking
-		String percentagesConfig = AppConfig.getInstance().getConfig().getProperty("jpf.percentages");
+		IS_BOUNDED_MODEL_CHECKING = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.isEnable", "false"));
+		MAX_DEPTH = Integer.parseInt(AppConfig.getInstance().getConfig().getProperty("jpf.bmc.max_depth", "1000000"));	// Maximum depth when you run Bounded Model Checking
+		String percentagesConfig = AppConfig.getInstance().getConfig().getProperty("jpf.percentages", "100");
 		String[] percentages = percentagesConfig.split(" ");
 		PERCENTAGES = new ArrayList<Double>();
 		for (int i = 0; i < percentages.length; i ++) {
 			PERCENTAGES.add(Double.parseDouble(percentages[i]));
 		}
 		
-		IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote"));
+		IS_REMOTE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("env.isRemote", "false"));
 
 		// RABBITMQ
 		// -> remote mode
@@ -125,7 +125,7 @@ public abstract class CaseStudy {
 		REDIS_LOCAL_PORT = Integer.valueOf(AppConfig.getInstance().getConfig().getProperty("redis.local.port"));
 		
 		// MySQL
-		MYSQL_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("mysql.isEnable"));
+		MYSQL_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("mysql.isEnable", "false"));
 	}
 	/**
 	 * Get CLASS_PATH where you program is locate

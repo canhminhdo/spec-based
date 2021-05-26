@@ -44,12 +44,12 @@ public class Receiver<P> extends Thread {
                 */
                 if (pr.second() == flag2) {
                 	// Add bugs
-//                	if (packetsReceived.size() == 2) {
-//                		packetsReceived.add(((List<P>)packetsToBeSent).get(3));
-//                	} else {
-//                		packetsReceived.add(pr.first());
-//                	}
-                	packetsReceived.add(pr.first());
+                	if (packetsReceived.size() == 2) {
+                		packetsReceived.add(((List<P>)packetsToBeSent).get(3));
+                	} else {
+                		packetsReceived.add(pr.first());
+                	}
+//                	packetsReceived.add(pr.first());
                     flag2 = !flag2;
                     
                 }
