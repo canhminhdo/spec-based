@@ -48,7 +48,11 @@ mod ICHECKER{X :: TRIV} is
     op checkConform : Qid NeStateList Bound -> Result4Conform? .
     eq checkConform(mQid, nil, B) = success .
     eq checkConform(mQid, S | nil, B) = success .
-    eq checkConform(mQid, S1 | S2 | L, B) = $checkConform(mQid, S2 | L, S1, 0, B).
+    eq checkConform(mQid, S1 | S2 | L, B) = if S1 == S2 then
+                                              checkConform(mQid, S2 | L, B)
+                                            else
+                                              $checkConform(mQid, S2 | L, S1, 0, B)
+                                            fi .
 
     op $checkConform : Qid NeStateList X$Elt Nat Bound -> Result4Conform? .
     eq $checkConform(mQid, nil, S, N, B) = success .
