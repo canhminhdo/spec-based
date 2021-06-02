@@ -1,4 +1,7 @@
 package abp.main;
+
+import gov.nasa.jpf.vm.Verify;
+
 public class DDropper<P,B> extends Thread {
     private Channel<P> channel1;
     private Channel<B> channel2;
@@ -16,13 +19,17 @@ public class DDropper<P,B> extends Thread {
             catch (InterruptedException e) { }
             if (finish.get()) break;
             
-            channel1.getLock().requestCS();
-            P p = channel1.get();
-            channel1.getLock().releaseCS();
+            synchronized (channel1) {
+            	Verify.beginAtomic();
+                P p = channel1.get();
+                Verify.endAtomic();
+			}
             
-            channel2.getLock().requestCS();
-            B b = channel2.get();
-            channel2.getLock().releaseCS();
+            synchronized (channel1) {
+            	Verify.beginAtomic();
+                B b = channel2.get();
+                Verify.endAtomic();
+			}
             
 //            if (p != null)
 //                System.out.println("dropped1: " + p);

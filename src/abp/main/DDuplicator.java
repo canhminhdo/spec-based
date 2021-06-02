@@ -1,4 +1,7 @@
 package abp.main;
+
+import gov.nasa.jpf.vm.Verify;
+
 public class DDuplicator<P,B> extends Thread {
     private Channel<P> channel1;
     private Channel<B> channel2;
@@ -15,8 +18,18 @@ public class DDuplicator<P,B> extends Thread {
             try { Thread.sleep(100); }
             catch (InterruptedException e) { }
             if (finish.get()) break;
-            P p = channel1.duptop();
-            B b = channel2.duptop();
+            
+            synchronized (channel1) {
+            	Verify.beginAtomic();
+            	P p = channel1.duptop();
+            	Verify.endAtomic();
+			}
+            
+            synchronized (channel1) {
+            	Verify.beginAtomic();
+            	B b = channel2.duptop();
+            	Verify.endAtomic();
+			}
             /*
             if (p != null)
                 System.out.println("duplicated1: " + p);

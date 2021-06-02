@@ -32,30 +32,33 @@ public class Sender<P> extends Thread {
     		Pair<P,Boolean> pr = new Pair<P,Boolean>(((List<P>)packetsToBeSent).get(i),flag1);
     		
             while (true) {
-                channel1.put(pr);
+            	synchronized (channel1) {
+            		Verify.beginAtomic();
+                    channel1.put(pr);
+                    Verify.endAtomic();
+				}
                 /*
                 if (p != null)
                     System.out.println("Snd-Sending " + p);
                 */
                 
                 Boolean flag = false;
-                
-                channel2.getLock().requestCS();
-                if (CaseStudy.JPF_MODE) Verify.beginAtomic();
-                Boolean b = channel2.get();
-                if (b != null) {
-                    if (b == !flag1) {
-                        /*
-                        System.out.println("Snd-Received " + b);
-                        */
-                    	
-                        flag1 = !flag1;
-                        index ++;
-                        flag = true;
-                    }
+                synchronized (channel1) {
+	                Verify.beginAtomic();
+	                Boolean b = channel2.get();
+	                if (b != null) {
+	                    if (b == !flag1) {
+	                        /*
+	                        System.out.println("Snd-Received " + b);
+	                        */
+	                    	
+	                        flag1 = !flag1;
+	                        index ++;
+	                        flag = true;
+	                    }
+	                }
+	                Verify.endAtomic();
                 }
-                if (CaseStudy.JPF_MODE) Verify.endAtomic();
-                channel2.getLock().releaseCS();
                 
                 if (flag) {
                 	break;

@@ -25,20 +25,16 @@ public class Channel<P> implements Serializable {
     }
 
     public P put(P p) {
-    	lock.requestCS();
         if (bound <= nop) {
-        	lock.releaseCS();
         	return null;
         }
         queue = queue.enqueue(p);
         nop++;
-        lock.releaseCS();
         return p;
     }
     
     public P put_asyn(P p) {
         if (bound <= nop) {
-        	lock.releaseCS();
         	return null;
         }
         queue = queue.enqueue(p);
@@ -48,28 +44,22 @@ public class Channel<P> implements Serializable {
 
 
     public P get() {
-//    	lock.requestCS();
         if (nop <= 0) {
-//        	lock.releaseCS();
         	return null;
         }
         P p = queue.top();
         queue = queue.dequeue();
         nop--;
-//        lock.releaseCS();
         return p;
     }
 
     public P duptop() {
-    	lock.requestCS();
         if (bound <= nop || nop <= 0) {
-        	lock.releaseCS();
         	return null;
         }
         queue = queue.duptop();
         nop++;
         P p = queue.top();
-        lock.releaseCS();
         return p;
     }
     
