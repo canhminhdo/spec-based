@@ -1,12 +1,10 @@
 package abp.main;
 import java.util.Collection;
-
-import atomic.HWMutex;
-import atomic.Lock;
-import atomic.TestAndSet;
 import gov.nasa.jpf.vm.Verify;
+import lock.Lock;
 
 public class ABP<P> {
+	
 	public void begin(
 			Collection<P> sentPackets,
 			Collection<P> recPackets,
@@ -19,18 +17,24 @@ public class ABP<P> {
 		Verify.beginAtomic();
 		
 		// Initial for lock
-		TestAndSet lockFlagCh1 = new TestAndSet();
-		Lock lockCh1 = new HWMutex(lockFlagCh1);
-		TestAndSet lockFlagCh2 = new TestAndSet();
-		Lock lockCh2 = new HWMutex(lockFlagCh2);
-		ch1.setLock(lockCh1);
-		ch2.setLock(lockCh2);
+//		TestAndSet lockFlagCh1 = new TestAndSet();
+//		Lock lockCh1 = new HWMutex(lockFlagCh1);
+//		TestAndSet lockFlagCh2 = new TestAndSet();
+//		Lock lockCh2 = new HWMutex(lockFlagCh2);
+//		ch1.setLock(lockCh1);
+//		ch2.setLock(lockCh2);
 		
 		Cell<Boolean> f = new Cell<Boolean>(finish);
         Sender<P> sender = new Sender<P>(ch1,ch2,sentPackets,f,flag1,index);
         Receiver<P> receiver = new Receiver<P>(ch1,ch2,recPackets,f,flag2,sentPackets);
         DDropper<Pair<P,Boolean>,Boolean> ddropper = new DDropper<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         DDuplicator<Pair<P,Boolean>,Boolean> dduplicator = new DDuplicator<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
+        
+        Lock lock = new Lock();
+        sender.setLock(lock);
+        receiver.setLock(lock);
+        ddropper.setLock(lock);
+        dduplicator.setLock(lock);
         
         Verify.endAtomic();
         /*

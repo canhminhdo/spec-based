@@ -4,8 +4,9 @@ import java.util.List;
 
 import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
+import lock.LockPool;
 
-public class Receiver<P> extends Thread {
+public class Receiver<P> extends LockPool {
     private Channel<Pair<P,Boolean>> channel1;
     private Channel<Boolean> channel2;
     private Collection<P> packetsToBeSent;
@@ -29,7 +30,7 @@ public class Receiver<P> extends Thread {
 
     public void run() {
         while (true) {
-        	synchronized (channel1) {
+        	synchronized (this.getLock()) {
         		Verify.beginAtomic();
         		Boolean b = channel2.put(flag2);
         		Verify.endAtomic();
@@ -39,7 +40,7 @@ public class Receiver<P> extends Thread {
                 System.out.println("RecSending " + flag2);
             */
             
-        	synchronized (channel1) {
+        	synchronized (this.getLock()) {
         		Verify.beginAtomic();
         		Pair<P,Boolean> pr = channel1.get();
         		if (pr != null) {

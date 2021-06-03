@@ -1,8 +1,9 @@
 package abp.main;
 
 import gov.nasa.jpf.vm.Verify;
+import lock.LockPool;
 
-public class DDuplicator<P,B> extends Thread {
+public class DDuplicator<P,B> extends LockPool {
     private Channel<P> channel1;
     private Channel<B> channel2;
     private Cell<Boolean> finish;
@@ -19,13 +20,13 @@ public class DDuplicator<P,B> extends Thread {
             catch (InterruptedException e) { }
             if (finish.get()) break;
             
-            synchronized (channel1) {
+            synchronized (this.getLock()) {
             	Verify.beginAtomic();
             	P p = channel1.duptop();
             	Verify.endAtomic();
 			}
             
-            synchronized (channel1) {
+            synchronized (this.getLock()) {
             	Verify.beginAtomic();
             	B b = channel2.duptop();
             	Verify.endAtomic();

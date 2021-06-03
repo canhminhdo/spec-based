@@ -2,26 +2,15 @@ package abp.main;
 
 import java.io.Serializable;
 
-import atomic.Lock;
-
 public class Channel<P> implements Serializable {
     private Queue<P> queue;
     private final int bound;
     private int nop;
-    private Lock lock;
 
     public Channel(int bound) {
         this.queue = new EmptyQueue<P>();
         this.bound = bound;
         this.nop = 0;
-    }
-    
-    public void setLock(Lock lock) {
-    	this.lock = lock;
-    }
-    
-    public Lock getLock() {
-    	return lock;
     }
 
     public P put(P p) {
