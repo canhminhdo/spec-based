@@ -1,4 +1,4 @@
-package nspk.parser;
+package nslpk.parser;
 
 import nspk.main.Intruder;
 import nspk.main.Principal;

@@ -2,7 +2,8 @@ package nspk.main;
 
 import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
-import nspk.parser.MessageOC;
+import nslpk.parser.MessageOC;
+import nslpk.parser.NslpkMessageParser;
 import nspk.parser.NspkMessageParser;
 
 public class TestNSPK {
@@ -17,7 +18,12 @@ public class TestNSPK {
 				Verify.beginAtomic();
 			
 			// Have some series of state here due to GO TO command
-			MessageOC oc = NspkMessageParser.parse(args[0]);
+			MessageOC oc;
+			if (CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk")) {
+				oc = NslpkMessageParser.parse(args[0]);
+			} else {
+				oc = NspkMessageParser.parse(args[0]);
+			}
 			Principal p = oc.getP();
 			Principal q = oc.getQ();
 			Intruder intrdr = oc.getIntrdr();

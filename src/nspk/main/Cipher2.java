@@ -1,5 +1,7 @@
 package nspk.main;
 
+import config.CaseStudy;
+
 /**
  * c2(p,n1,n2,q)
  * 
@@ -25,6 +27,12 @@ public class Cipher2 implements Cipher {
 		this.q = q;
 	}
 	
+	public Cipher2(Principal p, Nonce n1, Nonce n2) {
+		this.p = p;
+		this.n1 = n1;
+		this.n2 = n2;
+	}
+	
 	public Nonce getNonce1() {
 		return n1;
 	}
@@ -33,9 +41,10 @@ public class Cipher2 implements Cipher {
 		return n2;
 	}
 	
-//	public Principal getGen() {
-//		return q;
-//	}
+	// for nslpk
+	public Principal getGen() {
+		return q;
+	}
 	
 	public Principal getEnc() {
 		return p;
@@ -60,12 +69,14 @@ public class Cipher2 implements Cipher {
 		
 		return this.p.equals(c2.getEnc()) &&
 				this.n1.equals(c2.getNonce1()) &&
-//				this.q.equals(c2.getGen()) &&
+				(!CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk") || this.q.equals(c2.getGen())) && // for nslpk
 				this.n2.equals(c2.getNonce2());
 	}
 
 	@Override
 	public String toString() {
+		if (this.q == null)
+			return "c2(" + this.p.toString() + "," + this.n1.toString() + "," + this.n2.toString() + ")";
 		return "c2(" + this.p.toString() + "," + this.n1.toString() + "," + this.n2.toString() + "," + this.q.toString() + ")";
 	}
 

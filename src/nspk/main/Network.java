@@ -2,6 +2,8 @@ package nspk.main;
 
 import java.util.ArrayList;
 
+import config.CaseStudy;
+
 public class Network<E extends Message<Cipher>> extends MultiSet<E> {
 
 	public Network(String oc) {
@@ -42,7 +44,7 @@ public class Network<E extends Message<Cipher>> extends MultiSet<E> {
 								
 								Cipher2 c2 = (Cipher2) m2.getCipher();
 								if (c2.getEnc().equals(m2.getReceiver()) &&
-//										c2.getGen().equals(m2.getSender()) &&
+										(!CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk") || c2.getGen().equals(m2.getSender())) && // for nslpk
 										c2.getNonce1().equals(c1.getNonce())
 								) {
 									Pair<Message<Cipher>, Message<Cipher>> pair = new Pair<Message<Cipher>, Message<Cipher>>(m1, m2);

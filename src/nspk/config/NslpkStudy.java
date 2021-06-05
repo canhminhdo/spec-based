@@ -19,19 +19,19 @@ import nspk.main.MultiSet;
  * 
  * @author OgataLab
  */
-public class NspkStudy extends CaseStudy {
+public class NslpkStudy extends CaseStudy {
 
 	// Maude files
-	final String[] maude_files = { CaseStudy.PROJECT_BASE + "/maude/env-nspk.maude" };
+	final String[] maude_files = { CaseStudy.PROJECT_BASE + "/maude/env-nslpk.maude" };
 	// Maude command
-	final String command = "reduce checkConform('NSPK, {{seq}}, {{depth}}) .\n";
+	final String command = "reduce checkConform('NSLPK, {{seq}}, {{depth}}) .\n";
 
 	// main class to start NSPK program
 	final String MAIN_CLASS = "nspk.main.TestNSPK";
 
 	// name of queue when using RabbitMQ
-	final String QUEUE_NAME = "NSPK";
-	final String MAUDE_QUEUE = "NSPK_MAUDE";
+	final String QUEUE_NAME = "NSLPK";
+	final String MAUDE_QUEUE = "NSLPK_MAUDE";
 
 	@Override
 	public String getQueueName() {

@@ -1,6 +1,7 @@
 package server;
 
 import abp.config.ABPStudy;
+import nspk.config.NslpkStudy;
 import nspk.config.NspkStudy;
 import cloudsync.config.CloudSyncStudy;
 import config.AppConfig;
@@ -29,6 +30,8 @@ public class ApplicationConfigurator {
 			String caseStudy = AppConfig.getInstance().getConfig().getProperty("caseStudy");
 			if (caseStudy.equals("nspk")) {
 				_instance = new ApplicationConfigurator(new NspkStudy());
+			} else if (caseStudy.equals("nslpk")) {
+				_instance = new ApplicationConfigurator(new NslpkStudy());
 			} else if (caseStudy.equals("cloudsync")) {
 				_instance = new ApplicationConfigurator(new CloudSyncStudy());
 			} else if (caseStudy.equals("abp")) {

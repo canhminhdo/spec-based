@@ -18,16 +18,16 @@ public class MultiSet<E> implements Serializable {
 	}
 	
 	public synchronized boolean add(E e) {
-		if (this.contains(e))
-			return false;
+//		if (this.contains(e))
+//			return false;
 		
 		multiset.add(e);
 		return true;
 	}
 	
 	public boolean _add(E e) {
-		if (this.contains(e))
-			return false;
+//		if (this.contains(e))
+//			return false;
 		
 		multiset.add(e);
 		return true;

@@ -2,6 +2,7 @@ package nspk.jpf;
 
 import java.util.HashMap;
 
+import config.CaseStudy;
 import gov.nasa.jpf.search.Search;
 import gov.nasa.jpf.vm.ElementInfo;
 import gov.nasa.jpf.vm.FieldInfo;
@@ -100,10 +101,14 @@ public class NspkJPF extends HeapJPF {
 									ElementInfo ei_n2 = (ElementInfo) ei_cipher.getFieldValueObject("n2");
 									String n2 = getNonce(ei_n2);
 									
-									ElementInfo ei_q = (ElementInfo) ei_cipher.getFieldValueObject("q");
-									String q = getIdOfOC(ei_q);
-									
-									String cipher2 = "c2(" + p + "," + n1 + "," + n2 + "," + q + ")";
+									String cipher2;
+									if (CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk")) {
+										ElementInfo ei_q = (ElementInfo) ei_cipher.getFieldValueObject("q");
+										String q = getIdOfOC(ei_q);
+										cipher2 = "c2(" + p + "," + n1 + "," + n2 + "," + q + ")";
+									} else {
+										cipher2 = "c2(" + p + "," + n1 + "," + n2 + ")";
+									}
 									cipher = cipher2;
 								}
 								

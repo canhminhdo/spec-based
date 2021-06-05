@@ -18,6 +18,8 @@ public abstract class CaseStudy {
 	
 	public static String SYSTEM_MODE;
 	
+	public static String CASE_STUDY_NAME;
+	
 	public static String PROJECT_BASE;
 	
 	// runtime
@@ -75,6 +77,7 @@ public abstract class CaseStudy {
 	
 	static void initStaticFields() {
 		PROJECT_BASE = AppConfig.getInstance().getConfig().getProperty("project.base");
+		CASE_STUDY_NAME = AppConfig.getInstance().getConfig().getProperty("caseStudy");
 		RUNTIME = AppConfig.getInstance().getConfig().getProperty("version");
 		JPF_MODE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("jpf.mode", "true"));
 		SECRETE_KEY = AppConfig.getInstance().getConfig().getProperty("secreteKey");
@@ -127,6 +130,7 @@ public abstract class CaseStudy {
 		// MySQL
 		MYSQL_IS_ENABLE = Boolean.valueOf(AppConfig.getInstance().getConfig().getProperty("mysql.isEnable", "false"));
 	}
+	
 	/**
 	 * Get CLASS_PATH where you program is locate
 	 * 
@@ -134,6 +138,15 @@ public abstract class CaseStudy {
 	 */
 	public String getClassPath() {
 		return System.getProperty("java.class.path");
+	}
+	
+	/**
+	 * Get case study name under test
+	 * 
+	 * @return {@link String}
+	 */
+	public String getCaseStudyName() {
+		return CASE_STUDY_NAME;
 	}
 
 	/**

@@ -15,11 +15,12 @@ import checker.factory.StarterFactory;
 import config.CaseStudy;
 import jpf.common.OC;
 import mq.RabbitMQClient;
+import nslpk.parser.MessageOC;
+import nslpk.parser.NslpkMessageParser;
 import nspk.main.Cipher;
 import nspk.main.Message;
 import nspk.main.Network;
 import nspk.main.Principal;
-import nspk.parser.MessageOC;
 import nspk.parser.NspkMessageParser;
 import redis.api.RedisConsumerInfo;
 import redis.api.RedisLock;
@@ -123,7 +124,13 @@ public class RandStarter extends StarterFactory {
 			String state = jedisHash.hget(jedisHash.getStoreNameAtDepth(currentDepth), key);
 			OC message = SerializationUtilsExt.deserialize(state);
 			
-			MessageOC oc = NspkMessageParser.parse(message.toString());
+			
+			MessageOC oc;
+			if (CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk")) {
+				oc = NslpkMessageParser.parse(message.toString());
+			} else {
+				oc = NspkMessageParser.parse(message.toString());
+			}
 			Principal p = oc.getP();
 			if (p.getRand().size() == 2) {
 				jedisSet.srem(jedisSet.getDepthSetName(currentDepth), key);

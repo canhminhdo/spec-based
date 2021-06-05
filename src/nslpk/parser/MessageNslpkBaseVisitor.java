@@ -1,11 +1,10 @@
-package nspk.parser;
+package nslpk.parser;
 // Generated from Nspk.g4 by ANTLR 4.7.1
 import java.util.ArrayList;
 import java.util.Arrays;
 
 import org.antlr.v4.runtime.tree.AbstractParseTreeVisitor;
 
-import nslpk.parser.MessageOC;
 import nspk.main.Challenge;
 import nspk.main.Cipher;
 import nspk.main.Cipher1;
@@ -25,14 +24,14 @@ import nspk.main.Response;
 import nspk.main.RewriteRule;
 
 /**
- * This class provides an empty implementation of {@link NspkVisitor},
+ * This class provides an empty implementation of {@link NslpkVisitor},
  * which can be extended to create a visitor which only needs to handle a subset
  * of the available methods.
  *
  * @param <T> The return type of the visit operation. Use {@link Void} for
  * operations with no return type.
  */
-public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements NspkVisitor<T> {
+public class MessageNslpkBaseVisitor<T> extends AbstractParseTreeVisitor<T> implements NslpkVisitor<T> {
 
 	// Observer components
 	Network<Message<Cipher>> nw = new Network<Message<Cipher>>(Constants.nw);;
@@ -40,7 +39,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	MultiSet<Nonce> nonces = new MultiSet<Nonce>(Constants.nonces);
 	MultiSet<Principal> prins = new MultiSet<Principal>(Constants.prins);
 	
-	NspkParser parser;
+	NslpkParser parser;
 	
 	boolean nw_flag = false;
 	boolean rand_flag = false;
@@ -63,7 +62,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	
 	ArrayList<RewriteRule> rewriteRuleList = new ArrayList<RewriteRule>(Arrays.asList(new Challenge(), new Response(), new Confirmation(), new Fake()));
 	
-	public MessageNspkBaseVisitor(NspkParser parser) {
+	public MessageNslpkBaseVisitor(NslpkParser parser) {
 		this.parser = parser;
 		this.prins._add(this.p);
 		this.prins._add(this.q);
@@ -124,7 +123,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitStart(NspkParser.StartContext ctx) {
+	@Override public T visitStart(NslpkParser.StartContext ctx) {
 		visitChildren(ctx);
 //		System.out.println(this.nw);
 //		System.out.println(this.rand);
@@ -142,7 +141,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNetworkOC(NspkParser.NetworkOCContext ctx) {
+	@Override public T visitNetworkOC(NslpkParser.NetworkOCContext ctx) {
 		this.nw_flag = true;
 		T t = visitChildren(ctx);
 		this.nw_flag = false;
@@ -154,7 +153,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRandOC(NspkParser.RandOCContext ctx) {
+	@Override public T visitRandOC(NslpkParser.RandOCContext ctx) {
 		this.rand_flag = true;
 		T t = visitChildren(ctx);
 		this.rand_flag = false;
@@ -167,7 +166,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNoncesOC(NspkParser.NoncesOCContext ctx) {
+	@Override public T visitNoncesOC(NslpkParser.NoncesOCContext ctx) {
 		this.nonces_flag = true;
 		T t = visitChildren(ctx);
 		this.nonces_flag = false;
@@ -179,7 +178,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPrinsOC(NspkParser.PrinsOCContext ctx) { 
+	@Override public T visitPrinsOC(NslpkParser.PrinsOCContext ctx) { 
 		return visitChildren(ctx);
 	}
 	/**
@@ -188,7 +187,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMessage(NspkParser.MessageContext ctx) {
+	@Override public T visitMessage(NslpkParser.MessageContext ctx) {
 		String message_name = ctx.MESSAGENAME().getText();
 		Principal creator = this.getPrin(ctx.prin(0).getText());
 		Principal sender = this.getPrin(ctx.prin(1).getText());
@@ -204,28 +203,28 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitMessagelist(NspkParser.MessagelistContext ctx) { return visitChildren(ctx); }
+	@Override public T visitMessagelist(NslpkParser.MessagelistContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPrin(NspkParser.PrinContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPrin(NslpkParser.PrinContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitPrinslist(NspkParser.PrinslistContext ctx) { return visitChildren(ctx); }
+	@Override public T visitPrinslist(NslpkParser.PrinslistContext ctx) { return visitChildren(ctx); }
 	/**
 	 * {@inheritDoc}
 	 *
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitCipher(NspkParser.CipherContext ctx) {
+	@Override public T visitCipher(NslpkParser.CipherContext ctx) {
 		if (ctx.getChild(0).getText().equals(Constants.c1)) {
 			Principal p = this.getPrin(ctx.prin(0).getText());
 			Principal q = this.getPrin(ctx.prin(1).getText());
@@ -236,9 +235,10 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 		
 		if (ctx.getChild(0).getText().equals(Constants.c2)) {
 			Principal p = this.getPrin(ctx.prin(0).getText());
+			Principal q = this.getPrin(ctx.prin(1).getText());
 			Nonce n1 = (Nonce) visit(ctx.nonce(0));
 			Nonce n2 = (Nonce) visit(ctx.nonce(1));
-			Cipher2 c2 = new Cipher2(p, n1, n2);
+			Cipher2 c2 = new Cipher2(p, n1, n2, q);
 			
 			return (T) c2;
 		}
@@ -258,7 +258,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNonce(NspkParser.NonceContext ctx) { 
+	@Override public T visitNonce(NslpkParser.NonceContext ctx) { 
 		if (this.nonces_flag) {
 			Principal p1 = this.getPrin(ctx.prin(0).getText());
 			Principal p2 = this.getPrin(ctx.prin(1).getText());
@@ -282,7 +282,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitNoncelist(NspkParser.NoncelistContext ctx) {
+	@Override public T visitNoncelist(NslpkParser.NoncelistContext ctx) {
 		return visitChildren(ctx);
 		
 	}
@@ -292,7 +292,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	 * <p>The default implementation returns the result of calling
 	 * {@link #visitChildren} on {@code ctx}.</p>
 	 */
-	@Override public T visitRandlist(NspkParser.RandlistContext ctx) {
+	@Override public T visitRandlist(NslpkParser.RandlistContext ctx) {
 		if (this.rand_flag) {
 			if (ctx.RAND() != null) {
 				Rand r = this.getRand(ctx.RAND().getText());
@@ -303,7 +303,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 		return visitChildren(ctx);
 	}
 	
-	public void enableRewriteRule(NspkParser.RwOCContext ctx, boolean flag) {
+	public void enableRewriteRule(NslpkParser.RwOCContext ctx, boolean flag) {
 		if (this.parser.getVocabulary().getLiteralName(this.parser.RW_P).replaceAll("\'","").equals(ctx.rw().getText())) {
 			this.rw_p_flag = flag;
 		}
@@ -316,7 +316,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	}
 	
 	@Override
-	public T visitRwOC(NspkParser.RwOCContext ctx) {
+	public T visitRwOC(NslpkParser.RwOCContext ctx) {
 		this.enableRewriteRule(ctx, true);
 		visitChildren(ctx);
 		this.enableRewriteRule(ctx, false);
@@ -324,7 +324,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	}
 
 	@Override
-	public T visitRulelist(NspkParser.RulelistContext ctx) {
+	public T visitRulelist(NslpkParser.RulelistContext ctx) {
 		if (ctx.RULE() != null) {
 			RewriteRule rw = this.getRewriteRule(ctx.RULE().getText());
 			if (rw != null) {
@@ -343,7 +343,7 @@ public class MessageNspkBaseVisitor<T> extends AbstractParseTreeVisitor<T> imple
 	}
 
 	@Override
-	public T visitRw(NspkParser.RwContext ctx) {
+	public T visitRw(NslpkParser.RwContext ctx) {
 		// TODO Auto-generated method stub
 		return null;
 	}

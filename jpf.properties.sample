@@ -2,10 +2,11 @@
 version=0.0.1
 secreteKey=OgataLab
 log4j.path=/Users/ogataslab/eclipse-workspace/spec-based/logs/log.out
-
-# cloudsync
+ 
 # abp
 # nspk
+# nslpk
+# cloudsync
 caseStudy=nspk
 
 # project base location

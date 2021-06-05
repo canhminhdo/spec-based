@@ -196,7 +196,7 @@ fmod CONFIG is
   eq init = {(nw: emp) (rand: (r1 r2)) (nonces: emp) (prins: (p q intrdr))} .
 endfm
 
-mod NSPK is
+mod NSLPK is
   inc CONFIG .
   var NW : Soup{Msg} .
   var R : Rand .
@@ -281,16 +281,16 @@ endm
 
 ***(
 *** Nonce secrecy property
-search [1] in NSPK : init =>* {(nonces: (n(P,Q,R) Ns)) OCs} such that P =/= intrdr /\ Q =/= intrdr .
+search [1] in NSLPK : init =>* {(nonces: (n(P,Q,R) Ns)) OCs} such that P =/= intrdr /\ Q =/= intrdr .
 show path 181915 .
 
 *** Correspondency property for initiator P
-search [1] in NSPK : init =>*
+search [1] in NSLPK : init =>*
 {(nw: (m1(P,P,Q,c1(Q,N,P)) m2(Q',Q,P,c2(P,N,N',Q)) m3(P,P,Q,c3(Q,N')) NW)) OCs}
 such that not (m2(Q,Q,P,c2(P,N,N',Q)) \in (m2(Q',Q,P,c2(P,N,N',Q)) NW)) /\ P =/= intrdr /\ Q =/= intrdr .
 
 *** Correspondency property for responder Q
-search [1] in NSPK : init =>*
+search [1] in NSLPK : init =>*
 {(nw: (m1(P',P,Q,c1(Q,N,P)) m2(Q,Q,P,c2(P,N,N',Q)) m3(P'',P,Q,c3(Q,N')) NW)) OCs}
 such that not (m1(P,P,Q,c1(Q,N,P)) \in (m1(P',P,Q,c1(Q,N,P)) NW) and
                          m3(P,P,Q,c3(Q,N')) \in (m3(P'',P,Q,c3(Q,N')) NW) )

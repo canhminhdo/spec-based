@@ -3,6 +3,7 @@ package nspk.main;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
 
 public class Principal extends Thread {	
@@ -132,7 +133,14 @@ public class Principal extends Thread {
 					Cipher1 c1 = (Cipher1) m1.getCipher();
 					Nonce n1 = c1.getNonce();
 					Nonce n2 = new Nonce(q, p, r);
-					Cipher2 c2 = new Cipher2(p, n1, n2, q);
+					
+					Cipher2 c2;
+					if (CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk")) {
+						c2 = new Cipher2(p, n1, n2, q); // for nslpk
+					} else {
+						c2 = new Cipher2(p, n1, n2); // for nspk
+					}
+					
 					Message<Cipher> m2 = new Message<Cipher>(Constants.m2, q, q, p, c2);
 					if (nw.add(m2)) {
 //						System.out.println(this + " - " + nw);

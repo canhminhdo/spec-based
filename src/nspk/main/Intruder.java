@@ -4,7 +4,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.logging.Logger;
 
+import config.CaseStudy;
 import gov.nasa.jpf.vm.Verify;
+import utils.DateUtil;
 
 public class Intruder extends Principal {
 	
@@ -101,7 +103,13 @@ public class Intruder extends Principal {
 			Principal p = this.fullController.getOne();	// receiver
 			Principal q = this.fullController.getNext(new ArrayList<Principal>(Arrays.asList(p)));	// sender
 			
-			Cipher2 c2 = new Cipher2(p, n1, n2, q);
+			Cipher2 c2;
+			if (CaseStudy.CASE_STUDY_NAME.equalsIgnoreCase("nslpk")) {
+				c2 = new Cipher2(p, n1, n2, q); // for nslpk
+			} else {
+				c2 = new Cipher2(p, n1, n2); // for nspk
+			}
+			
 			Message<Cipher> m2_fake = new Message<Cipher>(Constants.m2, this, q, p, c2);
 			if (nw.add(m2_fake)) {
 //				System.out.println(this + " - fake21 - " + nw);
@@ -178,7 +186,7 @@ public class Intruder extends Principal {
 //					+ "\n" + this.nw + "\n" + this.rand + "\n" + this.prins + "\n" + this.nonces;
 			
 			if (!n.getGen().isIntruder() && !n.getForWhom().isIntruder()) {
-				System.out.println("Nonce Secrecy Property (NSP) Violation: " + n.toString() + "\n" + this.nw + "\n" + this.rand + "\n" + this.prins + "\n" + this.nonces);
+				System.out.println("[" + DateUtil.getDateTimeString() + "] Nonce Secrecy Property (NSP) Violation: " + n.toString() + "\n" + this.nw + "\n" + this.rand + "\n" + this.prins + "\n" + this.nonces);
 			}
 		}
 		Verify.endAtomic();
