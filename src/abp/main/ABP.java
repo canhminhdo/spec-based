@@ -30,11 +30,12 @@ public class ABP<P> {
         DDropper<Pair<P,Boolean>,Boolean> ddropper = new DDropper<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         DDuplicator<Pair<P,Boolean>,Boolean> dduplicator = new DDuplicator<Pair<P,Boolean>,Boolean>(ch1,ch2,f);
         
-        Lock lock = new Lock();
-        sender.setLock(lock);
-        receiver.setLock(lock);
-        ddropper.setLock(lock);
-        dduplicator.setLock(lock);
+        Lock lock1 = new Lock();
+        Lock lock2 = new Lock();
+        sender.setLock(lock1, lock2);
+        receiver.setLock(lock1, lock2);
+        ddropper.setLock(lock1, lock2);
+        dduplicator.setLock(lock1, lock2);
         
         Verify.endAtomic();
         /*

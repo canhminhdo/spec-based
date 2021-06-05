@@ -16,18 +16,20 @@ public class DDuplicator<P,B> extends LockPool {
 
     public void run() {
         while (true) {
-            try { Thread.sleep(100); }
-            catch (InterruptedException e) { }
-            if (finish.get()) break;
+//            try { Thread.sleep(100); }
+//            catch (InterruptedException e) { }
+//        	if (finish.get()) break;
             
-            synchronized (this.getLock()) {
+            synchronized (this.getLock1()) {
             	Verify.beginAtomic();
+            	if (finish.get()) break;
             	P p = channel1.duptop();
             	Verify.endAtomic();
 			}
             
-            synchronized (this.getLock()) {
+            synchronized (this.getLock2()) {
             	Verify.beginAtomic();
+            	if (finish.get()) break;
             	B b = channel2.duptop();
             	Verify.endAtomic();
 			}

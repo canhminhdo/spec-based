@@ -33,7 +33,7 @@ public class Sender<P> extends LockPool {
     		Pair<P,Boolean> pr = new Pair<P,Boolean>(((List<P>)packetsToBeSent).get(i),flag1);
     		
             while (true) {
-            	synchronized (this.getLock()) {
+            	synchronized (this.getLock1()) {
             		Verify.beginAtomic();
                     channel1.put(pr);
                     Verify.endAtomic();
@@ -44,7 +44,7 @@ public class Sender<P> extends LockPool {
                 */
                 
                 Boolean flag = false;
-                synchronized (this.getLock()) {
+                synchronized (this.getLock2()) {
 	                Verify.beginAtomic();
 	                Boolean b = channel2.get();
 	                if (b != null) {
