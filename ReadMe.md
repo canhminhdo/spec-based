@@ -4,11 +4,11 @@
 Brevity, for a formal specification S and a concurrent program P, state sequences are generated from P and checked to be accepted by S. We suppose that S is specified in Maude and P is implemented in Java. Java Pathfinder (JPF) and Maude are then used to generate state sequences from P and to check if such state sequences are accepted by S, respectively. Even without checking any property violations with JPF, JPF often encounters the notorious state space explosion while only generating state sequences. Thus, we propose a technique to generate state sequences from P and check if such state sequences are accepted by S in a stratified way. Some experiments demonstrate that the proposed technique mitigates the state space explosion instances from which otherwise only one JPF instance cannot suffice.
 
 ## Features
-- Generating all possible state sequences from concurrent Java programs by PDF
+- Generating all possible state sequences from concurrent Java programs by JPF
 
-- Checking state sequences on the fly by Maude programs.
+- Checking state sequences with Maude specification on the fly.
 
-- Divide & Conquer approach to generate state sequences in a stratified way.
+- Divide & Conquer approach to generating state sequences in a stratified way.
 
 - Parallelizing the whole process of environment from generating state sequences to checking such state sequences to be accepted by specifications.
 
@@ -17,18 +17,21 @@ Brevity, for a formal specification S and a concurrent program P, state sequence
 - Redis is used as a cache memory to avoid duplicate states as well as state sequences.
 - RabbitMQ is used as message broker to deliver messages to workers.
 - Maude is used to load specification and test state sequences by using meta-programing supported by itself.
-- JPF is known as a model checker software specialized to Java programs. We have used JPF to generate state sequences instead of model checking Java programs.
+- JPF is known as a model checker software specialized to Java programs which is used to generate state sequences.
 
 ## How to install
 - Clone the source code to your computer and go to the source code directory.
 
-- Copy **config.properties.sample** file to **config.properties**. All configuration is set into this file.
+- Copy **jpf.properties.sample** file to **jpf.properties**. All configuration is set into this file.
 
 - The environment supports two modes running, including local and remote modes.
 
-- Check the configuration with Redis, RabbitMQ as well as MySQL in the file configuration.
+- Check the configuration with Redis, RabbitMQ as well as MySQL in the configuration file.
 
-- To more extends, if you want to conduct a new case study with the environment, you need to create your own CaseStudy by extending from config.CaseStudy class. And then do as follows:
+- To run experiments, you need to change the "caseStudy" in the configuration that correspond to which case study being checked
+
+- To extend more case studies, if you want to conduct a new case study with the environment, you need to create your own CaseStudy by extending from config.CaseStudy class. And then do as follows:
+
     - Configure the application with your own case study in server.ApplicationConfiguration file.
 
     - Overwrite the initial message sending to the system for kick off, getInitialMessage method in your own CaseStudy file.
@@ -39,7 +42,7 @@ Brevity, for a formal specification S and a concurrent program P, state sequence
 Some case studies are conducted to proof the correctness as well as the efficiency of the environment as follows.
 - Test & Set Protocol (TAS)
 - Alternative Bit Protocol (ABP)
-- Needham-Schroeder Public-key Authentication Protocol (NSPK)
+- Needham-Schroeder Public-key Authentication Protocol (NSPK and NSLPK)
 - Simplified Cloud Synchronization Protocol (CloudSync)
 
 ## Publication
@@ -49,8 +52,8 @@ Some case studies are conducted to proof the correctness as well as the efficien
 
 ## Known Issues
 
-Checking the known issues at [here](https://github.com/minhcanh99/spec-based/issues). You are appriciated to report bug to improve the extension as well.
+Checking the known issues at [here](https://github.com/minhcanh99/spec-based/issues). You are appreciated to report bug to improve the extension as well.
 
 ## Release Notes
 
-### 0.0.1
+### 1.0.1
