@@ -30,6 +30,7 @@ public class MaudeWorker {
 	public static Long currentTime = DateUtil.getTime();
 	public static int timeOut = 1 * 60 * 1000;	// 1 minutes
 	public static int batch = 100;
+	public static int count;
 	
 	/**
 	 * Starting a RabbitMQ client.
@@ -52,7 +53,8 @@ public class MaudeWorker {
 		DeliverCallback deliverCallback = (consumerTag, delivery) -> {
 			String seq = SerializationUtils.deserialize(delivery.getBody());
 //			String seq = AES.decrypt(cipher, CaseStudy.SECRETE_KEY);
-			System.out.println(" [x] Received ");
+			MaudeWorker.count += 1;
+			System.out.println(" [x] Received " + MaudeWorker.count);
 			maude.checkSeq(app.getCaseStudy().getCommand(), seq, CaseStudy.MAUDE_DEPTH);
 			OutputParser output = new OutputParser(maude.getOutput());
 			output.parsing();

@@ -30,7 +30,7 @@ public class Receiver<P> extends LockPool {
 
     public void run() {
         while (true) {
-        	synchronized (this.getLock2()) {
+        	synchronized (this.getLock()) {
         		Verify.beginAtomic();
         		if (finish.get()) break;
         		Boolean b = channel2.put(flag2);
@@ -41,7 +41,7 @@ public class Receiver<P> extends LockPool {
                 System.out.println("RecSending " + flag2);
             */
             
-        	synchronized (this.getLock1()) {
+        	synchronized (this.getLock()) {
         		Verify.beginAtomic();
         		if (finish.get()) break;
         		Pair<P,Boolean> pr = channel1.get();

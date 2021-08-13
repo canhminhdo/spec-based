@@ -34,7 +34,7 @@ public class ABPStudy extends CaseStudy {
 	// packets will send over network
 	public static String PACKETS[] = { "0", "1", "2", "3" };
 	// channel size
-	public static int BOUND = 1;
+	public static int BOUND = 3;
 
 	@Override
 	public String getQueueName() {

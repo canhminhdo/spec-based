@@ -20,14 +20,14 @@ public class DDropper<P,B> extends LockPool {
 //            catch (InterruptedException e) { }
 //            if (finish.get()) break;
             
-            synchronized (this.getLock1()) {
+            synchronized (this.getLock()) {
             	Verify.beginAtomic();
             	if (finish.get()) break;
                 P p = channel1.get();
                 Verify.endAtomic();
 			}
             
-            synchronized (this.getLock2()) {
+            synchronized (this.getLock()) {
             	Verify.beginAtomic();
             	if (finish.get()) break;
                 B b = channel2.get();
