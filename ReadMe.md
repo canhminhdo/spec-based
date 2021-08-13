@@ -10,14 +10,14 @@ Brevity, for a formal specification S and a concurrent program P, state sequence
 
 - Divide & Conquer approach to generating state sequences in a stratified way.
 
-- Parallelizing the whole process of environment from generating state sequences to checking such state sequences to be accepted by specifications.
+- Parallelizing the whole process of the environment from generating state sequences to checking such state sequences to be accepted by specifications.
 
 ## Dependences
-- MySQL is a relational database which is used to save all state sequences after checked by Maude programs.
-- Redis is used as a cache memory to avoid duplicate states as well as state sequences.
-- RabbitMQ is used as message broker to deliver messages to workers.
+- MySQL is a relational database that is used to save all state sequences after being checked by Maude programs.
+- Redis is used as a memory cache to avoid duplicate states as well as state sequences.
+- RabbitMQ is used as a message broker to deliver messages to workers.
 - Maude is used to load specification and test state sequences by using meta-programing supported by itself.
-- JPF is known as a model checker software specialized to Java programs which is used to generate state sequences.
+- JPF is known as a model checker software specialized in Java programs that is used to generate state sequences.
 
 ## How to install
 - Clone the source code to your computer and go to the source code directory.
@@ -28,18 +28,18 @@ Brevity, for a formal specification S and a concurrent program P, state sequence
 
 - Check the configuration with Redis, RabbitMQ as well as MySQL in the configuration file.
 
-- To run experiments, you need to change the "caseStudy" in the configuration that correspond to which case study being checked
+- To run experiments, you need to change the "caseStudy" key in the configuration file that corresponds to a case study being checked.
 
 - To extend more case studies, if you want to conduct a new case study with the environment, you need to create your own CaseStudy by extending from config.CaseStudy class. And then do as follows:
 
     - Configure the application with your own case study in server.ApplicationConfiguration file.
 
-    - Overwrite the initial message sending to the system for kick off, getInitialMessage method in your own CaseStudy file.
+    - Overwrite the initial message sending to the system for kick-off, getInitialMessage method in your own CaseStudy file.
     
     - Remember to change the case study in the configuration file, in which you may run your own case study.
 
 ## Case Studies
-Some case studies are conducted to proof the correctness as well as the efficiency of the environment as follows.
+Some case studies are conducted to demonstrate the correctness as well as the efficiency of the environment as follows.
 - Test & Set Protocol (TAS)
 - Alternative Bit Protocol (ABP)
 - Needham-Schroeder Public-key Authentication Protocol (NSPK and NSLPK)
@@ -52,7 +52,7 @@ Some case studies are conducted to proof the correctness as well as the efficien
 
 ## Known Issues
 
-Checking the known issues at [here](https://github.com/minhcanh99/spec-based/issues). You are appreciated to report bug to improve the extension as well.
+Checking the known issues at [here](https://github.com/minhcanh99/spec-based/issues). You are appreciated to report bugs to improve the extension as well.
 
 ## Release Notes
 
