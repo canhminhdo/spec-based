@@ -48,7 +48,7 @@ public class BmcSender extends SenderFactory {
 	public void sendJob(OC message) {
 		try {
 			rabbitClient.basicPublish(getQueueServe(), SerializationUtils.serialize(message));
-			logger.debug(" [x] Sent '" + message);
+			System.out.println(" [x] Sent '" + message);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
