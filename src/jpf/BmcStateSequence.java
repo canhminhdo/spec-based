@@ -47,21 +47,21 @@ public class BmcStateSequence extends StateSequence {
 			}
 			depth -= DEPTH;
 		}
-//		if (jedisSet.sismember(jedisSet.getDepthSetName(this.nextDepth), elementSha256)) {
-//			return;
-//		}
-		
-		if (!lastElement.isFinished() && lastElement.isReady()) {
-			// saving to set of hash of states at a depth
-			jedisSet.sadd(jedisSet.getDepthSetName(this.nextDepth), elementSha256);
-			// saving to a hash table where key is the hash of a state, value is the encoded string of a state
-			if (app.getCaseStudy().isStoreStatesInRedis()) {
-				jedisHash.hset(jedisHash.getStoreNameAtDepth(this.nextDepth), elementSha256, SerializationUtilsExt.serializeToStr(lastElement));
-			}
-			if (is_publish) {
-				sender.sendJob(lastElement);
-			}
+		if (jedisSet.sismember(jedisSet.getDepthSetName(this.nextDepth), elementSha256)) {
+			return;
 		}
+		
+//		if (!lastElement.isFinished() && lastElement.isReady()) {
+//			// saving to set of hash of states at a depth
+//			jedisSet.sadd(jedisSet.getDepthSetName(this.nextDepth), elementSha256);
+//			// saving to a hash table where key is the hash of a state, value is the encoded string of a state
+//			if (app.getCaseStudy().isStoreStatesInRedis()) {
+//				jedisHash.hset(jedisHash.getStoreNameAtDepth(this.nextDepth), elementSha256, SerializationUtilsExt.serializeToStr(lastElement));
+//			}
+//			if (is_publish) {
+//				sender.sendJob(lastElement);
+//			}
+//		}
 	}
 
 	@Override

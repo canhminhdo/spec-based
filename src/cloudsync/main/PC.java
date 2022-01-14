@@ -92,9 +92,9 @@ public class PC extends Thread implements Serializable {
 	public boolean getval() {
 		synchronized (cloud) {
 			if (isIdlep() && cloud.isIdelc()) {
-				Verify.beginAtomic();
-				this.modval();
-				Verify.endAtomic();
+//				Verify.beginAtomic();
+//				this.modval();
+//				Verify.endAtomic();
 				
 				Verify.beginAtomic();
 				setTmp(cloud.getValc());
