@@ -38,9 +38,18 @@ public class BmcStateSequence extends StateSequence {
 			return;
 		String elementSha256 = GFG.getSHA(lastElement.toString());
 		lastElement.setCurrentDepth(this.nextDepth);
-		// if already existing is depth set
-		if (jedisSet.sismember(jedisSet.getDepthSetName(this.nextDepth), elementSha256))
-			return;
+		// if existing in current layer and previous layers
+		int depth = this.nextDepth;
+		while (depth >= 0) {
+			if (jedisSet.sismember(jedisSet.getDepthSetName(depth), elementSha256)) {
+				System.out.println("Hit cache at depth " + depth);
+				return;
+			}
+			depth -= DEPTH;
+		}
+//		if (jedisSet.sismember(jedisSet.getDepthSetName(this.nextDepth), elementSha256)) {
+//			return;
+//		}
 		
 		if (!lastElement.isFinished() && lastElement.isReady()) {
 			// saving to set of hash of states at a depth
