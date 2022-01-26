@@ -90,7 +90,7 @@ public class Sender {
 			// Encrypt before sending
 			String cipher = AES.encrypt(seq, CaseStudy.SECRETE_KEY);
 			channel.basicPublish("", this.rabbitMQ.getMaudeQueue(), null, SerializationUtils.serialize(seq));
-			System.out.println(" [x] Sent to Maude '" + seq);
+//			System.out.println(" [x] Sent to Maude '" + seq);
 		} catch (Exception e) {
 			System.out.println("Cannot send message on queue " + this.rabbitMQ.getMaudeQueue());
 			e.printStackTrace();
